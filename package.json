@@ -13,10 +13,12 @@
     "format": "prettier --write \\\"**/*.{js,ts,vue,jsx,tsx,json,css,scss,md}\\\""
   },
   "dependencies": {
+    "@tailwindcss/vite": "^4.1.5",
     "ant-design-vue": "4.x",
     "axios": "^1.9.0",
     "normalize.css": "^8.0.1",
     "pinia": "^3.0.2",
+    "tailwindcss": "^4.1.5",
     "vue": "^3.5.13",
     "vue-router": "^4.5.1"
   },
