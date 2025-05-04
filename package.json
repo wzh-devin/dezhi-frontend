@@ -13,6 +13,7 @@
     "format": "prettier --write \\\"**/*.{js,ts,vue,jsx,tsx,json,css,scss,md}\\\""
   },
   "dependencies": {
+    "@ant-design/icons-vue": "^7.0.1",
     "@tailwindcss/vite": "^4.1.5",
     "ant-design-vue": "4.x",
     "axios": "^1.9.0",

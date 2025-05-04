@@ -7,6 +7,7 @@
  */
 import axios, { type AxiosInstance, type InternalAxiosRequestConfig } from 'axios'
 import { BASE_URL, TIME_OUT } from '../config'
+import { TOKEN_KEY } from '../../../../constant/global-key.ts'
 
 const axiosInstance: AxiosInstance = axios.create({
   baseURL: BASE_URL,
@@ -19,11 +20,10 @@ const axiosInstance: AxiosInstance = axios.create({
 // 请求拦截器
 axiosInstance.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
-    // TODO 添加 token 到请求头
-    // const token = getToken()
-    // if (token) {
-    //   config.headers.token = `${token}`
-    // }
+    const token = localStorage.getItem(TOKEN_KEY) ?? ''
+    if (token) {
+      config.headers.token = `${token}`
+    }
     return config
   },
   (error) => {
