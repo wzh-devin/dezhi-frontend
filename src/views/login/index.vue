@@ -11,31 +11,31 @@ import EmailLogin from '@/views/login/cmps/EmailLogin.vue'
 </script>
 
 <template>
-  <a-row class="login-row">
+  <ARow class="login-row">
     <!-- 左侧看板 -->
-    <a-col class="left-panel" :span="11">
+    <ACol class="left-panel" :span="11">
       <div class="logo-container">
         <div class="brand-logo-text">
           <img src="/public/logo.png" alt="DeZhi Logo" class="brand-logo-img" />
           <span class="brand-text"><span class="brand-text-rest">eZhi</span></span>
         </div>
       </div>
-    </a-col>
+    </ACol>
 
     <!-- 右侧登录看板 -->
-    <a-col class="right-panel" :span="13">
+    <ACol class="right-panel" :span="13">
       <div class="login-form-container">
-        <a-tabs default-active-key="account" class="login-tabs">
-          <a-tab-pane key="account" tab="账号密码登录">
+        <ATabs default-active-key="account" class="login-tabs">
+          <ATabPane key="account" tab="账号密码登录">
             <AccountLogin />
-          </a-tab-pane>
-          <a-tab-pane key="email" tab="验证码登录">
+          </ATabPane>
+          <ATabPane key="email" tab="验证码登录">
             <EmailLogin />
-          </a-tab-pane>
-        </a-tabs>
+          </ATabPane>
+        </ATabs>
       </div>
-    </a-col>
-  </a-row>
+    </ACol>
+  </ARow>
 </template>
 
 <style scoped lang="less">

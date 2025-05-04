@@ -7,33 +7,59 @@
  * @since 1.0
  */
 import { MailOutlined, PhoneOutlined } from '@ant-design/icons-vue'
+import { reactive } from 'vue'
+import { loginFormRules, type LoginPage } from '@/interfaces/pages/login-page.js'
+import EmailCodeButton from '@components/btn/EmailCodeButton.vue'
+import { message } from 'ant-design-vue'
+import useLoginStore from '@/store/login'
+
+/**
+ * 登录表单
+ */
+const loginPage = reactive<LoginPage>({
+  loginForm: {
+    email: '',
+    code: '',
+  },
+})
+
+const loginStore = useLoginStore()
+
+/**
+ * 登录提交执行
+ */
+const submitHandler = async () => {
+  console.log(loginPage.loginForm)
+  await loginStore.loginEmail(loginPage.loginForm)
+  message.success('登录成功')
+}
 </script>
 
 <template>
-  <a-form class="login-form">
-    <a-form-item>
-      <a-input type="email" placeholder="请输入邮箱">
+  <AForm class="login-form" :model="loginPage.loginForm" :rules="loginFormRules">
+    <AFormItem name="email">
+      <AInput type="email" placeholder="请输入邮箱" v-model:value="loginPage.loginForm.email">
         <template #prefix>
           <MailOutlined />
         </template>
-      </a-input>
-    </a-form-item>
-    <a-form-item>
+      </AInput>
+    </AFormItem>
+    <AFormItem name="code">
       <div class="code-row">
-        <a-input placeholder="请输入验证码">
+        <AInput placeholder="请输入验证码" v-model:value="loginPage.loginForm.code">
           <template #prefix>
             <PhoneOutlined />
           </template>
-        </a-input>
-        <a-button type="primary" class="code-btn">获取验证码</a-button>
+        </AInput>
+        <EmailCodeButton :email="loginPage.loginForm.email" />
       </div>
-    </a-form-item>
-    <a-form-item>
-      <a-button type="primary" block>登 录</a-button>
-    </a-form-item>
+    </AFormItem>
+    <AFormItem>
+      <AButton type="primary" block @click="submitHandler">登 录</AButton>
+    </AFormItem>
     <div class="divider">或</div>
     <div class="register-link">还没有账号？<a href="#">立即注册</a></div>
-  </a-form>
+  </AForm>
 </template>
 
 <style scoped lang="less">
@@ -70,11 +96,6 @@ import { MailOutlined, PhoneOutlined } from '@ant-design/icons-vue'
 
   .ant-input {
     flex: 1;
-  }
-
-  .code-btn {
-    padding: 0 16px;
-    margin-left: 8px;
   }
 }
 </style>

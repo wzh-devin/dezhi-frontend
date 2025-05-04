@@ -6,10 +6,10 @@
  * @since 1.0
  */
 import type { UserInfo } from '../../interfaces/entity/user/user-info.ts'
-import { post } from '../../utils/http/axios'
+import { get, post } from '../../utils/http/axios'
 
 /**
- * 账号登录请求
+ * 登录请求
  * @param userInfo 账号信息
  * @return token
  */
@@ -21,4 +21,26 @@ const loginAccount = async (userInfo: UserInfo): Promise<{ token: string }> => {
   return result?.data as { token: string }
 }
 
-export { loginAccount }
+/**
+ * 获取邮箱验证码
+ * @param email 邮箱
+ */
+const getEmailCode = async (email: string): Promise<void> => {
+  return await get({
+    url: `/user/getEmailCode?email=${email}`,
+  })
+}
+
+/**
+ * 邮箱登录
+ * @param userInfo
+ */
+const loginEmail = async (userInfo: UserInfo): Promise<{ token: string }> => {
+  const result = await post({
+    url: '/user/loginEmail',
+    data: userInfo,
+  })
+  return result?.data as { token: string }
+}
+
+export { loginAccount, getEmailCode, loginEmail }

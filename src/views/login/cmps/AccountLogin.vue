@@ -9,14 +9,14 @@
 import { UnlockOutlined, UserOutlined } from '@ant-design/icons-vue'
 import { reactive } from 'vue'
 import { message } from 'ant-design-vue'
-import type { LoginForm } from '@/interfaces/form/login-form.ts'
+import { loginFormRules, type LoginPage } from '@/interfaces/pages/login-page.js'
 import useLoginStore from '@/store/login'
 
 /**
  * 登录表单属性设置
  */
-const loginForm = reactive<LoginForm>({
-  userInfo: {
+const loginPage = reactive<LoginPage>({
+  loginForm: {
     username: '',
     password: '',
   },
@@ -29,38 +29,39 @@ const loginStore = useLoginStore()
  * 登录提交执行
  */
 const submitHandler = async () => {
-  console.log(loginForm.userInfo)
-  await loginStore.loginAccount(loginForm.userInfo)
-  message.success('登录成功')
+  loginStore.loginAccount(loginPage.loginForm).then(
+    () => message.success('登录成功'),
+    () => message.error('登录失败，请联系管理员！！！'),
+  )
 }
 </script>
 
 <template>
-  <a-form class="login-form" :model="loginForm">
-    <a-form-item>
-      <a-input placeholder="请输入账号" v-model:value="loginForm.userInfo.username">
+  <AForm class="login-form" :model="loginPage.loginForm" :rules="loginFormRules">
+    <AFormItem name="username">
+      <AInput placeholder="请输入账号" v-model:value="loginPage.loginForm.username">
         <template #prefix>
           <UserOutlined />
         </template>
-      </a-input>
-    </a-form-item>
-    <a-form-item>
-      <a-input-password placeholder="请输入密码" v-model:value="loginForm.userInfo.password">
+      </AInput>
+    </AFormItem>
+    <AFormItem name="password">
+      <AInputPassword placeholder="请输入密码" v-model:value="loginPage.loginForm.password">
         <template #prefix>
           <UnlockOutlined />
         </template>
-      </a-input-password>
-    </a-form-item>
+      </AInputPassword>
+    </AFormItem>
     <div class="form-options">
-      <a-checkbox>记住密码</a-checkbox>
+      <ACheckbox>记住密码</ACheckbox>
       <a href="#" class="forgot-link">忘记密码?</a>
     </div>
-    <a-form-item>
+    <AFormItem>
       <a-button type="primary" block @click="submitHandler">登 录</a-button>
-    </a-form-item>
+    </AFormItem>
     <div class="divider">或</div>
     <div class="register-link">还没有账号？<a href="#">立即注册</a></div>
-  </a-form>
+  </AForm>
 </template>
 
 <style scoped lang="less">

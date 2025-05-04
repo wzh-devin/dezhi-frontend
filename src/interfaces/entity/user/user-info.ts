@@ -30,4 +30,9 @@ export interface UserInfo {
    * 邮箱
    */
   email?: string
+
+  /**
+   * 邮箱验证码
+   */
+  code?: number
 }
