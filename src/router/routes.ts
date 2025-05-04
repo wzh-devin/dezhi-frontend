@@ -7,6 +7,12 @@
  */
 import type { RouteRecordRaw } from 'vue-router'
 
-const routes: RouteRecordRaw = []
+const routes: RouteRecordRaw = [
+  {
+    path: '/',
+    name: 'root',
+    component: () => import('@/views/login/index.vue'),
+  },
+]
 
 export default routes
