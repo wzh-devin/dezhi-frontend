@@ -9,9 +9,10 @@
 import { MailOutlined, PhoneOutlined } from '@ant-design/icons-vue'
 import { reactive } from 'vue'
 import { loginFormRules, type LoginPage } from '@/interfaces/pages/login-page.js'
-import EmailCodeButton from '@components/btn/EmailCodeButton.vue'
+import EmailCodeButton from '@components/btn-cmp/EmailCodeButton.vue'
 import { message } from 'ant-design-vue'
 import useLoginStore from '@/store/login'
+import { errMsgExtract } from '@/global/string-format.ts'
 
 /**
  * 登录表单
@@ -29,9 +30,10 @@ const loginStore = useLoginStore()
  * 登录提交执行
  */
 const submitHandler = async () => {
-  console.log(loginPage.loginForm)
-  await loginStore.loginEmail(loginPage.loginForm)
-  message.success('登录成功')
+  loginStore.loginEmailAction(loginPage.loginForm).then(
+    () => message.success('登录成功'),
+    (error) => errMsgExtract(error),
+  )
 }
 </script>
 
@@ -57,8 +59,6 @@ const submitHandler = async () => {
     <AFormItem>
       <AButton type="primary" block @click="submitHandler">登 录</AButton>
     </AFormItem>
-    <div class="divider">或</div>
-    <div class="register-link">还没有账号？<a href="#">立即注册</a></div>
   </AForm>
 </template>
 
@@ -72,21 +72,6 @@ const submitHandler = async () => {
   justify-content: space-between;
   align-items: center;
   margin-bottom: 16px;
-}
-
-.forgot-link {
-  font-size: 14px;
-}
-
-.divider {
-  text-align: center;
-  color: #bfbfbf;
-  margin: 16px 0 8px 0;
-}
-
-.register-link {
-  text-align: center;
-  font-size: 14px;
 }
 
 .code-row {
