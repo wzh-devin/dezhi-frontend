@@ -12,8 +12,11 @@ import { reactive, ref } from 'vue'
 import { type CommonModalConfig, FieldType, ModalType } from '@components/modal-cmp/common-modal.d.ts'
 import { MailOutlined, PhoneOutlined, UnlockOutlined, UserOutlined } from '@ant-design/icons-vue'
 import CommonModal from '@components/modal-cmp/CommonModal.vue'
+import { signup } from '@/api/login'
+import { message } from 'ant-design-vue'
+import { errMsgExtract } from '@/global/string-format.ts'
 
-const commonModalRef = ref()
+const registerModalRef = ref()
 
 // 注册弹窗类型配置
 const registerModalProps = reactive<CommonModalConfig>({
@@ -69,9 +72,21 @@ const registerModalProps = reactive<CommonModalConfig>({
   },
 })
 
-const registerHandler = (formData) => {
-  // TODO: 提交注册信息
-  console.log('注册信息：', formData)
+/**
+ * 用户注册
+ * @param formData 表单数据
+ */
+const registerHandler = async (formData) => {
+  signup(formData).then(
+    () => {
+      registerModalRef?.value.hiddenModal()
+      registerModalRef?.value.clearFormData()
+      message.success('信息注册成功, 请进行登录')
+    },
+    (error) => {
+      errMsgExtract(error)
+    },
+  )
 }
 </script>
 
@@ -101,7 +116,7 @@ const registerHandler = (formData) => {
         <div class="divider">或</div>
         <div class="register-link">
           还没有账号？
-          <a @click="commonModalRef.showModal()">立即注册</a>
+          <a @click="registerModalRef.showModal()">立即注册</a>
         </div>
       </div>
     </ACol>
@@ -109,7 +124,7 @@ const registerHandler = (formData) => {
 
   <!-- 账号注册弹窗 -->
   <CommonModal
-    ref="commonModalRef"
+    ref="registerModalRef"
     :form-data="registerModalProps.formData"
     :type="ModalType.FORM"
     :loading="registerModalProps.loading"

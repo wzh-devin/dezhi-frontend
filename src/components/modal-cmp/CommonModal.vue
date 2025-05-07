@@ -6,7 +6,7 @@
  * @version 1.0
  * @since 1.0
  */
-import { defineProps, type PropType, reactive, ref, defineEmits } from 'vue'
+import { defineProps, type PropType, reactive, ref, defineEmits, computed } from 'vue'
 import {
   FieldType,
   type FormFieldConfig,
@@ -14,6 +14,7 @@ import {
   ModalType,
 } from '@components/modal-cmp/common-modal.d.ts'
 import EmailCodeButton from '@components/btn-cmp/EmailCodeButton.vue'
+import { message } from 'ant-design-vue'
 
 const emit = defineEmits(['confirm'])
 
@@ -21,11 +22,6 @@ const props = defineProps({
   title: {
     type: String,
     required: true,
-  },
-  loading: {
-    type: Boolean,
-    required: false,
-    default: false,
   },
   type: {
     type: Number,
@@ -65,18 +61,35 @@ const props = defineProps({
 const open = ref<boolean>(false)
 
 // 加载状态
-const loading = ref<boolean>(props.loading)
+const loading = ref<boolean>(false)
 
 // 表单数据
 const formData = reactive<{ key: string; value: string }>(props.formData)
+
+const formRef = ref()
+
+const formRules = computed(() => {
+  const rules: Record<string, object[]> = {}
+  if (props.formItemsConfig) {
+    props.formItemsConfig.forEach((item) => {
+      if (item.rules) rules[item.name] = item.rules
+    })
+  }
+  return rules
+})
 
 /**
  * 确认函数
  */
 const confirmHandler = () => {
-  emit('confirm', formData)
-  hiddenModal()
-  clearFormData()
+  formRef.value
+    ?.validate()
+    .then(() => {
+      emit('confirm', formData)
+    })
+    .catch(() => {
+      message.warn('请检查信息是否填写合规！！！')
+    })
 }
 
 /**
@@ -87,11 +100,12 @@ const cancelHandler = () => {
   clearFormData()
 }
 
-// 清空表单
+// 清空表单 & 重置表单校验
 const clearFormData = () => {
   for (const key in formData) {
     formData[key] = ''
   }
+  formRef.value?.resetFields()
 }
 
 /**
@@ -111,6 +125,7 @@ const hiddenModal = () => {
 defineExpose({
   showModal,
   hiddenModal,
+  clearFormData,
 })
 </script>
 
@@ -130,7 +145,7 @@ defineExpose({
     </template>
     <!-- 表单类型 -->
     <template v-else-if="props.type === ModalType.FORM">
-      <AForm v-model:value="formData">
+      <AForm :model="formData" :rules="formRules" ref="formRef">
         <template v-for="(field, index) in props.formItemsConfig" :key="index">
           <!-- 普通输入框 -->
           <AFormItem :name="field.name" :rules="field.rules" v-if="field.type === FieldType.NORMAL_INPUT">
@@ -157,7 +172,7 @@ defineExpose({
                   <component :is="field?.icon" />
                 </template>
               </AInput>
-              <EmailCodeButton :email="formData[field.name]" />
+              <EmailCodeButton :email="formData.email" />
             </div>
           </AFormItem>
         </template>

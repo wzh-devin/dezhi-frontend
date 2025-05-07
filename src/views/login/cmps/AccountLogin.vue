@@ -11,6 +11,7 @@ import { reactive } from 'vue'
 import { message } from 'ant-design-vue'
 import { loginFormRules, type LoginPage } from '@/interfaces/pages/login-page.js'
 import useLoginStore from '@/store/login'
+import { errMsgExtract } from '@/global/string-format.ts'
 
 /**
  * 登录表单属性设置
@@ -31,7 +32,7 @@ const loginStore = useLoginStore()
 const submitHandler = async () => {
   loginStore.loginAccount(loginPage.loginForm).then(
     () => message.success('登录成功'),
-    () => message.error('登录失败，请联系管理员！！！'),
+    (error) => errMsgExtract(error),
   )
 }
 </script>

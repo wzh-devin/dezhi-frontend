@@ -12,17 +12,17 @@ export enum ModalType {
   /**
    * 普通文本弹窗
    */
-  NORMAL_TEXT,
+  NORMAL_TEXT = 'normal-text',
 
   /**
    * 表单类型弹窗
    */
-  FORM,
+  FORM = 'form',
 
   /**
    * 页面类型弹窗
    */
-  PAGE,
+  PAGE = 'page',
 }
 
 export enum FieldType {
@@ -100,7 +100,7 @@ export interface CommonModalConfig {
   /**
    * 弹窗类型
    */
-  type: string
+  type: 'normal-text' | 'form' | 'page'
 
   /**
    * 文本弹窗展示的内容
@@ -111,6 +111,11 @@ export interface CommonModalConfig {
    * 表单弹窗配置
    */
   formConfig?: FormFieldConfig[]
+
+  /**
+   * 表单数据
+   */
+  formData?: object
 
   /**
    * TODO 页面弹窗配置

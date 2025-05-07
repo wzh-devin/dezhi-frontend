@@ -32,7 +32,7 @@ const useLoginStore = defineStore('login', {
      * 邮箱登录行为
      * @param userInfo 用户信息
      */
-    async loginEmail(userInfo: UserInfo): void {
+    async loginEmail(userInfo: UserInfo): Promise<void> {
       // 获取token & 将token保存到本地
       const { token } = await loginEmail(userInfo)
       localStorage.setItem(TOKEN_KEY, token)
