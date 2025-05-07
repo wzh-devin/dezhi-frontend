@@ -7,7 +7,7 @@
  */
 import { defineStore } from 'pinia'
 import type { UserInfo } from '../../interfaces/entity/user/user-info.ts'
-import { loginAccount, loginEmail } from '../../api/login'
+import { forgetPassword, loginAccount, loginEmail, signup } from '../../api/login'
 import { TOKEN_KEY } from '../../constant/global-key.ts'
 
 interface LoginState {
@@ -23,7 +23,7 @@ const useLoginStore = defineStore('login', {
      * 账号登录行为
      * @param userInfo 用户信息
      */
-    async loginAccount(userInfo: UserInfo): Promise<void> {
+    async loginAccountAction(userInfo: UserInfo): Promise<void> {
       // 获取token & 将token保存到本地
       const { token } = await loginAccount(userInfo)
       localStorage.setItem(TOKEN_KEY, token)
@@ -32,10 +32,24 @@ const useLoginStore = defineStore('login', {
      * 邮箱登录行为
      * @param userInfo 用户信息
      */
-    async loginEmail(userInfo: UserInfo): void {
+    async loginEmailAction(userInfo: UserInfo): Promise<void> {
       // 获取token & 将token保存到本地
       const { token } = await loginEmail(userInfo)
       localStorage.setItem(TOKEN_KEY, token)
+    },
+    /**
+     * 注册行为
+     * @param userInfo 用户信息
+     */
+    async signupAction(userInfo: UserInfo): Promise<void> {
+      await signup(userInfo)
+    },
+    /**
+     * 忘记密码行为
+     * @param userInfo 用户信息
+     */
+    async forgetPasswordAction(userInfo: UserInfo): Promise<void> {
+      await forgetPassword(userInfo)
     },
   },
 })

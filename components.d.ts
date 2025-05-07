@@ -19,6 +19,8 @@ declare module 'vue' {
     ARow: typeof import('ant-design-vue/es')['Row']
     ATabPane: typeof import('ant-design-vue/es')['TabPane']
     ATabs: typeof import('ant-design-vue/es')['Tabs']
+    CommonModal: typeof import('./src/components/modal-cmp/CommonModal.vue')['default']
+    EmailCodeButton: typeof import('./src/components/btn-cmp/EmailCodeButton.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
   }
