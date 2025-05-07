@@ -54,4 +54,15 @@ const signup = async (userInfo: UserInfo): Promise<void> => {
   })
 }
 
-export { loginAccount, getEmailCode, loginEmail, signup }
+/**
+ * 忘记密码
+ * @param userInfo 用户信息
+ */
+const forgetPassword = async (userInfo: UserInfo): Promise<void> => {
+  await post({
+    url: '/user/forgetPassword',
+    data: userInfo,
+  })
+}
+
+export { loginAccount, getEmailCode, loginEmail, signup, forgetPassword }

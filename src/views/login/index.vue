@@ -12,11 +12,13 @@ import { reactive, ref } from 'vue'
 import { type CommonModalConfig, FieldType, ModalType } from '@components/modal-cmp/common-modal.d.ts'
 import { MailOutlined, PhoneOutlined, UnlockOutlined, UserOutlined } from '@ant-design/icons-vue'
 import CommonModal from '@components/modal-cmp/CommonModal.vue'
-import { signup } from '@/api/login'
 import { message } from 'ant-design-vue'
 import { errMsgExtract } from '@/global/string-format.ts'
+import useLoginStore from '@/store/login'
 
 const registerModalRef = ref()
+
+const loginStore = useLoginStore()
 
 // 注册弹窗类型配置
 const registerModalProps = reactive<CommonModalConfig>({
@@ -77,7 +79,7 @@ const registerModalProps = reactive<CommonModalConfig>({
  * @param formData 表单数据
  */
 const registerHandler = async (formData) => {
-  signup(formData).then(
+  loginStore.signupAction(formData).then(
     () => {
       registerModalRef?.value.hiddenModal()
       registerModalRef?.value.clearFormData()

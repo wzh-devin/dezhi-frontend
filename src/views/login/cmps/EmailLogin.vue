@@ -30,7 +30,7 @@ const loginStore = useLoginStore()
  * 登录提交执行
  */
 const submitHandler = async () => {
-  loginStore.loginEmail(loginPage.loginForm).then(
+  loginStore.loginEmailAction(loginPage.loginForm).then(
     () => message.success('登录成功'),
     (error) => errMsgExtract(error),
   )
