@@ -48,19 +48,17 @@ const submitHandler = async () => {
     <AFormItem name="password">
       <AInputPassword placeholder="请输入密码" v-model:value="loginPage.loginForm.password">
         <template #prefix>
-          <UnlockOutlined />
+          <component :is="UnlockOutlined" />
         </template>
       </AInputPassword>
     </AFormItem>
     <div class="form-options">
-      <ACheckbox>记住密码</ACheckbox>
+      <ACheckbox v-model:checked="loginPage.rememberMe">记住密码</ACheckbox>
       <a href="#" class="forgot-link">忘记密码?</a>
     </div>
     <AFormItem>
       <a-button type="primary" block @click="submitHandler">登 录</a-button>
     </AFormItem>
-    <div class="divider">或</div>
-    <div class="register-link">还没有账号？<a href="#">立即注册</a></div>
   </AForm>
 </template>
 
@@ -77,17 +75,6 @@ const submitHandler = async () => {
 }
 
 .forgot-link {
-  font-size: 14px;
-}
-
-.divider {
-  text-align: center;
-  color: #bfbfbf;
-  margin: 16px 0 8px 0;
-}
-
-.register-link {
-  text-align: center;
   font-size: 14px;
 }
 </style>
