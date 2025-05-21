@@ -13,6 +13,7 @@ import EmailCodeButton from '@components/btn-cmp/EmailCodeButton.vue'
 import { message } from 'ant-design-vue'
 import useLoginStore from '@/store/login'
 import { errMsgExtract } from '@/global/string-format.ts'
+import { useRouter } from 'vue-router'
 
 /**
  * 登录表单
@@ -26,12 +27,17 @@ const loginPage = reactive<LoginPage>({
 
 const loginStore = useLoginStore()
 
+const router = useRouter()
+
 /**
  * 登录提交执行
  */
 const submitHandler = async () => {
   loginStore.loginEmailAction(loginPage.loginForm).then(
-    () => message.success('登录成功'),
+    () => {
+      router.push('/main')
+      message.success('登录成功')
+    },
     (error) => errMsgExtract(error),
   )
 }

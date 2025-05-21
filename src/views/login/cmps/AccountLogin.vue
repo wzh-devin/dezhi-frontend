@@ -14,6 +14,7 @@ import useLoginStore from '@/store/login'
 import { errMsgExtract } from '@/global/string-format.ts'
 import CommonModal from '@components/modal-cmp/CommonModal.vue'
 import { type CommonModalConfig, FieldType, ModalType } from '@components/modal-cmp/common-modal.d.ts'
+import { useRouter } from 'vue-router'
 
 /**
  * 登录表单属性设置
@@ -30,12 +31,17 @@ const resetPwdModalRef = ref()
 
 const loginStore = useLoginStore()
 
+const router = useRouter()
+
 /**
  * 登录提交执行
  */
 const submitHandler = async () => {
   loginStore.loginAccountAction(loginPage.loginForm).then(
-    () => message.success('登录成功'),
+    () => {
+      router.push('/main')
+      message.success('登录成功')
+    },
     (error) => errMsgExtract(error),
   )
 }
