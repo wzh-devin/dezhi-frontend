@@ -39,7 +39,7 @@ const router = useRouter()
 const submitHandler = async () => {
   loginStore.loginAccountAction(loginPage.loginForm).then(
     () => {
-      router.push('/main')
+      router.push('/layout')
       message.success('登录成功')
     },
     (error) => errMsgExtract(error),

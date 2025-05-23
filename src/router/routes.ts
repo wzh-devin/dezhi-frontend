@@ -19,9 +19,31 @@ const routes: RouteRecordRaw = [
     component: () => import('@/views/login/index.vue'),
   },
   {
-    path: '/main',
-    name: 'main',
-    component: () => import('@/views/main/index.vue'),
+    path: '/layout',
+    name: 'layout',
+    component: () => import('@/views/layout/index.vue'),
+    children: [
+      {
+        path: '/dashboard',
+        name: 'dashboard',
+        component: () => import('@/views/dashboard/index.vue'),
+      },
+      {
+        path: '/comment',
+        name: 'comment',
+        component: () => import('@/views/comment/index.vue'),
+      },
+      {
+        path: '/material',
+        name: 'material',
+        component: () => import('@/views/material/index.vue'),
+      },
+      {
+        path: '/system',
+        name: 'system',
+        component: () => import('@/views/system/index.vue'),
+      },
+    ],
   },
 ]
 

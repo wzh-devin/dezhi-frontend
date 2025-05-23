@@ -1,45 +1,60 @@
 <script lang="ts" setup>
-import { ref } from 'vue'
+/**
+ * 2025/5/21 17:08
+ * @author <a href="https://github.com/wzh-devin">devin</a>
+ * @description 布局页面
+ * @version 1.0
+ * @since 1.0
+ */
+import { onMounted, ref } from 'vue'
 import { MenuUnfoldOutlined, MenuFoldOutlined, BellOutlined } from '@ant-design/icons-vue'
-import Menu from '@/views/main/cmps/Menu.vue'
+import Menu from '@/views/layout/cmps/Menu.vue'
+import useLayoutStore from '@/store/layout'
 
 const collapsed = ref(false)
+
+const layoutStore = useLayoutStore()
+
+onMounted(() => {
+  layoutStore.getMenuData()
+  console.log('menuData>>>>>>', layoutStore.menuData)
+})
 </script>
 
 <template>
-  <a-layout class="main-layout">
-    <a-layout-sider class="main-sider" width="220" :collapsed="collapsed" collapsible :trigger="null">
+  <a-layout class="layout-layout">
+    <a-layout-sider class="layout-sider" width="220" :collapsed="collapsed" collapsible :trigger="null">
       <!-- 标题 -->
-      <div class="main-sider__logo">
+      <div class="layout-sider__logo">
         <img src="/logo.png" alt="logo" />
-        <span :class="['main-sider__title', { collapsed }]">DeZhi后台</span>
+        <span :class="['layout-sider__title', { collapsed }]">DeZhi后台</span>
       </div>
       <!-- 菜单 -->
       <Menu />
     </a-layout-sider>
     <a-layout>
       <!-- 头部导航区域 -->
-      <a-layout-header class="main-header">
+      <a-layout-header class="layout-header">
         <!-- 头部导航栏左侧 -->
-        <div class="main-header__left">
-          <span class="main-header__trigger" @click="collapsed = !collapsed">
+        <div class="layout-header__left">
+          <span class="layout-header__trigger" @click="collapsed = !collapsed">
             <MenuUnfoldOutlined v-if="collapsed" />
             <MenuFoldOutlined v-else />
           </span>
-          <div class="main-header__title">管理控制台</div>
+          <div class="layout-header__title">{{}}</div>
         </div>
         <!-- 头部导航栏右侧 -->
-        <div class="main-header__right">
+        <div class="layout-header__right">
           <!-- 用户信息提醒 -->
-          <a-button type="text" shape="circle" class="main-header__bell-btn">
+          <a-button type="text" shape="circle" class="layout-header__bell-btn">
             <template #icon>
               <BellOutlined />
             </template>
           </a-button>
           <!-- 用户头像 -->
-          <a-avatar class="main-header__avatar" src="/logo.png"></a-avatar>
+          <a-avatar class="layout-header__avatar" src="/logo.png"></a-avatar>
           <!-- 用户操作 -->
-          <a-dropdown class="main-header__user" :arrow="{ pointAtCenter: true }">
+          <a-dropdown class="layout-header__user" :arrow="{ pointAtCenter: true }">
             <a class="ant-dropdown-link" @click.prevent> 管理员 </a>
             <template #overlay>
               <a-menu>
@@ -51,7 +66,7 @@ const collapsed = ref(false)
       </a-layout-header>
 
       <!-- 内容区域 -->
-      <a-layout-content class="main-content">
+      <a-layout-content class="layout-content">
         <router-view></router-view>
       </a-layout-content>
     </a-layout>
@@ -59,11 +74,11 @@ const collapsed = ref(false)
 </template>
 
 <style scoped lang="less">
-.main-layout {
+.layout-layout {
   min-height: 100vh;
   background: #f5f6fa;
 
-  .main-sider {
+  .layout-sider {
     background: #fff;
     box-shadow: 2px 0 8px #f0f1f2;
     position: relative;
@@ -100,7 +115,7 @@ const collapsed = ref(false)
     }
   }
 
-  .main-header {
+  .layout-header {
     background: #fff;
     padding: 0 30px;
     display: flex;
@@ -159,7 +174,7 @@ const collapsed = ref(false)
     }
   }
 
-  .main-sider__title {
+  .layout-sider__title {
     display: inline-block;
     white-space: nowrap;
     overflow: hidden;
@@ -170,12 +185,16 @@ const collapsed = ref(false)
     opacity: 1;
   }
 
-  .main-sider__title.collapsed {
+  .layout-sider__title.collapsed {
     clip-path: inset(0 100% 0 0);
     opacity: 0;
     transition:
       clip-path 0.3s cubic-bezier(0.4, 0, 0.2, 1),
       opacity 0.1s 0.2s;
+  }
+
+  .layout-content {
+    padding: 20px 24px 0 24px;
   }
 }
 </style>

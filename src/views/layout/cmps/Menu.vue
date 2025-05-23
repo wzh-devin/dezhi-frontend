@@ -19,6 +19,8 @@ import {
   SettingOutlined,
   TagsOutlined,
 } from '@ant-design/icons-vue'
+import { useRouter } from 'vue-router'
+import useLayoutStore from '@/store/layout'
 
 function getItem(
   label: string,
@@ -36,6 +38,9 @@ function getItem(
   } as ItemType
 }
 
+const router = useRouter()
+const layoutStore = useLayoutStore()
+
 /**
  * 菜单数据 ==> TODO 后续以后端动态配置
  */
@@ -46,9 +51,7 @@ const items: ItemType[] = [
     getItem('标签配置', 'article-tag', () => h(TagsOutlined)),
     getItem('分类配置', 'article-category', () => h(AppstoreOutlined)),
   ]),
-  getItem('评论管理', 'comment', () => h(MessageOutlined), [
-    getItem('评论管理', 'comment-manage', () => h(MessageOutlined)),
-  ]),
+  getItem('评论管理', 'comment', () => h(MessageOutlined)),
   getItem('文件素材管理', 'material', () => h(FolderOpenOutlined)),
   getItem('系统管理', 'system', () => h(SettingOutlined)),
   getItem('AI智能体配置', 'ai', () => h(RobotOutlined)),
@@ -78,6 +81,25 @@ const onOpenChange = (openKeys: string[]) => {
     state.openKeys = latestOpenKey ? [latestOpenKey] : []
   }
 }
+
+/**
+ * 菜单点击事件
+ * @param item
+ * @param key
+ * @param keyPath
+ */
+const itemClickHandler = ({ item, keyPath }) => {
+  layoutStore.setActiveItemAction(item.originItemValue)
+  router.push(rewritePath(keyPath))
+}
+
+/**
+ * 路径重写
+ * @param keyPath
+ */
+const rewritePath = (keyPath: string[]): string => {
+  return keyPath.join('/')
+}
 </script>
 
 <template>
@@ -87,6 +109,7 @@ const onOpenChange = (openKeys: string[]) => {
     :open-keys="state.openKeys"
     :items="items"
     @openChange="onOpenChange"
+    @click="itemClickHandler"
   />
 </template>
 
