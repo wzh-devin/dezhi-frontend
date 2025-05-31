@@ -7,12 +7,7 @@
  * @since 1.0
  */
 import { defineProps, type PropType, reactive, ref, defineEmits, computed } from 'vue'
-import {
-  FieldType,
-  type FormFieldConfig,
-  type ModalPageConfig,
-  ModalType,
-} from '@components/modal-cmp/common-modal.d.ts'
+import { FieldType, type FormFieldConfig, type ModalPageConfig, ModalType } from '@/components/modal-cmp/common-modal'
 import EmailCodeButton from '@components/btn-cmp/EmailCodeButton.vue'
 import { message } from 'ant-design-vue'
 
@@ -24,7 +19,7 @@ const props = defineProps({
     required: true,
   },
   type: {
-    type: Number,
+    type: String as PropType<string>,
     required: true,
     default: ModalType.NORMAL_TEXT,
   },
@@ -38,7 +33,7 @@ const props = defineProps({
     required: false,
   },
   formData: {
-    type: Object as PropType<{ key: string; value: string }>,
+    type: Object as PropType<Record<string, string>>,
     required: false,
   },
   pageConfig: {
@@ -64,7 +59,7 @@ const open = ref<boolean>(false)
 const loading = ref<boolean>(false)
 
 // 表单数据
-const formData = reactive<{ key: string; value: string }>(props.formData)
+const formData = reactive<Record<string, string>>(props.formData || {})
 
 const formRef = ref()
 
@@ -103,7 +98,7 @@ const cancelHandler = () => {
 // 清空表单 & 重置表单校验
 const clearFormData = () => {
   for (const key in formData) {
-    formData[key] = ''
+    formData[key as keyof typeof formData] = ''
   }
   formRef.value?.resetFields()
 }
@@ -172,7 +167,7 @@ defineExpose({
                   <component :is="field?.icon" />
                 </template>
               </AInput>
-              <EmailCodeButton :email="formData.email" />
+              <EmailCodeButton :email="formData['email'] || ''" />
             </div>
           </AFormItem>
         </template>

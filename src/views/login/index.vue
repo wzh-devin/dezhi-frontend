@@ -9,7 +9,7 @@
 import AccountLogin from '@/views/login/cmps/AccountLogin.vue'
 import EmailLogin from '@/views/login/cmps/EmailLogin.vue'
 import { reactive, ref } from 'vue'
-import { type CommonModalConfig, FieldType, ModalType } from '@components/modal-cmp/common-modal.d.ts'
+import { type CommonModalConfig, FieldType, ModalType } from '@/components/modal-cmp/common-modal'
 import { MailOutlined, PhoneOutlined, UnlockOutlined, UserOutlined } from '@ant-design/icons-vue'
 import CommonModal from '@components/modal-cmp/CommonModal.vue'
 import { message } from 'ant-design-vue'
@@ -78,7 +78,7 @@ const registerModalProps = reactive<CommonModalConfig>({
  * 用户注册
  * @param formData 表单数据
  */
-const registerHandler = async (formData) => {
+const registerHandler = async (formData: object) => {
   loginStore.signupAction(formData).then(
     () => {
       registerModalRef?.value.hiddenModal()

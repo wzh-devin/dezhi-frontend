@@ -10,7 +10,7 @@ import type { Rule } from 'ant-design-vue/es/form'
 
 export interface LoginPage {
   loginForm: UserInfo
-  rememberMe: boolean
+  rememberMe?: boolean
 }
 
 export const loginFormRules: Record<string, Rule[]> = {

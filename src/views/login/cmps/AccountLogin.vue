@@ -13,7 +13,7 @@ import { loginFormRules, type LoginPage } from '@/interfaces/pages/login-page.js
 import useLoginStore from '@/store/login'
 import { errMsgExtract } from '@/global/string-format.ts'
 import CommonModal from '@components/modal-cmp/CommonModal.vue'
-import { type CommonModalConfig, FieldType, ModalType } from '@components/modal-cmp/common-modal.d.ts'
+import { type CommonModalConfig, FieldType, ModalType } from '@/components/modal-cmp/common-modal'
 import { useRouter } from 'vue-router'
 
 /**
@@ -21,8 +21,8 @@ import { useRouter } from 'vue-router'
  */
 const loginPage = reactive<LoginPage>({
   loginForm: {
-    username: '',
-    password: '',
+    username: 'admin',
+    password: '123456',
   },
   rememberMe: false,
 })
@@ -39,7 +39,7 @@ const router = useRouter()
 const submitHandler = async () => {
   loginStore.loginAccountAction(loginPage.loginForm).then(
     () => {
-      router.push('/main')
+      router.push('/')
       message.success('登录成功')
     },
     (error) => errMsgExtract(error),
@@ -91,7 +91,7 @@ const resetPwdModalProps = reactive<CommonModalConfig>({
  * 重置密码执行
  * @param formData 表单数据
  */
-const resetPwdHandler = async (formData) => {
+const resetPwdHandler = async (formData: object) => {
   loginStore.forgetPasswordAction(formData).then(
     () => {
       resetPwdModalRef?.value.hiddenModal()
