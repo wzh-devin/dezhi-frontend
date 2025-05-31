@@ -21,8 +21,8 @@ import { useRouter } from 'vue-router'
  */
 const loginPage = reactive<LoginPage>({
   loginForm: {
-    username: '',
-    password: '',
+    username: 'devin',
+    password: 'wzh7230610',
   },
   rememberMe: false,
 })
@@ -39,7 +39,7 @@ const router = useRouter()
 const submitHandler = async () => {
   loginStore.loginAccountAction(loginPage.loginForm).then(
     () => {
-      router.push('/layout')
+      router.push('/')
       message.success('登录成功')
     },
     (error) => errMsgExtract(error),

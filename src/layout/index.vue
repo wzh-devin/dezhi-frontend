@@ -6,19 +6,11 @@
  * @version 1.0
  * @since 1.0
  */
-import { onMounted, ref } from 'vue'
+import { ref } from 'vue'
 import { MenuUnfoldOutlined, MenuFoldOutlined, BellOutlined } from '@ant-design/icons-vue'
-import Menu from '@/views/layout/cmps/Menu.vue'
-import useLayoutStore from '@/store/layout'
+import { MenuCmp, BreadcrumbCmp } from './cmps'
 
 const collapsed = ref(false)
-
-const layoutStore = useLayoutStore()
-
-onMounted(() => {
-  layoutStore.getMenuData()
-  console.log('menuData>>>>>>', layoutStore.menuData)
-})
 </script>
 
 <template>
@@ -30,7 +22,7 @@ onMounted(() => {
         <span :class="['layout-sider__title', { collapsed }]">DeZhi后台</span>
       </div>
       <!-- 菜单 -->
-      <Menu />
+      <MenuCmp />
     </a-layout-sider>
     <a-layout>
       <!-- 头部导航区域 -->
@@ -41,7 +33,9 @@ onMounted(() => {
             <MenuUnfoldOutlined v-if="collapsed" />
             <MenuFoldOutlined v-else />
           </span>
-          <div class="layout-header__title">{{}}</div>
+          <div class="layout-header__title">
+            <BreadcrumbCmp />
+          </div>
         </div>
         <!-- 头部导航栏右侧 -->
         <div class="layout-header__right">
