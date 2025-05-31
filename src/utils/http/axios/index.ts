@@ -14,11 +14,11 @@ import type { AxiosRequestConfig } from 'axios'
  * @param config
  * @return Promise
  */
-export function get(config: AxiosRequestConfig): Promise<object> {
+export function get<T = object>(config: AxiosRequestConfig): Promise<T> {
   return new Promise((resolve, reject) => {
     axiosInstance.get(config.url ?? '').then(
       // 响应成功，返回数据
-      (response) => resolve(response?.data),
+      (response) => resolve(response?.data?.data),
       // 响应失败，返回错误信息
       (error) => reject(error),
     )
@@ -30,11 +30,11 @@ export function get(config: AxiosRequestConfig): Promise<object> {
  * @param config
  * @return Promise
  */
-export function post(config: AxiosRequestConfig): Promise<object> {
+export function post<T = object>(config: AxiosRequestConfig): Promise<T> {
   return new Promise((resolve, reject) => {
     axiosInstance.post(config.url ?? '', config.data).then(
       // 响应成功，返回数据
-      (response) => resolve(response?.data),
+      (response) => resolve(response?.data?.data),
       // 响应失败，向上抛出错误数据
       (error) => reject(error),
     )
@@ -46,11 +46,11 @@ export function post(config: AxiosRequestConfig): Promise<object> {
  * @param config
  * @return Promise
  */
-export function put(config: AxiosRequestConfig): Promise<object> {
+export function put<T = object>(config: AxiosRequestConfig): Promise<T> {
   return new Promise((resolve, reject) => {
     axiosInstance.put(config.url ?? '', config.data).then(
       // 响应成功，返回数据
-      (response) => resolve(response?.data),
+      (response) => resolve(response?.data?.data),
       // 响应失败，返回错误信息
       (error) => reject(error),
     )
@@ -62,11 +62,11 @@ export function put(config: AxiosRequestConfig): Promise<object> {
  * @param config
  * @return Promise
  */
-export function del(config: AxiosRequestConfig): Promise<object> {
+export function del<T = object>(config: AxiosRequestConfig): Promise<T> {
   return new Promise((resolve, reject) => {
     axiosInstance.delete(config.url ?? '', { data: config.data }).then(
       // 响应成功，返回数据
-      (response) => resolve(response?.data),
+      (response) => resolve(response?.data?.data),
       // 响应失败，返回错误信息
       (error) => reject(error),
     )

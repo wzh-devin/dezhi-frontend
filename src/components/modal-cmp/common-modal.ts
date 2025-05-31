@@ -1,5 +1,5 @@
 import type { Rule } from 'ant-design-vue/es/form'
-import type { IconComponentProps } from '@ant-design/icons-vue/es/components/Icon'
+import type { Component } from 'vue'
 
 /**
  * 2025/5/7 11:21
@@ -81,10 +81,12 @@ export interface FormFieldConfig {
   /**
    * 图标组件
    */
-  icon?: IconComponentProps
+  icon?: Component
 }
 
-interface ModalPageConfig {}
+export interface ModalPageConfig {
+  [key: string]: object
+}
 
 export interface CommonModalConfig {
   /**

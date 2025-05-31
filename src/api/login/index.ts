@@ -5,8 +5,8 @@
  * @version 1.0
  * @since 1.0
  */
-import type { UserInfo } from '../../interfaces/entity/user/user-info.ts'
-import { get, post, put } from '../../utils/http/axios'
+import type { UserInfo } from '@/interfaces/entity/user/user-info.ts'
+import { get, post, put } from '@/utils/http/axios'
 
 /**
  * 登录请求
@@ -14,11 +14,10 @@ import { get, post, put } from '../../utils/http/axios'
  * @return token
  */
 const loginAccount = async (userInfo: UserInfo): Promise<{ token: string }> => {
-  const result = await post({
+  return await post<{ token: string }>({
     url: '/user/loginAccount',
     data: userInfo,
   })
-  return result?.data as { token: string }
 }
 
 /**
@@ -36,11 +35,10 @@ const getEmailCode = async (email: string): Promise<void> => {
  * @param userInfo
  */
 const loginEmail = async (userInfo: UserInfo): Promise<{ token: string }> => {
-  const result = await post({
+  return await post<{ token: string }>({
     url: '/user/loginEmail',
     data: userInfo,
   })
-  return result?.data as { token: string }
 }
 
 /**

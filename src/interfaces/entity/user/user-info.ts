@@ -34,5 +34,5 @@ export interface UserInfo {
   /**
    * 邮箱验证码
    */
-  code?: number
+  code?: string
 }
