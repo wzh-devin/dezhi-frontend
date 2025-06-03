@@ -28,6 +28,11 @@ export default defineConfig([
 
   // 关闭与 Prettier 冲突的 ESLint 规则 （仍未「运行」Prettier）
   eslintConfigPrettier,
+  {
+    rules: {
+      'prettier/prettier': ['error', { endOfLine: 'auto' }],
+    },
+  },
 
   // Vue essential 规范
   pluginVue.configs['flat/essential'],
