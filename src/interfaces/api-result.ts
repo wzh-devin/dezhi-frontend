@@ -11,3 +11,28 @@ export interface ApiResult<T> {
   errMsg: string
   data: T
 }
+
+/**
+ * 分页结果接口集
+ */
+export interface PageResult<T> {
+  /**
+   * 数据列表
+   */
+  dataList: Array<T>
+
+  /**
+   * 数据总数
+   */
+  total: number
+
+  /**
+   * 当前页码
+   */
+  pageNum: number
+
+  /**
+   * 每页数据量
+   */
+  pageSize: number
+}

@@ -14,7 +14,7 @@ import type { AxiosRequestConfig } from 'axios'
  * @param config
  * @return Promise
  */
-export function get<T = object>(config: AxiosRequestConfig): Promise<T> {
+export function get(config: AxiosRequestConfig): Promise<object> {
   return new Promise((resolve, reject) => {
     axiosInstance.get(config.url ?? '').then(
       // 响应成功，返回数据
@@ -30,7 +30,7 @@ export function get<T = object>(config: AxiosRequestConfig): Promise<T> {
  * @param config
  * @return Promise
  */
-export function post<T = object>(config: AxiosRequestConfig): Promise<T> {
+export function post(config: AxiosRequestConfig): Promise<object> {
   return new Promise((resolve, reject) => {
     axiosInstance.post(config.url ?? '', config.data).then(
       // 响应成功，返回数据
@@ -46,7 +46,7 @@ export function post<T = object>(config: AxiosRequestConfig): Promise<T> {
  * @param config
  * @return Promise
  */
-export function put<T = object>(config: AxiosRequestConfig): Promise<T> {
+export function put(config: AxiosRequestConfig): Promise<object> {
   return new Promise((resolve, reject) => {
     axiosInstance.put(config.url ?? '', config.data).then(
       // 响应成功，返回数据
@@ -62,7 +62,7 @@ export function put<T = object>(config: AxiosRequestConfig): Promise<T> {
  * @param config
  * @return Promise
  */
-export function del<T = object>(config: AxiosRequestConfig): Promise<T> {
+export function del(config: AxiosRequestConfig): Promise<object> {
   return new Promise((resolve, reject) => {
     axiosInstance.delete(config.url ?? '', { data: config.data }).then(
       // 响应成功，返回数据
