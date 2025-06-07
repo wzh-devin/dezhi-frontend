@@ -94,6 +94,7 @@ const pageInit = async (pageNum: number, pageSize: number) => {
     },
     (error) => {
       errMsgExtract(error)
+      pageInfo.loading = false
     },
   )
 }

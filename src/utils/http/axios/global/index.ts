@@ -7,7 +7,8 @@
  */
 import axios, { type AxiosInstance, type InternalAxiosRequestConfig } from 'axios'
 import { BASE_URL, TIME_OUT } from '../config'
-import { TOKEN_KEY } from '../../../../constant/global-key.ts'
+import { TOKEN_KEY } from '@/constant/global-key.ts'
+import router from '@/router'
 
 const axiosInstance: AxiosInstance = axios.create({
   baseURL: BASE_URL,
@@ -39,6 +40,13 @@ axiosInstance.interceptors.response.use(
   },
   (error) => {
     // 抛出错误信息
+    if (error.response.status == 4003) {
+      console.log('用户登录失效 || 未登录')
+      // 用户登录失效 || 未登录
+      localStorage.removeItem(TOKEN_KEY)
+      // 重定向
+      router.push('/login').then()
+    }
     return Promise.reject(error.response?.data)
   },
 )

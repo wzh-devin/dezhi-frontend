@@ -13,6 +13,9 @@ const menuRoutes: Array<RouteRecordRaw> = [
     name: '/',
     redirect: '/dashboard',
     component: () => import('@/layout/index.vue'),
+    meta: {
+      requiresAuth: true,
+    },
     children: [
       {
         path: 'dashboard',
