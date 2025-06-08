@@ -223,7 +223,6 @@ const paginationHandler = (page: number, pageSize: number) => {
           :total="pageInfo.total"
           :page-size-options="['10', '25', '30']"
           @change="paginationHandler"
-          @show-size-change="paginationHandler"
         />
       </div>
     </div>
