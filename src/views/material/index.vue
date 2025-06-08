@@ -6,21 +6,28 @@
  * @version 1.0
  * @since 1.0
  */
-import { onMounted, reactive, ref } from 'vue'
+import { onMounted, reactive, ref, computed } from 'vue'
 import { PlusOutlined, DeleteOutlined } from '@ant-design/icons-vue'
 import type { IFileInfo } from '@/interfaces/pages/material-page.ts'
 import useMaterialStore from '@/store/material'
 import { errMsgExtract } from '@/global/string-format.ts'
 import dayjs from 'dayjs'
 import { convertBytesToKb } from '@/utils/convert.ts'
+import { ContentHeader, ContentTable } from '@/components/content-cmp'
+import type {
+  ButtonConfig,
+  FilterConfig,
+  SearchConfig,
+  ColumnConfig,
+  PaginationConfig,
+  RowSelectionConfig,
+} from '@/components/content-cmp'
 
 const materialStore = useMaterialStore()
 // 选择的行Keys
 const selectedRowKeys = ref<(string | number)[]>([])
 // 文件类型过滤器
 const fileTypeFilter = ref<string>('')
-// 查询器
-const searchQuery = ref<string>('')
 // 页面信息
 const pageInfo = reactive({
   pageNum: ref(1),
@@ -28,52 +35,54 @@ const pageInfo = reactive({
   total: ref(0),
   dataSource: reactive<IFileInfo[]>([]),
   loading: ref<boolean>(false),
-  pageConfig: [
-    {
-      title: '文件展示',
-      dataIndex: 'image',
-      key: 'image',
-      width: 80,
-    },
-    {
-      title: '文件名称',
-      dataIndex: 'name',
-      key: 'name',
-      width: 200,
-    },
-    {
-      title: '文件大小',
-      dataIndex: 'size',
-      key: 'size',
-      width: 100,
-    },
-    {
-      title: '文件地址',
-      dataIndex: 'url',
-      key: 'url',
-      ellipsis: true,
-      width: 300,
-    },
-    {
-      title: '文件类型',
-      dataIndex: 'fileType',
-      key: 'fileType',
-      width: 120,
-    },
-    {
-      title: '存储类型',
-      dataIndex: 'storageType',
-      key: 'storageType',
-      width: 120,
-    },
-    {
-      title: '上传时间',
-      dataIndex: 'uploadTime',
-      key: 'uploadTime',
-      width: 180,
-    },
-  ],
 })
+
+// 表格列配置
+const tableColumns: ColumnConfig[] = [
+  {
+    title: '文件展示',
+    dataIndex: 'image',
+    key: 'image',
+    width: 80,
+  },
+  {
+    title: '文件名称',
+    dataIndex: 'name',
+    key: 'name',
+    width: 200,
+  },
+  {
+    title: '文件大小',
+    dataIndex: 'size',
+    key: 'size',
+    width: 100,
+  },
+  {
+    title: '文件地址',
+    dataIndex: 'url',
+    key: 'url',
+    ellipsis: true,
+    width: 300,
+  },
+  {
+    title: '文件类型',
+    dataIndex: 'fileType',
+    key: 'fileType',
+    width: 120,
+  },
+  {
+    title: '存储类型',
+    dataIndex: 'storageType',
+    key: 'storageType',
+    width: 120,
+  },
+  {
+    title: '上传时间',
+    dataIndex: 'uploadTime',
+    key: 'uploadTime',
+    width: 180,
+  },
+]
 
 /**
  * 初始化页面
@@ -114,6 +123,72 @@ const onSelectChange = (selectedKeys: (string | number)[]) => {
   selectedRowKeys.value = selectedKeys
 }
 
+// 头部配置
+const headerConfig = computed(() => ({
+  leftButtons: [
+    {
+      key: 'add',
+      label: '新增文件',
+      type: 'primary' as const,
+      icon: PlusOutlined,
+      onClick: handleUpload,
+    },
+    {
+      key: 'batch-delete',
+      label: '批量删除',
+      onClick: handleBatchDelete,
+    },
+  ] as ButtonConfig[],
+  filters: [
+    {
+      key: 'fileType',
+      placeholder: '文件类型',
+      width: '120px',
+      options: [
+        { label: '全部', value: '' },
+        { label: '文档', value: 'DOC' },
+        { label: '图片', value: 'IMAGE' },
+        { label: '压缩包', value: 'ZIP' },
+      ],
+    },
+  ] as FilterConfig[],
+  search: {
+    placeholder: '请输入文件名称搜索',
+    width: '300px',
+    onSearch: onSearch,
+  } as SearchConfig,
+  rightButtons: [
+    {
+      key: 'recycle',
+      label: '回收站',
+      type: 'primary' as const,
+      danger: true,
+      icon: DeleteOutlined,
+      onClick: handleRecycleBin,
+    },
+  ] as ButtonConfig[],
+  selectedCount: selectedRowKeys.value.length,
+}))
+
+// 表格配置
+const tableConfig = computed(() => ({
+  dataSource: pageInfo.dataSource,
+  columns: tableColumns,
+  rowKey: (record: IFileInfo) => record.id.toString(),
+  loading: pageInfo.loading,
+  rowSelection: {
+    selectedRowKeys: selectedRowKeys.value,
+    onChange: onSelectChange,
+  } as RowSelectionConfig,
+  pagination: {
+    current: pageInfo.pageNum,
+    pageSize: pageInfo.pageSize,
+    total: pageInfo.total,
+    onChange: paginationHandler,
+  } as PaginationConfig,
+  scrollY: 420,
+}))
+
 const handleUpload = () => {
   // 处理上传逻辑
 }
@@ -132,6 +207,16 @@ const onSearch = (value: string) => {
 }
 
 /**
+ * 筛选器变化处理
+ */
+const onFilterChange = (key: string, value: string) => {
+  if (key === 'fileType') {
+    fileTypeFilter.value = value
+  }
+  console.log('筛选器变化:', key, value)
+}
+
+/**
  * 分页点击处理
  * @param page 当前页码
  * @param pageSize 每页数据量
@@ -143,89 +228,58 @@ const paginationHandler = (page: number, pageSize: number) => {
 
 <template>
   <div class="material-management">
-    <div class="operation-bar">
-      <div class="left-actions">
-        <a-button type="primary" class="add-btn" @click="handleUpload">
-          <template #icon>
-            <plus-outlined />
-          </template>
-          新增文件
-        </a-button>
-        <a-button class="delete-btn" :disabled="!selectedRowKeys.length" @click="handleBatchDelete">批量删除</a-button>
-        <a-select v-model:value="fileTypeFilter" placeholder="文件类型" class="type-select" style="width: 120px">
-          <a-select-option value="">全部</a-select-option>
-          <a-select-option value="DOC">文档</a-select-option>
-          <a-select-option value="IMAGE">图片</a-select-option>
-          <a-select-option value="ZIP">压缩包</a-select-option>
-        </a-select>
-      </div>
-      <div class="right-actions">
-        <a-input-search
-          v-model:value="searchQuery"
-          placeholder="请输入文件名称搜索"
-          class="search-input"
-          style="width: 300px"
-          @search="onSearch"
-        />
-        <a-button type="primary" class="recycle-btn" @click="handleRecycleBin">
-          <template #icon>
-            <delete-outlined />
-          </template>
-          回收站
-        </a-button>
-      </div>
-    </div>
+    <!-- 头部操作栏 -->
+    <ContentHeader
+      :left-buttons="headerConfig.leftButtons"
+      :filters="headerConfig.filters"
+      :search="headerConfig.search"
+      :right-buttons="headerConfig.rightButtons"
+      :selected-count="headerConfig.selectedCount"
+      @filter-change="onFilterChange"
+    />
 
-    <div class="table-container">
-      <a-table
-        :columns="pageInfo.pageConfig"
-        :data-source="pageInfo.dataSource"
-        :row-key="(record: IFileInfo) => record.id"
-        :row-selection="{
-          selectedRowKeys,
-          onChange: onSelectChange,
-        }"
-        :pagination="false"
-        :scroll="{ y: 420 }"
-        :loading="pageInfo.loading"
-        class="file-table"
-      >
-        <template #bodyCell="{ column, record }">
-          <template v-if="column.key === 'image'">
-            <a-image :width="40" :height="40" :src="record.url" :preview-mask="false" :key="record.id" />
-          </template>
-          <template v-if="column.key === 'url'">
-            <a :href="record.url" target="_blank" class="file-link">{{ record.url }}</a>
-          </template>
-          <template v-if="column.key === 'size'"> {{ `${convertBytesToKb(record.size)} KB` }}</template>
-          <template v-if="column.key === 'fileType'">
-            <a-tag
-              :class="[
-                'file-type-tag',
-                record.fileType === 'DOC' ? 'doc-tag' : record.fileType === 'IMAGE' ? 'image-tag' : 'zip-tag',
-              ]"
-            >
-              {{ record.fileType }}
-            </a-tag>
-          </template>
-          <template v-if="column.key === 'uploadTime'">
-            {{ dayjs(record.uploadTime).format('YYYY-MM-DD HH:mm:ss') }}
-          </template>
-        </template>
-      </a-table>
+    <!-- 表格内容 -->
+    <ContentTable
+      :data-source="tableConfig.dataSource"
+      :columns="tableConfig.columns"
+      :row-key="tableConfig.rowKey"
+      :loading="tableConfig.loading"
+      :row-selection="tableConfig.rowSelection"
+      :pagination="tableConfig.pagination"
+      :scroll-y="tableConfig.scrollY"
+    >
+      <!-- 文件展示列 -->
+      <template #bodyCell-image="{ record }">
+        <a-image :width="40" :height="40" :src="record.url" :preview-mask="false" :key="record.id" />
+      </template>
 
-      <div class="pagination-wrapper">
-        <a-pagination
-          v-model:current="pageInfo.pageNum"
-          v-model:page-size="pageInfo.pageSize"
-          show-size-changer
-          show-quick-jumper
-          :total="pageInfo.total"
-          :page-size-options="['10', '25', '30']"
-          @change="paginationHandler"
-        />
-      </div>
-    </div>
+      <!-- 文件地址列 -->
+      <template #bodyCell-url="{ record }">
+        <a :href="record.url" target="_blank" class="file-link">{{ record.url }}</a>
+      </template>
+
+      <!-- 文件大小列 -->
+      <template #bodyCell-size="{ record }">
+        {{ `${convertBytesToKb(record.size)} KB` }}
+      </template>
+
+      <!-- 文件类型列 -->
+      <template #bodyCell-fileType="{ record }">
+        <a-tag
+          :class="[
+            'file-type-tag',
+            record.fileType === 'DOC' ? 'doc-tag' : record.fileType === 'IMAGE' ? 'image-tag' : 'zip-tag',
+          ]"
+        >
+          {{ record.fileType }}
+        </a-tag>
+      </template>
+
+      <!-- 上传时间列 -->
+      <template #bodyCell-uploadTime="{ record }">
+        {{ dayjs(record.uploadTime).format('YYYY-MM-DD HH:mm:ss') }}
+      </template>
+    </ContentTable>
   </div>
 </template>
 
@@ -237,253 +291,49 @@ const paginationHandler = (page: number, pageSize: number) => {
   display: flex;
   flex-direction: column;
 
-  .operation-bar {
-    display: flex;
-    justify-content: space-between;
+  .file-link {
+    color: #1677ff;
+    text-decoration: none;
+    display: inline-flex;
     align-items: center;
-    margin-bottom: 24px;
-    padding: 24px;
-    background-color: #fff;
-    border-radius: 8px;
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
-    flex-shrink: 0;
 
-    .left-actions {
-      display: flex;
-      gap: 12px;
-      align-items: center;
-
-      .add-btn {
-        background-color: #1677ff;
-        border-radius: 6px;
-        display: flex;
-        align-items: center;
-
-        :deep(.anticon) {
-          font-size: 14px;
-          vertical-align: middle;
-          margin-right: 6px;
-        }
-      }
-
-      .delete-btn {
-        border-radius: 6px;
-        display: flex;
-        align-items: center;
-      }
-
-      .type-select {
-        border-radius: 6px;
-      }
-    }
-
-    .right-actions {
-      display: flex;
-      gap: 12px;
-      align-items: center;
-
-      .search-input {
-        border-radius: 6px;
-
-        :deep(.ant-input) {
-          border-radius: 6px 0 0 6px;
-        }
-
-        :deep(.ant-input-search-button) {
-          border-radius: 0 6px 6px 0;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-
-          .anticon {
-            margin-right: 0;
-          }
-        }
-      }
-
-      .recycle-btn {
-        border-radius: 6px;
-        background-color: #ff4d4f;
-        border-color: #ff4d4f;
-        display: flex;
-        align-items: center;
-
-        :deep(.anticon) {
-          font-size: 14px;
-          vertical-align: middle;
-          margin-right: 6px;
-        }
-
-        &:hover {
-          background-color: #ff7875;
-          border-color: #ff7875;
-        }
-      }
+    &:hover {
+      text-decoration: underline;
     }
   }
 
-  .table-container {
-    background-color: #fff;
-    border-radius: 8px;
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-  }
+  .file-type-tag {
+    border-radius: 4px;
+    padding: 1px 6px;
+    display: inline-flex;
+    align-items: center;
+    font-size: 12px;
 
-  .file-table {
-    background-color: transparent;
-    border-radius: 0;
-    padding: 12px;
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-
-    :deep(.ant-table) {
-      background: #fff;
-      flex: 1;
-
-      .ant-table-selection-column {
-        padding-left: 16px !important;
-        padding-right: 0 !important;
-        width: 48px !important;
-      }
-
-      .ant-checkbox-wrapper {
-        margin-inline-start: 0 !important;
-      }
-
-      .ant-table-thead > tr > th {
-        background: #fafafa;
-        white-space: nowrap;
-        padding: 12px 16px;
-        font-weight: 500;
-        color: #1f2329;
-        height: 48px;
-
-        &.ant-table-selection-column {
-          padding-right: 0;
-        }
-
-        &::before {
-          display: none;
-        }
-      }
-
-      .ant-table-tbody > tr > td {
-        padding: 8px 16px;
-        height: 56px;
-
-        &.ant-table-selection-column {
-          padding-right: 0;
-        }
-      }
-
-      .ant-table-tbody > tr {
-        &:hover > td {
-          background: #fafafa;
-        }
-      }
-    }
-
-    :deep(.ant-table-cell) {
-      .anticon {
-        font-size: 16px;
-        vertical-align: middle;
-      }
-
-      font-size: 14px;
-    }
-
-    .file-link {
+    &.doc-tag {
       color: #1677ff;
-      text-decoration: none;
-      display: inline-flex;
-      align-items: center;
-
-      &:hover {
-        text-decoration: underline;
-      }
+      background: #e6f4ff;
+      border-color: #91caff;
     }
 
-    .file-type-tag {
-      border-radius: 4px;
-      padding: 1px 6px;
-      display: inline-flex;
-      align-items: center;
-      font-size: 12px;
-
-      &.doc-tag {
-        color: #1677ff;
-        background: #e6f4ff;
-        border-color: #91caff;
-      }
-
-      &.image-tag {
-        color: #52c41a;
-        background: #f6ffed;
-        border-color: #b7eb8f;
-      }
-
-      &.zip-tag {
-        color: #faad14;
-        background: #fffbe6;
-        border-color: #ffe58f;
-      }
+    &.image-tag {
+      color: #52c41a;
+      background: #f6ffed;
+      border-color: #b7eb8f;
     }
 
-    :deep(.ant-image) {
-      cursor: pointer;
-
-      img {
-        object-fit: cover;
-        border-radius: 4px;
-      }
-    }
-
-    :deep(.ant-image-preview-operations) {
-      background: rgba(0, 0, 0, 0.5);
-    }
-
-    :deep(.preview-toolbar-btn) {
-      background: transparent;
-      border: none;
-      color: #fff;
-      cursor: pointer;
-      padding: 4px 8px;
-      border-radius: 4px;
-      transition: all 0.3s;
-
-      &:hover {
-        background: rgba(255, 255, 255, 0.1);
-      }
+    &.zip-tag {
+      color: #faad14;
+      background: #fffbe6;
+      border-color: #ffe58f;
     }
   }
 
-  .pagination-wrapper {
-    display: flex;
-    justify-content: center;
-    margin-top: 0;
-    padding: 16px;
-    background-color: transparent;
-    border-top: 1px solid #f0f0f0;
-    flex-shrink: 0;
+  :deep(.ant-image) {
+    cursor: pointer;
 
-    :deep(.ant-pagination) {
-      .ant-pagination-item {
-        border-radius: 6px;
-        margin-inline-end: 8px;
-      }
-
-      .ant-pagination-prev,
-      .ant-pagination-next {
-        border-radius: 6px;
-      }
-
-      .ant-pagination-jump-prev,
-      .ant-pagination-jump-next {
-        border-radius: 6px;
-      }
+    img {
+      object-fit: cover;
+      border-radius: 4px;
     }
   }
 }
