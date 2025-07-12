@@ -5,11 +5,11 @@
  * @version 1.0
  * @since 1.0
  */
-import type { UserInfo } from '../entity/user/user-info.ts'
 import type { Rule } from 'ant-design-vue/es/form'
+import type { UserInfoQueryVO } from '@/service/typings.ts'
 
 export interface LoginPage {
-  loginForm: UserInfo
+  loginForm: UserInfoQueryVO
   rememberMe?: boolean
 }
 

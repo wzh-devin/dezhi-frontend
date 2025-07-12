@@ -11,8 +11,9 @@
  * @param bytes
  * @param precision
  */
-const convertBytesToKb = (bytes: number, precision: number = 2) => {
+const convertBytesToKb = (bytes: string | number, precision: number = 2) => {
   const KILOBYTE_SIZE = 1024
+  bytes = Number(bytes)
 
   // 输入验证
   if (!Number.isFinite(bytes) || bytes < 0) {

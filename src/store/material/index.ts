@@ -6,8 +6,8 @@
  * @since 1.0
  */
 import { defineStore } from 'pinia'
-import type { FileInfoReq } from '@/interfaces/pages/material-page.ts'
-import { getMaterialList } from '@/api/material'
+import { delMaterial, page } from '@/service/materialService.ts'
+import type { ApiResultListFileInfoVO } from '@/service/typings.ts'
 
 const useMaterialStore = defineStore('material', {
   state: () => ({}),
@@ -16,8 +16,27 @@ const useMaterialStore = defineStore('material', {
      * 获取素材列表信息
      * @param fileInfoReq 文件请求信息
      */
-    async getMaterialListAction(fileInfoReq: FileInfoReq) {
-      return await getMaterialList(fileInfoReq)
+    async getMaterialListAction(fileInfoReq: {
+      /** 页码 */
+      pageNum?: number
+      /** 每页数量 */
+      pageSize?: number
+      /** 文件名称 */
+      fileName?: string
+      /** 存储类型 */
+      storageType?: 'MINIO'
+      /** 文件状态 */
+      status: 'DISABLED' | 'NORMAL'
+    }): Promise<ApiResultListFileInfoVO> {
+      return await page(fileInfoReq)
+    },
+
+    /**
+     * 批量删除文件
+     * @param fileIds 文件ids
+     */
+    async delMaterialAction(fileIds: string[]): Promise<void> {
+      await delMaterial(fileIds)
     },
   },
 })

@@ -22,6 +22,9 @@ import type {
   PaginationConfig,
   RowSelectionConfig,
 } from '@/components/content-cmp'
+import { StatusEnum } from '@/constant/status-enums.ts'
+import type { FileInfoVO } from '@/service/typings.ts'
+import { message } from 'ant-design-vue'
 
 const materialStore = useMaterialStore()
 // 选择的行Keys
@@ -30,10 +33,12 @@ const selectedRowKeys = ref<(string | number)[]>([])
 const fileTypeFilter = ref<string>('')
 // 页面信息
 const pageInfo = reactive({
-  pageNum: ref(1),
-  pageSize: ref(10),
-  total: ref(0),
-  dataSource: reactive<IFileInfo[]>([]),
+  addition: {
+    pageNum: ref(1),
+    pageSize: ref(10),
+    total: ref(0),
+  },
+  dataSource: reactive<FileInfoVO[]>([]),
   loading: ref<boolean>(false),
 })
 
@@ -78,8 +83,8 @@ const tableColumns: ColumnConfig[] = [
   },
   {
     title: '上传时间',
-    dataIndex: 'uploadTime',
-    key: 'uploadTime',
+    dataIndex: 'createTime',
+    key: 'createTime',
     width: 180,
   },
 ]
@@ -88,16 +93,12 @@ const tableColumns: ColumnConfig[] = [
  * 初始化页面
  */
 const pageInit = async (pageNum: number, pageSize: number) => {
-  console.log('初始化页面')
   pageInfo.loading = true
-  materialStore.getMaterialListAction({ pageNum: pageNum, pageSize: pageSize, status: 1 }).then(
+  materialStore.getMaterialListAction({ pageNum: pageNum, pageSize: pageSize, status: StatusEnum.NORMAL }).then(
     (res) => {
       // 重置属性
-      pageInfo.dataSource = res.dataList
-      pageInfo.pageNum = res.pageNum
-      pageInfo.pageSize = res.pageSize
-      pageInfo.total = res.total
-
+      pageInfo.dataSource = res.data ?? []
+      Object.assign(pageInfo.addition, res.addition ?? {})
       // 停止加载
       pageInfo.loading = false
     },
@@ -174,16 +175,16 @@ const headerConfig = computed(() => ({
 const tableConfig = computed(() => ({
   dataSource: pageInfo.dataSource,
   columns: tableColumns,
-  rowKey: (record: IFileInfo) => record.id.toString(),
+  rowKey: (record: FileInfoVO) => record.id as string,
   loading: pageInfo.loading,
   rowSelection: {
     selectedRowKeys: selectedRowKeys.value,
     onChange: onSelectChange,
   } as RowSelectionConfig,
   pagination: {
-    current: pageInfo.pageNum,
-    pageSize: pageInfo.pageSize,
-    total: pageInfo.total,
+    current: pageInfo.addition.pageNum,
+    pageSize: pageInfo.addition.pageSize,
+    total: pageInfo.addition.total,
     onChange: paginationHandler,
   } as PaginationConfig,
   scrollY: 420,
@@ -193,8 +194,19 @@ const handleUpload = () => {
   // 处理上传逻辑
 }
 
-const handleBatchDelete = () => {
+const handleBatchDelete = async () => {
+  pageInfo.loading = true
   // 处理批量删除逻辑
+  materialStore.delMaterialAction((selectedRowKeys.value as string[]) ?? []).then(
+    () => {
+      pageInit(pageInfo.addition.pageNum, pageInfo.addition.pageSize)
+      message.success('删除成功')
+    },
+    (error) => {
+      errMsgExtract(error)
+    },
+  )
+  pageInfo.loading = false
 }
 
 const handleRecycleBin = () => {
@@ -276,8 +288,8 @@ const paginationHandler = (page: number, pageSize: number) => {
       </template>
 
       <!-- 上传时间列 -->
-      <template #bodyCell-uploadTime="{ record }">
-        {{ dayjs(record.uploadTime).format('YYYY-MM-DD HH:mm:ss') }}
+      <template #bodyCell-createTime="{ record }">
+        {{ dayjs(record.createTime).format('YYYY-MM-DD HH:mm:ss') }}
       </template>
     </ContentTable>
   </div>

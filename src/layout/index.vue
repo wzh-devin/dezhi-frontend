@@ -9,8 +9,33 @@
 import { ref } from 'vue'
 import { MenuUnfoldOutlined, MenuFoldOutlined, BellOutlined } from '@ant-design/icons-vue'
 import { MenuCmp, BreadcrumbCmp } from './cmps'
+import { TOKEN_KEY } from '@/constant/global-key.ts'
+import { useRouter } from 'vue-router'
+import { message } from 'ant-design-vue'
+import { errMsgExtract } from '@/global/string-format.ts'
+import { logout } from '@/service/userService.ts'
 
 const collapsed = ref(false)
+
+const router = useRouter()
+
+/**
+ * 退出登录
+ */
+const handleLogout = () => {
+  logout().then(
+    () => {
+      // 删除token
+      localStorage.removeItem(TOKEN_KEY)
+
+      // 跳转到登录页
+      router.push('/login')
+
+      message.success('退出登录成功')
+    },
+    (error) => errMsgExtract(error),
+  )
+}
 </script>
 
 <template>
@@ -75,7 +100,7 @@ const collapsed = ref(false)
             <a class="ant-dropdown-link" @click.prevent> 管理员 </a>
             <template #overlay>
               <a-menu>
-                <a-menu-item>退出登录</a-menu-item>
+                <a-menu-item @click="handleLogout">退出登录</a-menu-item>
               </a-menu>
             </template>
           </a-dropdown>
