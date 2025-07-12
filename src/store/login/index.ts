@@ -6,9 +6,9 @@
  * @since 1.0
  */
 import { defineStore } from 'pinia'
-import type { UserInfo } from '../../interfaces/entity/user/user-info.ts'
-import { forgetPassword, loginAccount, loginEmail, signup } from '../../api/login'
-import { TOKEN_KEY } from '../../constant/global-key.ts'
+import { TOKEN_KEY } from '@/constant/global-key.ts'
+import { forgetPassword, loginAccount, loginEmail, signup } from '@/service/userService.ts'
+import type { UserInfoQueryVO } from '@/service/typings.ts'
 
 interface LoginState {
   token: string
@@ -23,32 +23,32 @@ const useLoginStore = defineStore('login', {
      * 账号登录行为
      * @param userInfo 用户信息
      */
-    async loginAccountAction(userInfo: UserInfo): Promise<void> {
+    async loginAccountAction(userInfo: UserInfoQueryVO): Promise<void> {
       // 获取token & 将token保存到本地
-      const { token } = await loginAccount(userInfo)
+      const token = await loginAccount(userInfo).then((res) => res.data?.token ?? '')
       localStorage.setItem(TOKEN_KEY, token)
     },
     /**
      * 邮箱登录行为
      * @param userInfo 用户信息
      */
-    async loginEmailAction(userInfo: UserInfo): Promise<void> {
+    async loginEmailAction(userInfo: UserInfoQueryVO): Promise<void> {
       // 获取token & 将token保存到本地
-      const { token } = await loginEmail(userInfo)
+      const token = await loginEmail(userInfo).then((res) => res.data?.token ?? '')
       localStorage.setItem(TOKEN_KEY, token)
     },
     /**
      * 注册行为
      * @param userInfo 用户信息
      */
-    async signupAction(userInfo: UserInfo): Promise<void> {
+    async signupAction(userInfo: UserInfoQueryVO): Promise<void> {
       await signup(userInfo)
     },
     /**
      * 忘记密码行为
      * @param userInfo 用户信息
      */
-    async forgetPasswordAction(userInfo: UserInfo): Promise<void> {
+    async forgetPasswordAction(userInfo: UserInfoQueryVO): Promise<void> {
       await forgetPassword(userInfo)
     },
   },

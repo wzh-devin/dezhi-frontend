@@ -24,3 +24,6 @@ components.d.ts
 *.njsproj
 *.sln
 *.sw?
+
+# common-utils #
+common-utils

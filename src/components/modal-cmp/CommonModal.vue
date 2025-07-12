@@ -77,14 +77,23 @@ const formRules = computed(() => {
  * 确认函数
  */
 const confirmHandler = () => {
-  formRef.value
-    ?.validate()
-    .then(() => {
-      emit('confirm', formData)
-    })
-    .catch(() => {
-      message.warn('请检查信息是否填写合规！！！')
-    })
+  // 如果是普通文本类型，直接触发 confirm 事件
+  if (props.type === ModalType.NORMAL_TEXT) {
+    emit('confirm', formData)
+    return
+  }
+
+  // 如果是表单类型，需要验证表单
+  if (props.type === ModalType.FORM) {
+    formRef.value
+      ?.validate()
+      .then(() => {
+        emit('confirm', formData)
+      })
+      .catch(() => {
+        message.warn('请检查信息是否填写合规！！！')
+      })
+  }
 }
 
 /**

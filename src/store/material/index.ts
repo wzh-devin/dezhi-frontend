@@ -1,0 +1,44 @@
+/**
+ * 2025/5/4 15:14
+ * @author <a href="https://github.com/wzh-devin">devin</a>
+ * @description 文件素材状态管理器
+ * @version 1.0
+ * @since 1.0
+ */
+import { defineStore } from 'pinia'
+import { delMaterial, page } from '@/service/materialService.ts'
+import type { ApiResultListFileInfoVO } from '@/service/typings.ts'
+
+const useMaterialStore = defineStore('material', {
+  state: () => ({}),
+  actions: {
+    /**
+     * 获取素材列表信息
+     * @param fileInfoReq 文件请求信息
+     */
+    async getMaterialListAction(fileInfoReq: {
+      /** 页码 */
+      pageNum?: number
+      /** 每页数量 */
+      pageSize?: number
+      /** 文件名称 */
+      fileName?: string
+      /** 存储类型 */
+      storageType?: 'MINIO'
+      /** 文件状态 */
+      status: 'DISABLED' | 'NORMAL'
+    }): Promise<ApiResultListFileInfoVO> {
+      return await page(fileInfoReq)
+    },
+
+    /**
+     * 批量删除文件
+     * @param fileIds 文件ids
+     */
+    async delMaterialAction(fileIds: string[]): Promise<void> {
+      await delMaterial(fileIds)
+    },
+  },
+})
+
+export default useMaterialStore

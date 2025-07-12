@@ -8,7 +8,7 @@
  */
 import { defineProps, ref } from 'vue'
 import { message } from 'ant-design-vue'
-import { getEmailCode } from '@/api/login'
+import { getEmailCode } from '@/service/userService.ts'
 
 const props = defineProps({
   email: {
@@ -39,7 +39,7 @@ const startCountdown = async () => {
   if (countdown.value > 0) return
 
   // 获取邮箱验证码
-  getEmailCode(props.email).then(
+  getEmailCode({ email: props.email }).then(
     () => {
       // 开启倒计时
       countdown.value = props.duration

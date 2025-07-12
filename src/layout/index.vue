@@ -9,13 +9,52 @@
 import { ref } from 'vue'
 import { MenuUnfoldOutlined, MenuFoldOutlined, BellOutlined } from '@ant-design/icons-vue'
 import { MenuCmp, BreadcrumbCmp } from './cmps'
+import { TOKEN_KEY } from '@/constant/global-key.ts'
+import { useRouter } from 'vue-router'
+import { message } from 'ant-design-vue'
+import { errMsgExtract } from '@/global/string-format.ts'
+import { logout } from '@/service/userService.ts'
 
 const collapsed = ref(false)
+
+const router = useRouter()
+
+/**
+ * 退出登录
+ */
+const handleLogout = () => {
+  logout().then(
+    () => {
+      // 删除token
+      localStorage.removeItem(TOKEN_KEY)
+
+      // 跳转到登录页
+      router.push('/login')
+
+      message.success('退出登录成功')
+    },
+    (error) => errMsgExtract(error),
+  )
+}
 </script>
 
 <template>
   <a-layout class="layout-layout">
-    <a-layout-sider class="layout-sider" width="220" :collapsed="collapsed" collapsible :trigger="null">
+    <a-layout-sider
+      class="layout-sider"
+      width="220"
+      :collapsed="collapsed"
+      collapsible
+      :trigger="null"
+      :style="{
+        overflow: 'auto',
+        height: '100vh',
+        position: 'fixed',
+        left: 0,
+        top: 0,
+        bottom: 0,
+      }"
+    >
       <!-- 标题 -->
       <div class="layout-sider__logo">
         <img src="/logo.png" alt="logo" />
@@ -24,9 +63,18 @@ const collapsed = ref(false)
       <!-- 菜单 -->
       <MenuCmp />
     </a-layout-sider>
-    <a-layout>
+    <a-layout :style="{ marginLeft: collapsed ? '80px' : '220px' }">
       <!-- 头部导航区域 -->
-      <a-layout-header class="layout-header">
+      <a-layout-header
+        class="layout-header"
+        :style="{
+          position: 'fixed',
+          top: 0,
+          right: 0,
+          left: collapsed ? '80px' : '220px',
+          zIndex: 1,
+        }"
+      >
         <!-- 头部导航栏左侧 -->
         <div class="layout-header__left">
           <span class="layout-header__trigger" @click="collapsed = !collapsed">
@@ -52,7 +100,7 @@ const collapsed = ref(false)
             <a class="ant-dropdown-link" @click.prevent> 管理员 </a>
             <template #overlay>
               <a-menu>
-                <a-menu-item>退出登录</a-menu-item>
+                <a-menu-item @click="handleLogout">退出登录</a-menu-item>
               </a-menu>
             </template>
           </a-dropdown>
@@ -60,7 +108,14 @@ const collapsed = ref(false)
       </a-layout-header>
 
       <!-- 内容区域 -->
-      <a-layout-content class="layout-content">
+      <a-layout-content
+        class="layout-content"
+        :style="{
+          marginTop: '64px',
+          height: 'calc(100vh - 64px)',
+          overflow: 'auto',
+        }"
+      >
         <router-view></router-view>
       </a-layout-content>
     </a-layout>
@@ -69,13 +124,13 @@ const collapsed = ref(false)
 
 <style scoped lang="less">
 .layout-layout {
-  min-height: 100vh;
+  height: 100vh;
+  overflow: hidden;
   background: #f5f6fa;
 
   .layout-sider {
     background: #fff;
     box-shadow: 2px 0 8px #f0f1f2;
-    position: relative;
 
     &__logo {
       height: 64px;
@@ -117,6 +172,7 @@ const collapsed = ref(false)
     justify-content: space-between;
     height: 64px;
     box-shadow: 0 1px 4px rgba(0, 21, 41, 0.08);
+    transition: all 0.2s;
 
     &__left {
       display: flex;
@@ -132,6 +188,11 @@ const collapsed = ref(false)
       cursor: pointer;
       margin-right: 6px;
       height: 64px;
+      transition: all 0.3s;
+
+      &:hover {
+        color: #1677ff;
+      }
     }
 
     &__title {
@@ -188,7 +249,8 @@ const collapsed = ref(false)
   }
 
   .layout-content {
-    padding: 20px 24px 0 24px;
+    padding: 10px 10px 0 10px;
+    background: #f5f6fa;
   }
 }
 </style>
