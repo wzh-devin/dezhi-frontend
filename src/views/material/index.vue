@@ -21,6 +21,7 @@ import type {
   PaginationConfig,
   RowSelectionConfig,
 } from '@/components/content-cmp'
+import { UploadModal } from '@/components/upload-cmp'
 import { StatusEnum } from '@/constant/status-enums.ts'
 import type { FileInfoVO } from '@/service/typings.ts'
 import { message } from 'ant-design-vue'
@@ -30,6 +31,8 @@ const materialStore = useMaterialStore()
 const selectedRowKeys = ref<(string | number)[]>([])
 // 文件类型过滤器
 const fileTypeFilter = ref<string>('')
+// 上传弹窗显示状态
+const uploadModalVisible = ref(false)
 // 页面信息
 const pageInfo = reactive({
   addition: {
@@ -189,7 +192,14 @@ const tableConfig = computed(() => ({
 }))
 
 const handleUpload = () => {
-  // 处理上传逻辑
+  uploadModalVisible.value = true
+}
+
+// 上传成功后的处理
+const handleUploadSuccess = () => {
+  // 重新加载数据
+  pageInit(pageInfo.addition)
+  uploadModalVisible.value = false
 }
 
 // 批量删除确认处理
@@ -293,6 +303,13 @@ const paginationHandler = (page: number, pageSize: number) => {
         {{ dayjs(record.createTime).format('YYYY-MM-DD HH:mm:ss') }}
       </template>
     </ContentTable>
+
+    <!-- 上传弹窗 -->
+    <UploadModal
+      v-model:visible="uploadModalVisible"
+      @success="handleUploadSuccess"
+      @cancel="uploadModalVisible = false"
+    />
   </div>
 </template>
 

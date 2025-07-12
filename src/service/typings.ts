@@ -44,19 +44,6 @@ export type ApiResultVoid = {
   addition?: Addition
 }
 
-export type ApiResultString = {
-  /** 响应是否成功 */
-  success?: boolean
-  /** 失败码 */
-  errCode?: number
-  /** 失败信息 */
-  errMsg?: string
-  /** 响应数据 */
-  data?: string
-  /**  */
-  addition?: Addition
-}
-
 export type ApiResultLoginVO = {
   /** 响应是否成功 */
   success?: boolean
@@ -73,6 +60,19 @@ export type ApiResultLoginVO = {
 export type LoginVO = {
   /** token信息 */
   token?: string
+}
+
+export type ApiResultString = {
+  /** 响应是否成功 */
+  success?: boolean
+  /** 失败码 */
+  errCode?: number
+  /** 失败信息 */
+  errMsg?: string
+  /** 响应数据 */
+  data?: string
+  /**  */
+  addition?: Addition
 }
 
 export type ApiResultUserInfoVO = {

@@ -1,20 +1,15 @@
-import { get, post, put } from '@/utils/http/axios'
+import { get, post } from '@/utils/http/axios'
 import type { ApiResultString, ApiResultVoid, ApiResultListFileInfoVO } from './typings'
 
 /**
- * 上传文件素材 PUT /api/v1/material/upload
+ * 上传文件素材 POST /api/v1/material/upload
  */
-export async function upload(
-  data?: {
-    /**  */
-    unknownParam?: unknown
-  },
-  options?: Record<string, unknown>,
-): Promise<ApiResultString> {
-  return put({
+export async function upload(data: FormData, options?: Record<string, unknown>): Promise<ApiResultString> {
+  return post({
     url: `/api/v1/material/upload`,
-    data: {
-      ...data,
+    data,
+    headers: {
+      'Content-Type': 'multipart/form-data',
     },
     ...(options || {}),
   })
@@ -23,7 +18,7 @@ export async function upload(
 /**
  * 批量删除文件 POST /api/v1/material/deleteMaterial
  */
-export async function delMaterial(data?: string[], options?: Record<string, unknown>): Promise<ApiResultVoid> {
+export async function delMaterial(data?: number[], options?: Record<string, unknown>): Promise<ApiResultVoid> {
   return post({
     url: `/api/v1/material/deleteMaterial`,
     data,
