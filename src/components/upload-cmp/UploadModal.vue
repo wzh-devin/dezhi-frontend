@@ -108,6 +108,7 @@ import { message } from 'ant-design-vue'
 import { CloudUploadOutlined, FileOutlined, CheckCircleOutlined, CloseCircleOutlined } from '@ant-design/icons-vue'
 import { upload } from '@/service/materialService'
 import { errMsgExtract } from '@/global/string-format.ts'
+import type { ApiResultObject } from '@/service/typings.ts'
 
 // 定义组件属性
 interface Props {
@@ -295,7 +296,7 @@ const handleUpload = async () => {
       fileItem.status = 'error'
       fileItem.error = '上传失败'
       errorCount++
-      errMsgExtract(error)
+      errMsgExtract(error as ApiResultObject)
     }
   })
 

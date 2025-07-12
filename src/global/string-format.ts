@@ -1,5 +1,5 @@
-import type { ApiResult } from '../interfaces/api-result.ts'
 import { message } from 'ant-design-vue'
+import type { ApiResultObject } from '@/service/typings.ts'
 
 /**
  * 2025/5/7 20:58
@@ -13,7 +13,7 @@ import { message } from 'ant-design-vue'
  * 错误信息提取
  * @param error
  */
-const errMsgExtract = (error: ApiResult<undefined>) => {
+const errMsgExtract = (error: ApiResultObject) => {
   const errCode = error?.errCode ?? ''
   const errMsgArr = error?.errMsg?.split(':')
 

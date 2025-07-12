@@ -18,7 +18,7 @@ export async function upload(data: FormData, options?: Record<string, unknown>):
 /**
  * 批量删除文件 POST /api/v1/material/deleteMaterial
  */
-export async function delMaterial(data?: number[], options?: Record<string, unknown>): Promise<ApiResultVoid> {
+export async function delMaterial(data?: string[], options?: Record<string, unknown>): Promise<ApiResultVoid> {
   return post({
     url: `/api/v1/material/deleteMaterial`,
     data,

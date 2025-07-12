@@ -23,7 +23,7 @@ import type {
 } from '@/components/content-cmp'
 import { UploadModal } from '@/components/upload-cmp'
 import { StatusEnum } from '@/constant/status-enums.ts'
-import type { FileInfoVO } from '@/service/typings.ts'
+import type { ApiResultObject, FileInfoVO } from '@/service/typings.ts'
 import { message } from 'ant-design-vue'
 
 const materialStore = useMaterialStore()
@@ -213,7 +213,7 @@ const handleBatchDeleteConfirm = async () => {
     await pageInit(pageInfo.addition)
     message.success('删除成功')
   } catch (error) {
-    errMsgExtract(error)
+    errMsgExtract(error as ApiResultObject)
   } finally {
     pageInfo.loading = false
   }
