@@ -8,7 +8,6 @@
  */
 import { onMounted, reactive, ref, computed } from 'vue'
 import { PlusOutlined, DeleteOutlined } from '@ant-design/icons-vue'
-import type { IFileInfo } from '@/interfaces/pages/material-page.ts'
 import useMaterialStore from '@/store/material'
 import { errMsgExtract } from '@/global/string-format.ts'
 import dayjs from 'dayjs'
@@ -92,9 +91,9 @@ const tableColumns: ColumnConfig[] = [
 /**
  * 初始化页面
  */
-const pageInit = async (pageNum: number, pageSize: number) => {
+const pageInit = async (addition: { pageNum: number; pageSize: number }) => {
   pageInfo.loading = true
-  materialStore.getMaterialListAction({ pageNum: pageNum, pageSize: pageSize, status: StatusEnum.NORMAL }).then(
+  materialStore.getMaterialListAction({ ...addition, status: StatusEnum.NORMAL }).then(
     (res) => {
       // 重置属性
       pageInfo.dataSource = res.data ?? []
@@ -113,7 +112,7 @@ const pageInit = async (pageNum: number, pageSize: number) => {
  * 页面挂载初始化
  */
 onMounted(() => {
-  pageInit(1, 10)
+  pageInit(pageInfo.addition)
 })
 
 /**
@@ -137,7 +136,6 @@ const headerConfig = computed(() => ({
     {
       key: 'batch-delete',
       label: '批量删除',
-      onClick: handleBatchDelete,
     },
   ] as ButtonConfig[],
   filters: [
@@ -194,19 +192,21 @@ const handleUpload = () => {
   // 处理上传逻辑
 }
 
-const handleBatchDelete = async () => {
+// 批量删除确认处理
+const handleBatchDeleteConfirm = async () => {
   pageInfo.loading = true
-  // 处理批量删除逻辑
-  materialStore.delMaterialAction((selectedRowKeys.value as string[]) ?? []).then(
-    () => {
-      pageInit(pageInfo.addition.pageNum, pageInfo.addition.pageSize)
-      message.success('删除成功')
-    },
-    (error) => {
-      errMsgExtract(error)
-    },
-  )
-  pageInfo.loading = false
+  try {
+    await materialStore.delMaterialAction((selectedRowKeys.value as string[]) ?? [])
+    // 清空选中的行
+    selectedRowKeys.value = []
+    // 重新加载数据
+    await pageInit(pageInfo.addition)
+    message.success('删除成功')
+  } catch (error) {
+    errMsgExtract(error)
+  } finally {
+    pageInfo.loading = false
+  }
 }
 
 const handleRecycleBin = () => {
@@ -234,7 +234,7 @@ const onFilterChange = (key: string, value: string) => {
  * @param pageSize 每页数据量
  */
 const paginationHandler = (page: number, pageSize: number) => {
-  pageInit(page, pageSize)
+  pageInit({ pageNum: page, pageSize: pageSize })
 }
 </script>
 
@@ -248,6 +248,7 @@ const paginationHandler = (page: number, pageSize: number) => {
       :right-buttons="headerConfig.rightButtons"
       :selected-count="headerConfig.selectedCount"
       @filter-change="onFilterChange"
+      @batch-delete-confirm="handleBatchDeleteConfirm"
     />
 
     <!-- 表格内容 -->

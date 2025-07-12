@@ -7,6 +7,9 @@
  * @since 1.0
  */
 import { ref } from 'vue'
+import CommonModal from '@/components/modal-cmp/CommonModal.vue'
+import { ModalType } from '@/components/modal-cmp/common-modal'
+import { message } from 'ant-design-vue'
 
 // 按钮配置接口
 interface ButtonConfig {
@@ -60,6 +63,7 @@ const props = withDefaults(defineProps<Props>(), {
 const emit = defineEmits<{
   filterChange: [key: string, value: string]
   searchChange: [value: string]
+  batchDeleteConfirm: []
 }>()
 
 // 筛选器值
@@ -67,6 +71,12 @@ const filterValues = ref<Record<string, string>>({})
 
 // 搜索值
 const searchValue = ref<string>('')
+
+// 批量删除弹窗 ref
+const batchDeleteModalRef = ref<InstanceType<typeof CommonModal>>()
+
+// 当前触发删除的按钮配置
+const currentDeleteButton = ref<ButtonConfig | null>(null)
 
 // 处理筛选器变化
 const handleFilterChange = (key: string, value: string) => {
@@ -91,6 +101,30 @@ const isButtonDisabled = (button: ButtonConfig) => {
   // 如果按钮key包含'batch'，则需要选中行才能使用
   return button.key.includes('batch') && props.selectedCount === 0
 }
+
+// 处理按钮点击
+const handleButtonClick = (button: ButtonConfig) => {
+  // 如果是批量删除按钮，先显示确认弹窗
+  if (button.key.includes('batch') && button.key.includes('delete')) {
+    if (props.selectedCount === 0) {
+      message.warning('请选择要删除的项目')
+      return
+    }
+    currentDeleteButton.value = button
+    batchDeleteModalRef.value?.showModal()
+  } else {
+    // 其他按钮直接执行原来的点击事件
+    button.onClick()
+  }
+}
+
+// 批量删除确认处理
+const handleBatchDeleteConfirm = () => {
+  // 触发删除确认事件，让父组件处理具体的删除逻辑
+  emit('batchDeleteConfirm')
+  // 关闭弹窗
+  batchDeleteModalRef.value?.hiddenModal()
+}
 </script>
 
 <template>
@@ -104,7 +138,7 @@ const isButtonDisabled = (button: ButtonConfig) => {
         :disabled="isButtonDisabled(button)"
         :danger="button.danger"
         class="action-btn"
-        @click="button.onClick"
+        @click="handleButtonClick(button)"
       >
         <template v-if="button.icon" #icon>
           <component :is="button.icon" />
@@ -147,7 +181,7 @@ const isButtonDisabled = (button: ButtonConfig) => {
         :disabled="isButtonDisabled(button)"
         :danger="button.danger"
         class="action-btn"
-        @click="button.onClick"
+        @click="handleButtonClick(button)"
       >
         <template v-if="button.icon" #icon>
           <component :is="button.icon" />
@@ -155,6 +189,17 @@ const isButtonDisabled = (button: ButtonConfig) => {
         {{ button.label }}
       </a-button>
     </div>
+
+    <!-- 批量删除确认弹窗 -->
+    <CommonModal
+      ref="batchDeleteModalRef"
+      :type="ModalType.NORMAL_TEXT"
+      title="确认删除"
+      :content="`您确定要删除选中的 ${selectedCount} 个项目吗？删除后无法恢复。`"
+      confirm-text="确认删除"
+      cancel-text="取消"
+      @confirm="handleBatchDeleteConfirm"
+    />
   </div>
 </template>
 

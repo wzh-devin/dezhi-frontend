@@ -21,7 +21,7 @@ export async function upload(
 }
 
 /**
- * 删除文件 POST /api/v1/material/deleteMaterial
+ * 批量删除文件 POST /api/v1/material/deleteMaterial
  */
 export async function delMaterial(data?: string[], options?: Record<string, unknown>): Promise<ApiResultVoid> {
   return post({
