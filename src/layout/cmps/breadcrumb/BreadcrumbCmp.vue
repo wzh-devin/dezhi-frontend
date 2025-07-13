@@ -19,11 +19,11 @@ const router = useRouter()
 const breadcrumbItems = computed(() => {
   const pathSegments = pathConvert()
   const menuInfo = getMenuInfo()
-  
+
   return pathSegments.map((item, index) => {
     const menu = menuInfo.find((menu) => menu.key === item)
     const label = menu?.label as string
-    
+
     // 构建路由路径
     let routePath = ''
     if (item === 'dashboard') {
@@ -47,12 +47,12 @@ const breadcrumbItems = computed(() => {
     } else {
       routePath = `/${item}`
     }
-    
+
     return {
       label,
       path: routePath,
       key: item,
-      isLast: index === pathSegments.length - 1
+      isLast: index === pathSegments.length - 1,
     }
   })
 })
@@ -72,7 +72,7 @@ const handleBreadcrumbClick = (item: { path: string; isLast: boolean }) => {
 const pathConvert = (): string[] => {
   // 直接使用当前路由的完整路径，避免重复
   const pathSegments = route.path.split('/').filter((segment) => segment !== '')
-  
+
   // 去重处理，确保不会出现重复的路径段
   return [...new Set(pathSegments)]
 }
@@ -82,17 +82,10 @@ const pathConvert = (): string[] => {
   <div class="header-breadcrumb">
     <a-breadcrumb separator="👉">
       <a-breadcrumb-item v-for="(item, index) in breadcrumbItems" :key="index">
-        <span
-          v-if="item.isLast"
-          class="breadcrumb-current"
-        >
+        <span v-if="item.isLast" class="breadcrumb-current">
           {{ item.label }}
         </span>
-        <span
-          v-else
-          class="breadcrumb-link"
-          @click="handleBreadcrumbClick(item)"
-        >
+        <span v-else class="breadcrumb-link" @click="handleBreadcrumbClick(item)">
           {{ item.label }}
         </span>
       </a-breadcrumb-item>
@@ -106,13 +99,13 @@ const pathConvert = (): string[] => {
     color: #1677ff;
     cursor: pointer;
     transition: color 0.3s;
-    
+
     &:hover {
       color: #4096ff;
       text-decoration: underline;
     }
   }
-  
+
   .breadcrumb-current {
     color: #666;
     cursor: default;

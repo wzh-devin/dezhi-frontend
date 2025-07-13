@@ -95,7 +95,7 @@ const visibleMenuData: Array<IMenuData> = [
 export const getMenuInfo = (): Array<{ key: string; label: string }> => {
   const menuInfo: Array<{ key: string; label: string }> = []
   const addedKeys = new Set<string>()
-  
+
   menuData.forEach((menu: IMenuData) => {
     // 处理子菜单数据
     menu?.children?.forEach((child: IMenuData) => {
@@ -107,7 +107,7 @@ export const getMenuInfo = (): Array<{ key: string; label: string }> => {
         addedKeys.add(child?.key)
       }
     })
-    
+
     // 处理父菜单数据
     if (!addedKeys.has(menu?.key)) {
       menuInfo.push({
@@ -117,7 +117,7 @@ export const getMenuInfo = (): Array<{ key: string; label: string }> => {
       addedKeys.add(menu?.key)
     }
   })
-  
+
   // 处理额外的可见菜单项
   visibleMenuData.forEach((menu: IMenuData) => {
     const index = menuInfo.findIndex((item: { key: string }) => item.key === menu.parentKey)
@@ -126,7 +126,7 @@ export const getMenuInfo = (): Array<{ key: string; label: string }> => {
       addedKeys.add(menu.key)
     }
   })
-  
+
   console.log(menuInfo)
   return menuInfo
 }

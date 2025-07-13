@@ -26,13 +26,7 @@
             <p class="upload-sub-hint">支持单个或批量上传，严禁上传违规文件</p>
           </div>
         </div>
-        <input
-          ref="fileInputRef"
-          type="file"
-          multiple
-          style="display: none"
-          @change="handleFileSelect"
-        />
+        <input ref="fileInputRef" type="file" multiple style="display: none" @change="handleFileSelect" />
       </div>
 
       <!-- 文件列表 -->
@@ -58,13 +52,7 @@
               </div>
             </div>
             <div class="file-actions">
-              <a-button
-                v-if="file.status !== 'uploading'"
-                type="link"
-                size="small"
-                danger
-                @click="removeFile(index)"
-              >
+              <a-button v-if="file.status !== 'uploading'" type="link" size="small" danger @click="removeFile(index)">
                 删除
               </a-button>
               <div v-if="file.status === 'uploading'" class="upload-progress">
@@ -110,12 +98,7 @@
 <script setup lang="ts">
 import { ref, reactive, watch } from 'vue'
 import { message } from 'ant-design-vue'
-import {
-  CloudUploadOutlined,
-  FileOutlined,
-  CheckCircleOutlined,
-  CloseCircleOutlined,
-} from '@ant-design/icons-vue'
+import { CloudUploadOutlined, FileOutlined, CheckCircleOutlined, CloseCircleOutlined } from '@ant-design/icons-vue'
 import { upload } from '@/service/materialService'
 
 // 定义组件属性
@@ -126,7 +109,9 @@ interface Props {
 // 定义组件事件
 interface Emits {
   (e: 'update:visible', value: boolean): void
+
   (e: 'success'): void
+
   (e: 'cancel'): void
 }
 
@@ -159,7 +144,7 @@ watch(
   () => props.visible,
   (newVal) => {
     visible.value = newVal
-  }
+  },
 )
 
 watch(visible, (newVal) => {
@@ -182,7 +167,7 @@ const handleDragLeave = (e: DragEvent) => {
 const handleDrop = (e: DragEvent) => {
   e.preventDefault()
   isDragOver.value = false
-  
+
   const files = e.dataTransfer?.files
   if (files && files.length > 0) {
     handleFiles(Array.from(files))
@@ -208,21 +193,21 @@ const handleFileSelect = (e: Event) => {
 // 处理文件
 const handleFiles = (files: File[]) => {
   const maxSize = 10 * 1024 * 1024 // 10MB
-  
-  files.forEach(file => {
+
+  files.forEach((file) => {
     // 检查文件大小
     if (file.size > maxSize) {
       message.error(`文件 ${file.name} 大小超过 10MB 限制`)
       return
     }
-    
+
     // 检查是否已存在相同文件
-    const existingFile = fileList.find(item => item.name === file.name && item.size === file.size)
+    const existingFile = fileList.find((item) => item.name === file.name && item.size === file.size)
     if (existingFile) {
       message.warning(`文件 ${file.name} 已存在`)
       return
     }
-    
+
     // 添加到文件列表
     fileList.push({
       name: file.name,
@@ -263,22 +248,22 @@ const handleUpload = async () => {
     message.warning('请选择要上传的文件')
     return
   }
-  
+
   uploading.value = true
   let successCount = 0
   let errorCount = 0
-  
+
   // 并发上传文件
   const uploadPromises = fileList.map(async (fileItem) => {
     try {
       fileItem.status = 'uploading'
       fileItem.progress = 0
-      
+
       const formData = new FormData()
       formData.append('material', fileItem.file)
-      
+
       const response = await upload(formData)
-      
+
       if (response.success) {
         fileItem.status = 'success'
         fileItem.progress = 100
@@ -295,11 +280,11 @@ const handleUpload = async () => {
       errorCount++
     }
   })
-  
+
   await Promise.all(uploadPromises)
-  
+
   uploading.value = false
-  
+
   // 显示上传结果
   if (successCount > 0 && errorCount === 0) {
     message.success(`成功上传 ${successCount} 个文件`)
@@ -318,7 +303,7 @@ const handleCancel = () => {
     message.warning('正在上传中，无法取消')
     return
   }
-  
+
   visible.value = false
   fileList.splice(0, fileList.length)
   emit('cancel')
@@ -345,31 +330,31 @@ defineExpose({
     text-align: center;
     cursor: pointer;
     transition: all 0.3s;
-    
+
     &:hover {
       border-color: #1677ff;
       background-color: #f0f8ff;
     }
-    
+
     &.drag-over {
       border-color: #1677ff;
       background-color: #f0f8ff;
     }
-    
+
     .upload-area-content {
       .upload-icon {
         font-size: 48px;
         color: #1677ff;
         margin-bottom: 16px;
       }
-      
+
       .upload-text {
         .upload-hint {
           font-size: 16px;
           color: #262626;
           margin-bottom: 8px;
         }
-        
+
         .upload-sub-hint {
           font-size: 14px;
           color: #8c8c8c;
@@ -378,10 +363,10 @@ defineExpose({
       }
     }
   }
-  
+
   .file-list {
     margin-top: 24px;
-    
+
     .file-list-header {
       display: flex;
       justify-content: space-between;
@@ -390,11 +375,11 @@ defineExpose({
       font-weight: 500;
       color: #262626;
     }
-    
+
     .file-items {
       max-height: 300px;
       overflow-y: auto;
-      
+
       .file-item {
         display: flex;
         justify-content: space-between;
@@ -404,28 +389,28 @@ defineExpose({
         border-radius: 6px;
         margin-bottom: 8px;
         transition: all 0.3s;
-        
+
         &.upload-success {
           border-color: #52c41a;
           background-color: #f6ffed;
         }
-        
+
         &.upload-error {
           border-color: #ff4d4f;
           background-color: #fff2f0;
         }
-        
+
         .file-info {
           display: flex;
           align-items: center;
           flex: 1;
-          
+
           .file-icon {
             font-size: 24px;
             color: #1677ff;
             margin-right: 12px;
           }
-          
+
           .file-details {
             .file-name {
               font-weight: 500;
@@ -433,31 +418,31 @@ defineExpose({
               margin-bottom: 4px;
               word-break: break-all;
             }
-            
+
             .file-size {
               font-size: 12px;
               color: #8c8c8c;
             }
           }
         }
-        
+
         .file-actions {
           display: flex;
           align-items: center;
-          
+
           .upload-progress {
             width: 100px;
             margin-right: 8px;
           }
-          
+
           .upload-status {
             font-size: 20px;
             margin-right: 8px;
-            
+
             &.success {
               color: #52c41a;
             }
-            
+
             &.error {
               color: #ff4d4f;
             }
@@ -466,28 +451,28 @@ defineExpose({
       }
     }
   }
-  
+
   .upload-tips {
     margin-top: 24px;
     padding: 16px;
     background-color: #f6f8fa;
     border-radius: 6px;
-    
+
     p {
       margin: 0 0 8px 0;
       font-weight: 500;
       color: #262626;
     }
-    
+
     ul {
       margin: 0;
       padding-left: 20px;
       color: #8c8c8c;
-      
+
       li {
         margin-bottom: 4px;
       }
     }
   }
 }
-</style> 
+</style>
