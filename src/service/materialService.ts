@@ -16,6 +16,17 @@ export async function upload(data: FormData, options?: Record<string, unknown>):
 }
 
 /**
+ * 批量恢复文件 POST /api/v1/material/recoverMaterial
+ */
+export async function recoverMaterial(data?: string[], options?: Record<string, unknown>): Promise<ApiResultVoid> {
+  return post({
+    url: `/api/v1/material/recoverMaterial`,
+    data,
+    ...(options || {}),
+  })
+}
+
+/**
  * 批量删除文件 POST /api/v1/material/deleteMaterial
  */
 export async function delMaterial(data?: string[], options?: Record<string, unknown>): Promise<ApiResultVoid> {

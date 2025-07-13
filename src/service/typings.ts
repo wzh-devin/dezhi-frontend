@@ -26,7 +26,7 @@ export type UserInfoQueryVO = {
   /** 邮箱 */
   email?: string
   /** 验证码 */
-  code?: number
+  code?: number | string
   /** 密码 */
   password?: string
 }

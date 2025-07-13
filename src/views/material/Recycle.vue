@@ -10,14 +10,16 @@ import { onMounted, reactive, ref, computed } from 'vue'
 import useMaterialStore from '@/store/material'
 import { errMsgExtract } from '@/global/string-format.ts'
 import dayjs from 'dayjs'
-import { convertBytesToKb } from '@/utils/convert.ts'
-import { ContentHeader, ContentTable } from '@/components/content-cmp'
+import { convertFileTypeToClassName, convertStorageTypeToClassName, formatFileSize } from '@/utils/convert.ts'
+import { ContentHeader, ContentTable, type RowSelectionConfig } from '@/components/content-cmp'
 import type { ButtonConfig, FilterConfig, SearchConfig, ColumnConfig, PaginationConfig } from '@/components/content-cmp'
 import { FileTypeEnum, StatusEnum } from '@/constant/enums.ts'
 import type { ApiResultObject, FileInfoVO } from '@/service/typings.ts'
 import { message } from 'ant-design-vue'
 
 const materialStore = useMaterialStore()
+// 选择的行Keys
+const selectedRowKeys = ref<(string | number)[]>([])
 // 文件类型过滤器
 const fileTypeFilter = ref<string>()
 // 页面信息
@@ -111,6 +113,13 @@ onMounted(() => {
 const headerConfig = computed(() => ({
   leftButtons: [
     {
+      key: 'recover',
+      label: '恢复文件',
+      type: 'primary' as const,
+      onClick: handleRecoverMaterial,
+      disabled: selectedRowKeys.value.length === 0,
+    },
+    {
       key: 'clear-recycle',
       label: '清空回收站',
       type: 'primary' as const,
@@ -144,6 +153,10 @@ const tableConfig = computed(() => ({
   columns: tableColumns,
   rowKey: (record: FileInfoVO) => record.id as string,
   loading: pageInfo.loading,
+  rowSelection: {
+    selectedRowKeys: selectedRowKeys.value,
+    onChange: onSelectChange,
+  } as RowSelectionConfig,
   pagination: {
     current: pageInfo.addition.pageNum,
     pageSize: pageInfo.addition.pageSize,
@@ -168,9 +181,37 @@ const handleClearRecycleConfirm = async () => {
   }
 }
 
+// 恢复文件
+const handleRecoverMaterial = async () => {
+  if (selectedRowKeys.value.length === 0) {
+    return
+  }
+  pageInfo.loading = true
+  try {
+    await materialStore.recoverMaterialAction(selectedRowKeys.value as string[])
+    // 清空选中的行
+    selectedRowKeys.value = []
+    // 重新加载数据
+    await pageInit(pageInfo.addition)
+    message.success('文件恢复成功')
+  } catch (error) {
+    errMsgExtract(error as ApiResultObject)
+  } finally {
+    pageInfo.loading = false
+  }
+}
+
 const onSearch = (value: string) => {
   // 处理搜索逻辑
   console.log('搜索:', value)
+}
+
+/**
+ * 表格选择处理
+ * @param selectedKeys 选中的行key数组
+ */
+const onSelectChange = (selectedKeys: (string | number)[]) => {
+  selectedRowKeys.value = selectedKeys
 }
 
 /**
@@ -211,6 +252,7 @@ const paginationHandler = (page: number, pageSize: number) => {
       :columns="tableConfig.columns"
       :row-key="tableConfig.rowKey"
       :loading="tableConfig.loading"
+      :row-selection="tableConfig.rowSelection"
       :pagination="tableConfig.pagination"
       :scroll-y="tableConfig.scrollY"
     >
@@ -226,18 +268,20 @@ const paginationHandler = (page: number, pageSize: number) => {
 
       <!-- 文件大小列 -->
       <template #bodyCell-size="{ record }">
-        {{ `${convertBytesToKb(record.size)} KB` }}
+        {{ formatFileSize(record.size) }}
       </template>
 
       <!-- 文件类型列 -->
       <template #bodyCell-fileType="{ record }">
-        <a-tag
-          :class="[
-            'file-type-tag',
-            record.fileType === 'DOC' ? 'doc-tag' : record.fileType === 'IMAGE' ? 'image-tag' : 'zip-tag',
-          ]"
-        >
+        <a-tag :class="['file-type-tag', convertFileTypeToClassName(record.fileType)]">
           {{ record.fileType }}
+        </a-tag>
+      </template>
+
+      <!-- 存储类型列 -->
+      <template #bodyCell-storageType="{ record }">
+        <a-tag :class="['storage-type-tag', convertStorageTypeToClassName(record.storageType)]">
+          {{ record.storageType }}
         </a-tag>
       </template>
 
@@ -275,22 +319,66 @@ const paginationHandler = (page: number, pageSize: number) => {
     align-items: center;
     font-size: 12px;
 
-    &.doc-tag {
+    &.jpg-tag {
       color: #1677ff;
       background: #e6f4ff;
       border-color: #91caff;
     }
 
-    &.image-tag {
+    &.png-tag {
       color: #52c41a;
       background: #f6ffed;
       border-color: #b7eb8f;
     }
 
-    &.zip-tag {
-      color: #faad14;
-      background: #fffbe6;
-      border-color: #ffe58f;
+    &.gif-tag {
+      color: #fa8c16;
+      background: #fff7e6;
+      border-color: #ffd591;
+    }
+
+    &.default-tag {
+      color: #8c8c8c;
+      background: #f5f5f5;
+      border-color: #d9d9d9;
+    }
+  }
+
+  .storage-type-tag {
+    border-radius: 4px;
+    padding: 1px 6px;
+    display: inline-flex;
+    align-items: center;
+    font-size: 12px;
+
+    &.minio-tag {
+      color: #722ed1;
+      background: #f9f0ff;
+      border-color: #d3adf7;
+    }
+
+    &.local-tag {
+      color: #13c2c2;
+      background: #e6fffb;
+      border-color: #87e8de;
+    }
+
+    &.oss-tag {
+      color: #eb2f96;
+      background: #fff0f6;
+      border-color: #ffadd2;
+    }
+
+    &.cos-tag {
+      color: #f5222d;
+      background: #fff1f0;
+      border-color: #ffa39e;
+    }
+
+    &.default-storage-tag {
+      color: #8c8c8c;
+      background: #f5f5f5;
+      border-color: #d9d9d9;
     }
   }
 

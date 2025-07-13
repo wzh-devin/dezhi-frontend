@@ -11,7 +11,7 @@ import { PlusOutlined, DeleteOutlined } from '@ant-design/icons-vue'
 import useMaterialStore from '@/store/material'
 import { errMsgExtract } from '@/global/string-format.ts'
 import dayjs from 'dayjs'
-import { convertBytesToKb } from '@/utils/convert.ts'
+import { convertFileTypeToClassName, convertStorageTypeToClassName, formatFileSize } from '@/utils/convert.ts'
 import { ContentHeader, ContentTable } from '@/components/content-cmp'
 import type {
   ButtonConfig,
@@ -21,10 +21,11 @@ import type {
   PaginationConfig,
   RowSelectionConfig,
 } from '@/components/content-cmp'
-import { UploadModal } from '@/components/upload-cmp'
+import { UploadModal, type UploadResponse } from '@/components/upload-cmp'
 import { FileTypeEnum, StatusEnum } from '@/constant/enums.ts'
 import type { ApiResultObject, FileInfoVO } from '@/service/typings.ts'
 import { message } from 'ant-design-vue'
+import { upload } from '@/service/materialService'
 import { useRouter } from 'vue-router'
 
 const materialStore = useMaterialStore()
@@ -202,11 +203,26 @@ const handleUpload = () => {
   uploadModalVisible.value = true
 }
 
+// 上传函数
+const uploadFunction = async (file: File): Promise<UploadResponse> => {
+  const formData = new FormData()
+  formData.append('material', file)
+  const result = await upload(formData)
+  return {
+    success: result.success ?? false,
+    errMsg: result.errMsg,
+    data: result.data,
+  }
+}
+
 // 上传成功后的处理
-const handleUploadSuccess = () => {
+const handleUploadSuccess = (results: { successCount: number; errorCount: number }) => {
   // 重新加载数据
   pageInit(pageInfo.addition)
   uploadModalVisible.value = false
+
+  // 可以根据results显示更详细的结果信息
+  console.log('上传结果:', results)
 }
 
 // 批量删除确认处理
@@ -292,18 +308,20 @@ const paginationHandler = (page: number, pageSize: number) => {
 
       <!-- 文件大小列 -->
       <template #bodyCell-size="{ record }">
-        {{ `${convertBytesToKb(record.size)} KB` }}
+        {{ formatFileSize(record.size) }}
       </template>
 
       <!-- 文件类型列 -->
       <template #bodyCell-fileType="{ record }">
-        <a-tag
-          :class="[
-            'file-type-tag',
-            record.fileType === 'DOC' ? 'doc-tag' : record.fileType === 'IMAGE' ? 'image-tag' : 'zip-tag',
-          ]"
-        >
+        <a-tag :class="['file-type-tag', convertFileTypeToClassName(record.fileType)]">
           {{ record.fileType }}
+        </a-tag>
+      </template>
+
+      <!-- 存储类型列 -->
+      <template #bodyCell-storageType="{ record }">
+        <a-tag :class="['storage-type-tag', convertStorageTypeToClassName(record.storageType)]">
+          {{ record.storageType }}
         </a-tag>
       </template>
 
@@ -316,6 +334,7 @@ const paginationHandler = (page: number, pageSize: number) => {
     <!-- 上传弹窗 -->
     <UploadModal
       v-model:visible="uploadModalVisible"
+      :upload-function="uploadFunction"
       @success="handleUploadSuccess"
       @cancel="uploadModalVisible = false"
     />
@@ -348,22 +367,66 @@ const paginationHandler = (page: number, pageSize: number) => {
     align-items: center;
     font-size: 12px;
 
-    &.doc-tag {
+    &.jpg-tag {
       color: #1677ff;
       background: #e6f4ff;
       border-color: #91caff;
     }
 
-    &.image-tag {
+    &.png-tag {
       color: #52c41a;
       background: #f6ffed;
       border-color: #b7eb8f;
     }
 
-    &.zip-tag {
-      color: #faad14;
-      background: #fffbe6;
-      border-color: #ffe58f;
+    &.gif-tag {
+      color: #fa8c16;
+      background: #fff7e6;
+      border-color: #ffd591;
+    }
+
+    &.default-tag {
+      color: #8c8c8c;
+      background: #f5f5f5;
+      border-color: #d9d9d9;
+    }
+  }
+
+  .storage-type-tag {
+    border-radius: 4px;
+    padding: 1px 6px;
+    display: inline-flex;
+    align-items: center;
+    font-size: 12px;
+
+    &.minio-tag {
+      color: #722ed1;
+      background: #f9f0ff;
+      border-color: #d3adf7;
+    }
+
+    &.local-tag {
+      color: #13c2c2;
+      background: #e6fffb;
+      border-color: #87e8de;
+    }
+
+    &.oss-tag {
+      color: #eb2f96;
+      background: #fff0f6;
+      border-color: #ffadd2;
+    }
+
+    &.cos-tag {
+      color: #f5222d;
+      background: #fff1f0;
+      border-color: #ffa39e;
+    }
+
+    &.default-storage-tag {
+      color: #8c8c8c;
+      background: #f5f5f5;
+      border-color: #d9d9d9;
     }
   }
 

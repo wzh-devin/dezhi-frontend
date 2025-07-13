@@ -1,116 +1,39 @@
-<template>
-  <a-modal
-    v-model:open="visible"
-    title="上传文件"
-    :width="600"
-    :maskClosable="false"
-    :destroyOnClose="true"
-    @cancel="handleCancel"
-  >
-    <div class="upload-modal-content">
-      <!-- 文件上传区域 -->
-      <div
-        class="upload-area"
-        :class="{ 'drag-over': isDragOver }"
-        @dragover.prevent="handleDragOver"
-        @dragleave.prevent="handleDragLeave"
-        @drop.prevent="handleDrop"
-        @click="handleClickUpload"
-      >
-        <div class="upload-area-content">
-          <div class="upload-icon">
-            <CloudUploadOutlined />
-          </div>
-          <div class="upload-text">
-            <p class="upload-hint">点击或拖拽文件到此区域上传</p>
-            <p class="upload-sub-hint">支持单个或批量上传，严禁上传违规文件</p>
-          </div>
-        </div>
-        <input ref="fileInputRef" type="file" multiple style="display: none" @change="handleFileSelect" />
-      </div>
-
-      <!-- 文件列表 -->
-      <div v-if="fileList.length > 0" class="file-list">
-        <div class="file-list-header">
-          <span>文件列表 ({{ fileList.length }})</span>
-          <a-button type="link" size="small" @click="clearFiles">清空</a-button>
-        </div>
-        <div class="file-items">
-          <div
-            v-for="(file, index) in fileList"
-            :key="index"
-            class="file-item"
-            :class="{ 'upload-success': file.status === 'success', 'upload-error': file.status === 'error' }"
-          >
-            <div class="file-info">
-              <div class="file-icon">
-                <FileOutlined />
-              </div>
-              <div class="file-details">
-                <div class="file-name">{{ file.name }}</div>
-                <div class="file-size">{{ formatFileSize(file.size) }}</div>
-              </div>
-            </div>
-            <div class="file-actions">
-              <a-button v-if="file.status !== 'uploading'" type="link" size="small" danger @click="removeFile(index)">
-                删除
-              </a-button>
-              <div v-if="file.status === 'uploading'" class="upload-progress">
-                <a-progress :percent="file.progress" size="small" />
-              </div>
-              <div v-if="file.status === 'success'" class="upload-status success">
-                <CheckCircleOutlined />
-              </div>
-              <div v-if="file.status === 'error'" class="upload-status error">
-                <CloseCircleOutlined />
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- 上传提示 -->
-      <div v-if="fileList.length === 0" class="upload-tips">
-        <p>上传要求：</p>
-        <ul>
-          <li>支持常见文件格式：图片、文档、压缩包等</li>
-          <li>单个文件大小不超过 10MB</li>
-          <li>建议文件名使用英文或数字，避免特殊字符</li>
-        </ul>
-      </div>
-    </div>
-
-    <!-- 底部操作按钮 -->
-    <template #footer>
-      <a-button @click="handleCancel">取消</a-button>
-      <a-button
-        type="primary"
-        :loading="uploading"
-        :disabled="fileList.length === 0 || uploading"
-        @click="handleUpload"
-      >
-        {{ uploading ? '上传中...' : '确认上传' }}
-      </a-button>
-    </template>
-  </a-modal>
-</template>
-
 <script setup lang="ts">
+/**
+ * 2025/5/21 17:10
+ * @author <a href="https://github.com/wzh-devin">devin</a>
+ * @description 文件上传组件
+ * @version 1.0
+ * @since 1.0
+ */
 import { ref, reactive, watch } from 'vue'
 import { message } from 'ant-design-vue'
 import { CloudUploadOutlined, FileOutlined, CheckCircleOutlined, CloseCircleOutlined } from '@ant-design/icons-vue'
-import { upload } from '@/service/materialService'
+import { errMsgExtract } from '@/global/string-format.ts'
+import type { ApiResultObject } from '@/service/typings.ts'
+
+// 上传函数类型定义
+interface UploadResponse {
+  success: boolean
+  errMsg?: string
+  data?: unknown
+}
 
 // 定义组件属性
 interface Props {
   visible?: boolean
+  uploadFunction?: (file: File) => Promise<UploadResponse>
+  accept?: string
+  maxSize?: number
+  maxSizeUnit?: 'B' | 'KB' | 'MB' | 'GB'
+  uploadTips?: string[]
 }
 
 // 定义组件事件
 interface Emits {
   (e: 'update:visible', value: boolean): void
 
-  (e: 'success'): void
+  (e: 'success', results: { successCount: number; errorCount: number }): void
 
   (e: 'cancel'): void
 }
@@ -122,12 +45,20 @@ interface FileItem {
   file: File
   status: 'pending' | 'uploading' | 'success' | 'error'
   progress: number
-  response?: any
+  response?: unknown
   error?: string
 }
 
 const props = withDefaults(defineProps<Props>(), {
   visible: false,
+  accept: '.png,.jpg,.jpeg,.gif',
+  maxSize: 10,
+  maxSizeUnit: 'MB',
+  uploadTips: () => [
+    '仅支持图片格式：PNG、JPG、GIF',
+    '单个文件大小不超过 10MB',
+    '建议文件名使用英文或数字，避免特殊字符',
+  ],
 })
 
 const emit = defineEmits<Emits>()
@@ -192,12 +123,29 @@ const handleFileSelect = (e: Event) => {
 
 // 处理文件
 const handleFiles = (files: File[]) => {
-  const maxSize = 10 * 1024 * 1024 // 10MB
+  // 计算最大文件大小
+  const sizeMultiplier = {
+    B: 1,
+    KB: 1024,
+    MB: 1024 * 1024,
+    GB: 1024 * 1024 * 1024,
+  }
+  const maxSize = props.maxSize * sizeMultiplier[props.maxSizeUnit]
+
+  // 从accept属性中解析允许的文件扩展名
+  const allowedExtensions = props.accept.split(',').map((ext) => ext.trim().toLowerCase())
 
   files.forEach((file) => {
+    // 检查文件类型
+    const fileExtension = file.name.toLowerCase().slice(file.name.lastIndexOf('.'))
+    if (!allowedExtensions.includes(fileExtension)) {
+      message.error(`文件 ${file.name} 格式不支持，支持格式：${props.accept}`)
+      return
+    }
+
     // 检查文件大小
     if (file.size > maxSize) {
-      message.error(`文件 ${file.name} 大小超过 10MB 限制`)
+      message.error(`文件 ${file.name} 大小超过 ${props.maxSize}${props.maxSizeUnit} 限制`)
       return
     }
 
@@ -249,6 +197,11 @@ const handleUpload = async () => {
     return
   }
 
+  if (!props.uploadFunction) {
+    message.error('未提供上传函数')
+    return
+  }
+
   uploading.value = true
   let successCount = 0
   let errorCount = 0
@@ -259,10 +212,7 @@ const handleUpload = async () => {
       fileItem.status = 'uploading'
       fileItem.progress = 0
 
-      const formData = new FormData()
-      formData.append('material', fileItem.file)
-
-      const response = await upload(formData)
+      const response = await props.uploadFunction!(fileItem.file)
 
       if (response.success) {
         fileItem.status = 'success'
@@ -274,9 +224,10 @@ const handleUpload = async () => {
         fileItem.error = response.errMsg || '上传失败'
         errorCount++
       }
-    } catch (error) {
+    } catch (err) {
       fileItem.status = 'error'
       fileItem.error = '上传失败'
+      errMsgExtract(err as ApiResultObject)
       errorCount++
     }
   })
@@ -288,12 +239,14 @@ const handleUpload = async () => {
   // 显示上传结果
   if (successCount > 0 && errorCount === 0) {
     message.success(`成功上传 ${successCount} 个文件`)
-    emit('success')
+    emit('success', { successCount, errorCount })
     handleCancel()
   } else if (successCount > 0 && errorCount > 0) {
     message.warning(`上传完成：成功 ${successCount} 个，失败 ${errorCount} 个`)
+    emit('success', { successCount, errorCount })
   } else {
     message.error('所有文件上传失败')
+    emit('success', { successCount, errorCount })
   }
 }
 
@@ -319,6 +272,108 @@ defineExpose({
   },
 })
 </script>
+
+<template>
+  <a-modal
+    v-model:open="visible"
+    title="上传文件"
+    :width="600"
+    :maskClosable="false"
+    :destroyOnClose="true"
+    @cancel="handleCancel"
+  >
+    <div class="upload-modal-content">
+      <!-- 文件上传区域 -->
+      <div
+        class="upload-area"
+        :class="{ 'drag-over': isDragOver }"
+        @dragover.prevent="handleDragOver"
+        @dragleave.prevent="handleDragLeave"
+        @drop.prevent="handleDrop"
+        @click="handleClickUpload"
+      >
+        <div class="upload-area-content">
+          <div class="upload-icon">
+            <CloudUploadOutlined />
+          </div>
+          <div class="upload-text">
+            <p class="upload-hint">点击或拖拽文件到此区域上传</p>
+            <p class="upload-sub-hint">支持单个或批量上传，请查看下方上传要求</p>
+          </div>
+        </div>
+        <input
+          ref="fileInputRef"
+          type="file"
+          multiple
+          :accept="props.accept"
+          style="display: none"
+          @change="handleFileSelect"
+        />
+      </div>
+
+      <!-- 文件列表 -->
+      <div v-if="fileList.length > 0" class="file-list">
+        <div class="file-list-header">
+          <span>文件列表 ({{ fileList.length }})</span>
+          <a-button type="link" size="small" @click="clearFiles">清空</a-button>
+        </div>
+        <div class="file-items">
+          <div
+            v-for="(file, index) in fileList"
+            :key="index"
+            class="file-item"
+            :class="{ 'upload-success': file.status === 'success', 'upload-error': file.status === 'error' }"
+          >
+            <div class="file-info">
+              <div class="file-icon">
+                <FileOutlined />
+              </div>
+              <div class="file-details">
+                <div class="file-name">{{ file.name }}</div>
+                <div class="file-size">{{ formatFileSize(file.size) }}</div>
+              </div>
+            </div>
+            <div class="file-actions">
+              <a-button v-if="file.status !== 'uploading'" type="link" size="small" danger @click="removeFile(index)">
+                删除
+              </a-button>
+              <div v-if="file.status === 'uploading'" class="upload-progress">
+                <a-progress :percent="file.progress" size="small" />
+              </div>
+              <div v-if="file.status === 'success'" class="upload-status success">
+                <CheckCircleOutlined />
+              </div>
+              <div v-if="file.status === 'error'" class="upload-status error">
+                <CloseCircleOutlined />
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 上传提示 -->
+      <div v-if="fileList.length === 0" class="upload-tips">
+        <p>上传要求：</p>
+        <ul>
+          <li v-for="(tip, index) in props.uploadTips" :key="index">{{ tip }}</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- 底部操作按钮 -->
+    <template #footer>
+      <a-button @click="handleCancel">取消</a-button>
+      <a-button
+        type="primary"
+        :loading="uploading"
+        :disabled="fileList.length === 0 || uploading"
+        @click="handleUpload"
+      >
+        {{ uploading ? '上传中...' : '确认上传' }}
+      </a-button>
+    </template>
+  </a-modal>
+</template>
 
 <style scoped lang="less">
 .upload-modal-content {
