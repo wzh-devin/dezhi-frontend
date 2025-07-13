@@ -6,7 +6,7 @@
  * @since 1.0
  */
 import { defineStore } from 'pinia'
-import { delMaterial, page } from '@/service/materialService.ts'
+import { clearRecycle, delMaterial, page } from '@/service/materialService.ts'
 import type { ApiResultListFileInfoVO } from '@/service/typings.ts'
 
 const useMaterialStore = defineStore('material', {
@@ -23,6 +23,8 @@ const useMaterialStore = defineStore('material', {
       pageSize?: number
       /** 文件名称 */
       fileName?: string
+      /** 文件类型 */
+      fileType?: 'JPG' | 'PNG' | 'GIF'
       /** 存储类型 */
       storageType?: 'MINIO'
       /** 文件状态 */
@@ -37,6 +39,13 @@ const useMaterialStore = defineStore('material', {
      */
     async delMaterialAction(fileIds: string[]): Promise<void> {
       await delMaterial(fileIds)
+    },
+
+    /**
+     * 清空回收站
+     */
+    async clearRecycleAction(): Promise<void> {
+      await clearRecycle()
     },
   },
 })

@@ -1,4 +1,4 @@
-import { get, post } from '@/utils/http/axios'
+import { get, post, del } from '@/utils/http/axios'
 import type { ApiResultString, ApiResultVoid, ApiResultListFileInfoVO } from './typings'
 
 /**
@@ -37,6 +37,8 @@ export async function page(
     pageSize?: number
     /** 文件名称 */
     fileName?: string
+    /** 文件类型 */
+    fileType?: 'JPG' | 'PNG' | 'GIF'
     /** 存储类型 */
     storageType?: 'MINIO'
     /** 文件状态 */
@@ -49,6 +51,16 @@ export async function page(
     params: {
       ...params,
     },
+    ...(options || {}),
+  })
+}
+
+/**
+ * 清空回收站 DELETE /api/v1/material/clearRecycle
+ */
+export async function clearRecycle(options?: Record<string, unknown>): Promise<ApiResultVoid> {
+  return del({
+    url: `/api/v1/material/clearRecycle`,
     ...(options || {}),
   })
 }

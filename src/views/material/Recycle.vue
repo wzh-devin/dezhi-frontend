@@ -1,40 +1,25 @@
 <script setup lang="ts">
 /**
- * 2025/5/21 17:10
+ * 2025/7/13 15:28
  * @author <a href="https://github.com/wzh-devin">devin</a>
- * @description 文件素材管理
+ * @description 回收站页面
  * @version 1.0
  * @since 1.0
  */
 import { onMounted, reactive, ref, computed } from 'vue'
-import { PlusOutlined, DeleteOutlined } from '@ant-design/icons-vue'
 import useMaterialStore from '@/store/material'
 import { errMsgExtract } from '@/global/string-format.ts'
 import dayjs from 'dayjs'
 import { convertBytesToKb } from '@/utils/convert.ts'
 import { ContentHeader, ContentTable } from '@/components/content-cmp'
-import type {
-  ButtonConfig,
-  FilterConfig,
-  SearchConfig,
-  ColumnConfig,
-  PaginationConfig,
-  RowSelectionConfig,
-} from '@/components/content-cmp'
-import { UploadModal } from '@/components/upload-cmp'
+import type { ButtonConfig, FilterConfig, SearchConfig, ColumnConfig, PaginationConfig } from '@/components/content-cmp'
 import { FileTypeEnum, StatusEnum } from '@/constant/enums.ts'
 import type { ApiResultObject, FileInfoVO } from '@/service/typings.ts'
 import { message } from 'ant-design-vue'
-import { useRouter } from 'vue-router'
 
 const materialStore = useMaterialStore()
-const router = useRouter()
-// 选择的行Keys
-const selectedRowKeys = ref<(string | number)[]>([])
 // 文件类型过滤器
 const fileTypeFilter = ref<string>()
-// 上传弹窗显示状态
-const uploadModalVisible = ref(false)
 // 页面信息
 const pageInfo = reactive({
   addition: {
@@ -99,7 +84,7 @@ const tableColumns: ColumnConfig[] = [
 const pageInit = async (addition: { pageNum: number; pageSize: number }) => {
   pageInfo.loading = true
   materialStore
-    .getMaterialListAction({ ...addition, status: StatusEnum.NORMAL, fileType: fileTypeFilter.value as FileTypeEnum })
+    .getMaterialListAction({ ...addition, status: StatusEnum.DISABLED, fileType: fileTypeFilter.value as FileTypeEnum })
     .then(
       (res) => {
         // 重置属性
@@ -122,29 +107,14 @@ onMounted(() => {
   pageInit(pageInfo.addition)
 })
 
-/**
- * 表格选择处理
- * @param selectedKeys 选中的行key数组
- */
-const onSelectChange = (selectedKeys: (string | number)[]) => {
-  selectedRowKeys.value = selectedKeys
-}
-
 // 头部配置
 const headerConfig = computed(() => ({
   leftButtons: [
     {
-      key: 'add',
-      label: '新增文件',
-      type: 'primary' as const,
-      icon: PlusOutlined,
-      onClick: handleUpload,
-    },
-    {
-      key: 'batch-delete',
+      key: 'clear-recycle',
+      label: '清空回收站',
       type: 'primary' as const,
       danger: true,
-      label: '批量删除',
     },
   ] as ButtonConfig[],
   filters: [
@@ -165,18 +135,7 @@ const headerConfig = computed(() => ({
     width: '300px',
     onSearch: onSearch,
   } as SearchConfig,
-  rightButtons: [
-    {
-      key: 'recycle',
-      label: '回收站',
-      type: 'primary' as const,
-      danger: true,
-      icon: DeleteOutlined,
-      onClick: handleRecycleBin,
-    },
-  ] as ButtonConfig[],
-  selectedCount: selectedRowKeys.value.length,
-  content: `您确定要删除选中的 ${selectedRowKeys.value.length} 个文件吗？删除后无法恢复。`,
+  content: '回收站清空后无法回溯，请谨慎操作！！！',
 }))
 
 // 表格配置
@@ -185,10 +144,6 @@ const tableConfig = computed(() => ({
   columns: tableColumns,
   rowKey: (record: FileInfoVO) => record.id as string,
   loading: pageInfo.loading,
-  rowSelection: {
-    selectedRowKeys: selectedRowKeys.value,
-    onChange: onSelectChange,
-  } as RowSelectionConfig,
   pagination: {
     current: pageInfo.addition.pageNum,
     pageSize: pageInfo.addition.pageSize,
@@ -198,24 +153,11 @@ const tableConfig = computed(() => ({
   scrollY: 420,
 }))
 
-const handleUpload = () => {
-  uploadModalVisible.value = true
-}
-
-// 上传成功后的处理
-const handleUploadSuccess = () => {
-  // 重新加载数据
-  pageInit(pageInfo.addition)
-  uploadModalVisible.value = false
-}
-
-// 批量删除确认处理
-const handleBatchDeleteConfirm = async () => {
+// 清空回收站
+const handleClearRecycleConfirm = async () => {
   pageInfo.loading = true
   try {
-    await materialStore.delMaterialAction((selectedRowKeys.value as string[]) ?? [])
-    // 清空选中的行
-    selectedRowKeys.value = []
+    await materialStore.clearRecycleAction()
     // 重新加载数据
     await pageInit(pageInfo.addition)
     message.success('删除成功')
@@ -224,11 +166,6 @@ const handleBatchDeleteConfirm = async () => {
   } finally {
     pageInfo.loading = false
   }
-}
-
-const handleRecycleBin = () => {
-  // 处理回收站逻辑
-  router.push({ name: 'material-recycle' })
 }
 
 const onSearch = (value: string) => {
@@ -263,11 +200,9 @@ const paginationHandler = (page: number, pageSize: number) => {
       :left-buttons="headerConfig.leftButtons"
       :filters="headerConfig.filters"
       :search="headerConfig.search"
-      :right-buttons="headerConfig.rightButtons"
-      :selected-count="headerConfig.selectedCount"
       :content="headerConfig.content"
       @filter-change="onFilterChange"
-      @batch-delete-confirm="handleBatchDeleteConfirm"
+      @batch-delete-confirm="handleClearRecycleConfirm"
     />
 
     <!-- 表格内容 -->
@@ -276,7 +211,6 @@ const paginationHandler = (page: number, pageSize: number) => {
       :columns="tableConfig.columns"
       :row-key="tableConfig.rowKey"
       :loading="tableConfig.loading"
-      :row-selection="tableConfig.rowSelection"
       :pagination="tableConfig.pagination"
       :scroll-y="tableConfig.scrollY"
     >
@@ -312,13 +246,6 @@ const paginationHandler = (page: number, pageSize: number) => {
         {{ dayjs(record.createTime).format('YYYY-MM-DD HH:mm:ss') }}
       </template>
     </ContentTable>
-
-    <!-- 上传弹窗 -->
-    <UploadModal
-      v-model:visible="uploadModalVisible"
-      @success="handleUploadSuccess"
-      @cancel="uploadModalVisible = false"
-    />
   </div>
 </template>
 
