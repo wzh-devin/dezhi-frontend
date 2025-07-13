@@ -23,19 +23,26 @@ const menuRoutes: Array<RouteRecordRaw> = [
         component: () => import('@/views/dashboard/index.vue'),
       },
       {
-        path: 'article/list',
-        name: 'article-list',
-        component: () => import('@/views/article/list/index.vue'),
-      },
-      {
-        path: 'article/tags',
-        name: 'article-tags',
-        component: () => import('@/views/article/tags/index.vue'),
-      },
-      {
-        path: 'article/category',
-        name: 'article-category',
-        component: () => import('@/views/article/category/index.vue'),
+        path: 'article',
+        name: 'article',
+        redirect: '/article/list',
+        children: [
+          {
+            path: 'list',
+            name: 'article-list',
+            component: () => import('@/views/article/list/index.vue'),
+          },
+          {
+            path: 'tags',
+            name: 'article-tags',
+            component: () => import('@/views/article/tags/index.vue'),
+          },
+          {
+            path: 'category',
+            name: 'article-category',
+            component: () => import('@/views/article/category/index.vue'),
+          },
+        ],
       },
       {
         path: '/comment',
@@ -51,6 +58,11 @@ const menuRoutes: Array<RouteRecordRaw> = [
         path: '/material',
         name: 'material',
         component: () => import('@/views/material/index.vue'),
+      },
+      {
+        path: '/material/recycle',
+        name: 'material-recycle',
+        component: () => import('@/views/material/Recycle.vue'),
       },
       {
         path: '/system',

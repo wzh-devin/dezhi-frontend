@@ -50,6 +50,8 @@ interface Props {
   rightButtons?: ButtonConfig[]
   // 选中的行数量（用于批量操作按钮的禁用状态）
   selectedCount?: number
+  // 弹窗配置
+  content?: string
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -57,6 +59,7 @@ const props = withDefaults(defineProps<Props>(), {
   filters: () => [],
   rightButtons: () => [],
   selectedCount: 0,
+  content: '',
 })
 
 // 事件定义
@@ -73,7 +76,7 @@ const filterValues = ref<Record<string, string>>({})
 const searchValue = ref<string>('')
 
 // 批量删除弹窗 ref
-const batchDeleteModalRef = ref<InstanceType<typeof CommonModal>>()
+const deleteModalRef = ref<InstanceType<typeof CommonModal>>()
 
 // 当前触发删除的按钮配置
 const currentDeleteButton = ref<ButtonConfig | null>(null)
@@ -111,7 +114,10 @@ const handleButtonClick = (button: ButtonConfig) => {
       return
     }
     currentDeleteButton.value = button
-    batchDeleteModalRef.value?.showModal()
+    deleteModalRef.value?.showModal()
+  } else if (button.key.includes('clear')) {
+    currentDeleteButton.value = button
+    deleteModalRef.value?.showModal()
   } else {
     // 其他按钮直接执行原来的点击事件
     button.onClick()
@@ -123,7 +129,7 @@ const handleBatchDeleteConfirm = () => {
   // 触发删除确认事件，让父组件处理具体的删除逻辑
   emit('batchDeleteConfirm')
   // 关闭弹窗
-  batchDeleteModalRef.value?.hiddenModal()
+  deleteModalRef.value?.hiddenModal()
 }
 </script>
 
@@ -190,12 +196,12 @@ const handleBatchDeleteConfirm = () => {
       </a-button>
     </div>
 
-    <!-- 批量删除确认弹窗 -->
+    <!-- 删除确认弹窗 -->
     <CommonModal
-      ref="batchDeleteModalRef"
+      ref="deleteModalRef"
       :type="ModalType.NORMAL_TEXT"
       title="确认删除"
-      :content="`您确定要删除选中的 ${selectedCount} 个项目吗？删除后无法恢复。`"
+      :content="content"
       confirm-text="确认删除"
       cancel-text="取消"
       @confirm="handleBatchDeleteConfirm"

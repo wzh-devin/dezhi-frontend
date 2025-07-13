@@ -21,7 +21,8 @@ import {
 interface IMenuData {
   label: string
   key: string
-  icon: VNode | (() => VNode)
+  parentKey?: string
+  icon?: VNode | (() => VNode)
   children?: IMenuData[]
   type?: 'group'
 }
@@ -77,23 +78,55 @@ export const menuData: Array<IMenuData> = [
 ]
 
 /**
+ * 需要隐藏的菜单
+ */
+const visibleMenuData: Array<IMenuData> = [
+  {
+    key: 'recycle',
+    parentKey: 'material',
+    label: '回收站',
+  },
+]
+
+/**
  * 获取菜单信息
  * @returns menuInfo
  */
 export const getMenuInfo = (): Array<{ key: string; label: string }> => {
   const menuInfo: Array<{ key: string; label: string }> = []
+  const addedKeys = new Set<string>()
+
   menuData.forEach((menu: IMenuData) => {
     // 处理子菜单数据
     menu?.children?.forEach((child: IMenuData) => {
+      if (!addedKeys.has(child?.key)) {
+        menuInfo.push({
+          key: child?.key as string,
+          label: child?.label as string,
+        })
+        addedKeys.add(child?.key)
+      }
+    })
+
+    // 处理父菜单数据
+    if (!addedKeys.has(menu?.key)) {
       menuInfo.push({
-        key: child?.key as string,
-        label: child?.label as string,
+        key: menu?.key as string,
+        label: menu?.label as string,
       })
-    })
-    menuInfo.push({
-      key: menu?.key as string,
-      label: menu?.label as string,
-    })
+      addedKeys.add(menu?.key)
+    }
   })
+
+  // 处理额外的可见菜单项
+  visibleMenuData.forEach((menu: IMenuData) => {
+    const index = menuInfo.findIndex((item: { key: string }) => item.key === menu.parentKey)
+    if (index !== -1 && !addedKeys.has(menu.key)) {
+      menuInfo.push({ key: menu.key, label: menu.label })
+      addedKeys.add(menu.key)
+    }
+  })
+
+  console.log(menuInfo)
   return menuInfo
 }

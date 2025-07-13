@@ -22,18 +22,11 @@
             <CloudUploadOutlined />
           </div>
           <div class="upload-text">
-            <p class="upload-hint">点击或拖拽图片到此区域上传</p>
-            <p class="upload-sub-hint">仅支持PNG、JPG、GIF格式，单个或批量上传</p>
+            <p class="upload-hint">点击或拖拽文件到此区域上传</p>
+            <p class="upload-sub-hint">支持单个或批量上传，严禁上传违规文件</p>
           </div>
         </div>
-        <input
-          ref="fileInputRef"
-          type="file"
-          multiple
-          accept=".png,.jpg,.jpeg,.gif"
-          style="display: none"
-          @change="handleFileSelect"
-        />
+        <input ref="fileInputRef" type="file" multiple style="display: none" @change="handleFileSelect" />
       </div>
 
       <!-- 文件列表 -->
@@ -80,7 +73,7 @@
       <div v-if="fileList.length === 0" class="upload-tips">
         <p>上传要求：</p>
         <ul>
-          <li>仅支持图片格式：PNG、JPG、GIF</li>
+          <li>支持常见文件格式：图片、文档、压缩包等</li>
           <li>单个文件大小不超过 10MB</li>
           <li>建议文件名使用英文或数字，避免特殊字符</li>
         </ul>
@@ -107,8 +100,6 @@ import { ref, reactive, watch } from 'vue'
 import { message } from 'ant-design-vue'
 import { CloudUploadOutlined, FileOutlined, CheckCircleOutlined, CloseCircleOutlined } from '@ant-design/icons-vue'
 import { upload } from '@/service/materialService'
-import { errMsgExtract } from '@/global/string-format.ts'
-import type { ApiResultObject } from '@/service/typings.ts'
 
 // 定义组件属性
 interface Props {
@@ -131,7 +122,7 @@ interface FileItem {
   file: File
   status: 'pending' | 'uploading' | 'success' | 'error'
   progress: number
-  response?: unknown
+  response?: any
   error?: string
 }
 
@@ -202,17 +193,8 @@ const handleFileSelect = (e: Event) => {
 // 处理文件
 const handleFiles = (files: File[]) => {
   const maxSize = 10 * 1024 * 1024 // 10MB
-  const allowedTypes = ['image/png', 'image/jpeg', 'image/jpg', 'image/gif']
-  const allowedExtensions = ['.png', '.jpg', '.jpeg', '.gif']
 
   files.forEach((file) => {
-    // 检查文件类型
-    const fileExtension = file.name.toLowerCase().slice(file.name.lastIndexOf('.'))
-    if (!allowedTypes.includes(file.type) && !allowedExtensions.includes(fileExtension)) {
-      message.error(`文件 ${file.name} 格式不支持，仅支持 PNG、JPG、GIF 格式`)
-      return
-    }
-
     // 检查文件大小
     if (file.size > maxSize) {
       message.error(`文件 ${file.name} 大小超过 10MB 限制`)
@@ -296,7 +278,6 @@ const handleUpload = async () => {
       fileItem.status = 'error'
       fileItem.error = '上传失败'
       errorCount++
-      errMsgExtract(error as ApiResultObject)
     }
   })
 
