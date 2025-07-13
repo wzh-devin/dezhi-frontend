@@ -21,7 +21,7 @@ import { useRouter } from 'vue-router'
 const loginPage = reactive<LoginPage>({
   loginForm: {
     email: '',
-    code: 0,
+    code: '',
   },
 })
 

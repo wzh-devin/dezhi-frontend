@@ -11,7 +11,7 @@ export async function signup(
     /** 邮箱 */
     email?: string
     /** 验证码 */
-    code?: number
+    code?: number | string
     /** 密码 */
     password?: string
   },
@@ -36,7 +36,7 @@ export async function loginEmail(
     /** 邮箱 */
     email?: string
     /** 验证码 */
-    code?: number
+    code?: number | string
     /** 密码 */
     password?: string
   },
@@ -61,7 +61,7 @@ export async function loginAccount(
     /** 邮箱 */
     email?: string
     /** 验证码 */
-    code?: number
+    code?: number | string
     /** 密码 */
     password?: string
   },
@@ -86,7 +86,7 @@ export async function forgetPassword(
     /** 邮箱 */
     email?: string
     /** 验证码 */
-    code?: number
+    code?: number | string
     /** 密码 */
     password?: string
   },

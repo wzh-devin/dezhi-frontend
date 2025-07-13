@@ -6,7 +6,7 @@
  * @since 1.0
  */
 import { defineStore } from 'pinia'
-import { clearRecycle, delMaterial, page } from '@/service/materialService.ts'
+import { clearRecycle, delMaterial, page, recoverMaterial } from '@/service/materialService.ts'
 import type { ApiResultListFileInfoVO } from '@/service/typings.ts'
 
 const useMaterialStore = defineStore('material', {
@@ -46,6 +46,14 @@ const useMaterialStore = defineStore('material', {
      */
     async clearRecycleAction(): Promise<void> {
       await clearRecycle()
+    },
+
+    /**
+     * 恢复文件
+     * @param fileIds 文件ids
+     */
+    async recoverMaterialAction(fileIds: string[]): Promise<void> {
+      await recoverMaterial(fileIds)
     },
   },
 })
