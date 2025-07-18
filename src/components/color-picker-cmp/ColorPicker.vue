@@ -1,24 +1,12 @@
 <template>
   <div class="color-picker-wrapper">
-    <div 
-      class="color-display" 
-      :style="{ backgroundColor: modelValue }"
-      @click="togglePanel"
-    >
+    <div class="color-display" :style="{ backgroundColor: modelValue }" @click="togglePanel">
       <span class="color-text">{{ modelValue }}</span>
     </div>
-    
+
     <Teleport to="body">
-      <div 
-        v-if="visible" 
-        class="color-panel-overlay"
-        @click="handleOverlayClick"
-      >
-        <div 
-          class="color-panel"
-          :style="panelStyle"
-          @click.stop
-        >
+      <div v-if="visible" class="color-panel-overlay" @click="handleOverlayClick">
+        <div class="color-panel" :style="panelStyle" @click.stop>
           <!-- 预设颜色 -->
           <div class="preset-colors">
             <div class="preset-section">
@@ -34,7 +22,7 @@
                 />
               </div>
             </div>
-            
+
             <div class="preset-section">
               <div class="preset-label">最近使用</div>
               <div class="preset-row">
@@ -49,37 +37,34 @@
               </div>
             </div>
           </div>
-          
+
           <!-- 颜色选择器 -->
           <div class="color-picker">
             <div class="saturation-brightness" @mousedown="handleSaturationMouseDown">
-              <div 
+              <div
                 class="saturation-brightness-overlay"
                 :style="{
-                  background: `linear-gradient(to right, #fff, hsl(${hue}, 100%, 50%)), linear-gradient(to top, #000, transparent)`
+                  background: `linear-gradient(to right, #fff, hsl(${hue}, 100%, 50%)), linear-gradient(to top, #000, transparent)`,
                 }"
               >
-                <div 
+                <div
                   class="saturation-brightness-handle"
                   :style="{
                     left: saturation + '%',
-                    top: (100 - brightness) + '%'
+                    top: 100 - brightness + '%',
                   }"
                 />
               </div>
             </div>
-            
+
             <div class="hue-slider" @mousedown="handleHueMouseDown">
-              <div 
-                class="hue-handle"
-                :style="{ left: (hue / 360) * 100 + '%' }"
-              />
+              <div class="hue-handle" :style="{ left: (hue / 360) * 100 + '%' }" />
             </div>
           </div>
-          
+
           <!-- 输入框 -->
           <div class="color-input">
-            <input 
+            <input
               v-model="hexValue"
               type="text"
               class="hex-input"
@@ -95,7 +80,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch, nextTick, onMounted, onUnmounted } from 'vue'
+import { ref, watch, nextTick, onMounted, onUnmounted } from 'vue'
 
 interface Props {
   modelValue?: string
@@ -106,7 +91,7 @@ interface Emits {
 }
 
 const props = withDefaults(defineProps<Props>(), {
-  modelValue: '#1890ff'
+  modelValue: '#1890ff',
 })
 
 const emit = defineEmits<Emits>()
@@ -117,27 +102,46 @@ const hue = ref(0)
 const saturation = ref(100)
 const brightness = ref(100)
 const hexValue = ref(props.modelValue)
-const triggerRef = ref<HTMLElement>()
 const panelStyle = ref({})
 
 // 预设颜色
 const recommendColors = [
-  '#1890ff', '#52c41a', '#fa541c', '#eb2f96', '#722ed1',
-  '#13c2c2', '#fadb14', '#a0d911', '#fa8c16', '#f5222d'
+  '#1890ff',
+  '#52c41a',
+  '#fa541c',
+  '#eb2f96',
+  '#722ed1',
+  '#13c2c2',
+  '#fadb14',
+  '#a0d911',
+  '#fa8c16',
+  '#f5222d',
 ]
 
 const recentColors = [
-  '#f5222d', '#fa8c16', '#fadb14', '#52c41a', '#1890ff',
-  '#13c2c2', '#722ed1', '#eb2f96', '#666666', '#262626'
+  '#f5222d',
+  '#fa8c16',
+  '#fadb14',
+  '#52c41a',
+  '#1890ff',
+  '#13c2c2',
+  '#722ed1',
+  '#eb2f96',
+  '#666666',
+  '#262626',
 ]
 
 // 监听外部值变化
-watch(() => props.modelValue, (newValue) => {
-  if (newValue !== hexValue.value) {
-    hexValue.value = newValue
-    updateHSVFromHex(newValue)
-  }
-}, { immediate: true })
+watch(
+  () => props.modelValue,
+  (newValue) => {
+    if (newValue !== hexValue.value) {
+      hexValue.value = newValue
+      updateHSVFromHex(newValue)
+    }
+  },
+  { immediate: true },
+)
 
 // 监听HSV变化
 watch([hue, saturation, brightness], () => {
@@ -155,7 +159,7 @@ const updatePanelPosition = () => {
       position: 'absolute',
       top: rect.bottom + 4 + 'px',
       left: rect.left + 'px',
-      zIndex: 1050
+      zIndex: 1050,
     }
   }
 }
@@ -189,18 +193,18 @@ const handleSaturationMouseDown = (e: MouseEvent) => {
     saturation.value = Math.round(x * 100)
     brightness.value = Math.round((1 - y) * 100)
   }
-  
+
   updatePosition(e)
-  
+
   const handleMouseMove = (event: MouseEvent) => {
     updatePosition(event)
   }
-  
+
   const handleMouseUp = () => {
     document.removeEventListener('mousemove', handleMouseMove)
     document.removeEventListener('mouseup', handleMouseUp)
   }
-  
+
   document.addEventListener('mousemove', handleMouseMove)
   document.addEventListener('mouseup', handleMouseUp)
 }
@@ -211,18 +215,18 @@ const handleHueMouseDown = (e: MouseEvent) => {
     const x = Math.max(0, Math.min(1, (event.clientX - rect.left) / rect.width))
     hue.value = Math.round(x * 360)
   }
-  
+
   updateHue(e)
-  
+
   const handleMouseMove = (event: MouseEvent) => {
     updateHue(event)
   }
-  
+
   const handleMouseUp = () => {
     document.removeEventListener('mousemove', handleMouseMove)
     document.removeEventListener('mouseup', handleMouseUp)
   }
-  
+
   document.addEventListener('mousemove', handleMouseMove)
   document.addEventListener('mouseup', handleMouseUp)
 }
@@ -250,11 +254,11 @@ const hexToHsv = (hex: string) => {
   const r = parseInt(hex.slice(1, 3), 16) / 255
   const g = parseInt(hex.slice(3, 5), 16) / 255
   const b = parseInt(hex.slice(5, 7), 16) / 255
-  
+
   const max = Math.max(r, g, b)
   const min = Math.min(r, g, b)
   const diff = max - min
-  
+
   let h = 0
   if (diff !== 0) {
     if (max === r) h = ((g - b) / diff) % 6
@@ -263,40 +267,60 @@ const hexToHsv = (hex: string) => {
   }
   h = Math.round(h * 60)
   if (h < 0) h += 360
-  
+
   const s = max === 0 ? 0 : Math.round((diff / max) * 100)
   const v = Math.round(max * 100)
-  
+
   return { h, s, v }
 }
 
 const hsvToHex = (h: number, s: number, v: number): string => {
   const sNorm = s / 100
   const vNorm = v / 100
-  
+
   const c = vNorm * sNorm
-  const x = c * (1 - Math.abs((h / 60) % 2 - 1))
+  const x = c * (1 - Math.abs(((h / 60) % 2) - 1))
   const m = vNorm - c
-  
-  let r = 0, g = 0, b = 0
+
+  let r = 0,
+    g = 0,
+    b = 0
   if (h >= 0 && h < 60) {
-    r = c; g = x; b = 0
+    r = c
+    g = x
+    b = 0
   } else if (h >= 60 && h < 120) {
-    r = x; g = c; b = 0
+    r = x
+    g = c
+    b = 0
   } else if (h >= 120 && h < 180) {
-    r = 0; g = c; b = x
+    r = 0
+    g = c
+    b = x
   } else if (h >= 180 && h < 240) {
-    r = 0; g = x; b = c
+    r = 0
+    g = x
+    b = c
   } else if (h >= 240 && h < 300) {
-    r = x; g = 0; b = c
+    r = x
+    g = 0
+    b = c
   } else if (h >= 300 && h < 360) {
-    r = c; g = 0; b = x
+    r = c
+    g = 0
+    b = x
   }
-  
-  const rHex = Math.round((r + m) * 255).toString(16).padStart(2, '0')
-  const gHex = Math.round((g + m) * 255).toString(16).padStart(2, '0')
-  const bHex = Math.round((b + m) * 255).toString(16).padStart(2, '0')
-  
+
+  const rHex = Math.round((r + m) * 255)
+    .toString(16)
+    .padStart(2, '0')
+  const gHex = Math.round((g + m) * 255)
+    .toString(16)
+    .padStart(2, '0')
+  const bHex = Math.round((b + m) * 255)
+    .toString(16)
+    .padStart(2, '0')
+
   return `#${rHex}${gHex}${bHex}`
 }
 
@@ -339,11 +363,11 @@ onUnmounted(() => {
   display: flex;
   align-items: center;
   padding: 0 11px;
-  
+
   &:hover {
     border-color: #40a9ff;
   }
-  
+
   &:focus-within {
     border-color: #40a9ff;
     box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
@@ -383,7 +407,7 @@ onUnmounted(() => {
 
 .preset-section {
   margin-bottom: 8px;
-  
+
   &:last-child {
     margin-bottom: 0;
   }
@@ -409,16 +433,16 @@ onUnmounted(() => {
   border: 1px solid #d9d9d9;
   position: relative;
   transition: all 0.2s;
-  
+
   &:hover {
     transform: scale(1.1);
     border-color: #40a9ff;
   }
-  
+
   &.active {
     border-color: #1890ff;
     border-width: 2px;
-    
+
     &::after {
       content: '✓';
       position: absolute;
@@ -467,13 +491,14 @@ onUnmounted(() => {
 .hue-slider {
   width: 100%;
   height: 12px;
-  background: linear-gradient(to right, 
-    #ff0000 0%, 
-    #ffff00 16.66%, 
-    #00ff00 33.33%, 
-    #00ffff 50%, 
-    #0000ff 66.66%, 
-    #ff00ff 83.33%, 
+  background: linear-gradient(
+    to right,
+    #ff0000 0%,
+    #ffff00 16.66%,
+    #00ff00 33.33%,
+    #00ffff 50%,
+    #0000ff 66.66%,
+    #ff00ff 83.33%,
     #ff0000 100%
   );
   border-radius: 6px;
@@ -507,15 +532,15 @@ onUnmounted(() => {
   border-radius: 6px;
   font-size: 14px;
   transition: all 0.3s;
-  
+
   &:focus {
     outline: none;
     border-color: #40a9ff;
     box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
   }
-  
+
   &::placeholder {
     color: #bfbfbf;
   }
 }
-</style> 
+</style>
