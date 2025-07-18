@@ -169,7 +169,7 @@ const headerConfig = computed(() => ({
   rightButtons: [
     {
       key: 'recycle',
-      label: '回收站',
+      label: '回收站 (15天)',
       type: 'primary' as const,
       danger: true,
       icon: DeleteOutlined,

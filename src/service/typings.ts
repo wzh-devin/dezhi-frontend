@@ -1,17 +1,17 @@
 export type Addition = {
   /** 当前页码 */
-  pageNum?: number
+  pageNum?: number | string
   /** 当前页码的总条数 */
-  pageSize?: number
+  pageSize?: number | string
   /** 总记录数 */
-  total?: number
+  total?: number | string
 }
 
 export type ApiResultObject = {
   /** 响应是否成功 */
   success?: boolean
   /** 失败码 */
-  errCode?: number
+  errCode?: number | string
   /** 失败信息 */
   errMsg?: string
   /** 响应数据 */
@@ -35,7 +35,7 @@ export type ApiResultVoid = {
   /** 响应是否成功 */
   success?: boolean
   /** 失败码 */
-  errCode?: number
+  errCode?: number | string
   /** 失败信息 */
   errMsg?: string
   /** 响应数据 */
@@ -44,11 +44,37 @@ export type ApiResultVoid = {
   addition?: Addition
 }
 
+export type TagVO = {
+  /** 标签id */
+  id?: string
+  /** 标签名称 */
+  name?: string
+  /** 标签颜色 */
+  color?: string
+  /** 创建时间 */
+  createTime?: string
+  /** 更新时间 */
+  updateTime?: string
+}
+
+export type CategoryVO = {
+  /** 类别id */
+  id?: string
+  /** 类别名称 */
+  name?: string
+  /** 类别颜色 */
+  color?: string
+  /** 创建时间 */
+  createTime?: string
+  /** 更新时间 */
+  updateTime?: string
+}
+
 export type ApiResultLoginVO = {
   /** 响应是否成功 */
   success?: boolean
   /** 失败码 */
-  errCode?: number
+  errCode?: number | string
   /** 失败信息 */
   errMsg?: string
   /**  */
@@ -66,7 +92,7 @@ export type ApiResultString = {
   /** 响应是否成功 */
   success?: boolean
   /** 失败码 */
-  errCode?: number
+  errCode?: number | string
   /** 失败信息 */
   errMsg?: string
   /** 响应数据 */
@@ -79,7 +105,7 @@ export type ApiResultUserInfoVO = {
   /** 响应是否成功 */
   success?: boolean
   /** 失败码 */
-  errCode?: number
+  errCode?: number | string
   /** 失败信息 */
   errMsg?: string
   /**  */
@@ -122,14 +148,27 @@ export type UserInfoVO = {
   /** 更新时间 */
   updateTime?: string
   /** 删除标志 */
-  delFlag?: number
+  delFlag?: number | string
+}
+
+export type ApiResultListTagVO = {
+  /** 响应是否成功 */
+  success?: boolean
+  /** 失败码 */
+  errCode?: number | string
+  /** 失败信息 */
+  errMsg?: string
+  /** 响应数据 */
+  data?: TagVO[]
+  /**  */
+  addition?: Addition
 }
 
 export type ApiResultListFileInfoVO = {
   /** 响应是否成功 */
   success?: boolean
   /** 失败码 */
-  errCode?: number
+  errCode?: number | string
   /** 失败信息 */
   errMsg?: string
   /** 响应数据 */
@@ -146,11 +185,24 @@ export type FileInfoVO = {
   /** 文件地址 */
   url?: string
   /** 文件大小 */
-  size?: number
+  size?: number | string
   /** 文件类型 */
   fileType?: string
   /** 存储类型 */
   storageType?: string
   /** 创建时间 */
   createTime?: string
+}
+
+export type ApiResultListCategoryVO = {
+  /** 响应是否成功 */
+  success?: boolean
+  /** 失败码 */
+  errCode?: number | string
+  /** 失败信息 */
+  errMsg?: string
+  /** 响应数据 */
+  data?: CategoryVO[]
+  /**  */
+  addition?: Addition
 }
