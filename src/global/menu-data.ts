@@ -127,6 +127,5 @@ export const getMenuInfo = (): Array<{ key: string; label: string }> => {
     }
   })
 
-  console.log(menuInfo)
   return menuInfo
 }

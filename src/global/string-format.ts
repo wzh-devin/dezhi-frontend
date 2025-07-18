@@ -15,14 +15,9 @@ import type { ApiResultObject } from '@/service/typings.ts'
  */
 const errMsgExtract = (error: ApiResultObject) => {
   const errCode = error?.errCode ?? ''
-  const errMsgArr = error?.errMsg?.split(':')
+  const errData = error?.data
 
-  let errMsg = '未知错误'
-  if (errMsgArr && errMsgArr.length > 1) {
-    errMsg = errMsgArr[errMsgArr.length - 1]
-  }
-
-  return message.error(`${errMsg}【${errCode}】`)
+  return message.error(`${errData}【${errCode}】`)
 }
 
 export { errMsgExtract }
