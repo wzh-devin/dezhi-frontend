@@ -43,9 +43,9 @@ export async function delMaterial(data?: string[], options?: Record<string, unkn
 export async function page(
   params?: {
     /** 页码 */
-    pageNum?: number
+    pageNum?: number | string
     /** 每页数量 */
-    pageSize?: number
+    pageSize?: number | string
     /** 文件名称 */
     fileName?: string
     /** 文件类型 */
