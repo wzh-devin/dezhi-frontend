@@ -4,21 +4,17 @@ FROM registry.cn-hangzhou.aliyuncs.com/wzh-devin/node:20.18.0-alpine AS builder
 # 设置工作目录
 WORKDIR /app
 
-# 启用corepack并设置pnpm
-RUN corepack enable
-RUN corepack prepare pnpm@latest --activate
-
-# 复制package.json和pnpm-lock.yaml
-COPY package.json pnpm-lock.yaml ./
+# 复制package.json
+COPY package.json ./
 
 # 安装依赖
-RUN pnpm install --frozen-lockfile
+RUN npm install --frozen-lockfile
 
 # 复制源代码
 COPY . .
 
 # 构建项目
-RUN pnpm run build
+RUN npm run build
 
 # 生产阶段 - nginx
 FROM registry.cn-hangzhou.aliyuncs.com/wzh-devin/nginx:1.24-alpine
