@@ -53,7 +53,7 @@ export async function page(
     /** 存储类型 */
     storageType?: 'MINIO'
     /** 文件状态 */
-    status: 'DISABLED' | 'NORMAL'
+    status: 'IS_DELETED' | 'NORMAL'
   },
   options?: Record<string, unknown>,
 ): Promise<ApiResultListFileInfoVO> {

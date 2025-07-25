@@ -101,6 +101,36 @@ export type ApiResultString = {
   addition?: Addition
 }
 
+export type CommonDeleteVO = {
+  /** id列表 */
+  idList?: string[]
+}
+
+export type ArticleUpdateVO = {
+  /** 文章id */
+  id?: string
+  /** 文章类别id */
+  categoryId?: string
+  /** 文章标题 */
+  title?: string
+  /** 文章摘要 */
+  summary?: string
+  /** 文章内容 */
+  content?: string
+  /** 文章内容md */
+  contentMd?: string
+  /** 文章url */
+  url?: string
+  /** 文章是否置顶 */
+  isStick?: number | string
+  /** 文章状态 */
+  status?: number | string
+  /** 文章是否AI生成 */
+  isAi?: number | string
+  /** 文章标签id列表 */
+  tagIdList?: string[]
+}
+
 export type ApiResultUserInfoVO = {
   /** 响应是否成功 */
   success?: boolean
@@ -203,6 +233,86 @@ export type ApiResultListCategoryVO = {
   errMsg?: string
   /** 响应数据 */
   data?: CategoryVO[]
+  /**  */
+  addition?: Addition
+}
+
+export type ArticleSaveVO = {
+  /** 文章类别id */
+  categoryId?: string
+  /** 文章标题 */
+  title?: string
+  /** 文章摘要 */
+  summary?: string
+  /** 文章内容 */
+  content?: string
+  /** 文章内容md */
+  contentMd?: string
+  /** 文章url */
+  url?: string
+  /** 文章是否置顶 */
+  isStick?: number | string
+  /** 文章状态 */
+  status?: number | string
+  /** 文章是否AI生成 */
+  isAi?: number | string
+  /** 文章标签id列表 */
+  tagIdList?: string[]
+}
+
+export type ApiResultListArticleVO = {
+  /** 响应是否成功 */
+  success?: boolean
+  /** 失败码 */
+  errCode?: number | string
+  /** 失败信息 */
+  errMsg?: string
+  /** 响应数据 */
+  data?: ArticleVO[]
+  /**  */
+  addition?: Addition
+}
+
+export type ArticleVO = {
+  /** 文章id */
+  id?: string
+  /**  */
+  category?: CategoryVO
+  /** 文章标题 */
+  title?: string
+  /** 文章摘要 */
+  summary?: string
+  /** 文章内容 */
+  content?: string
+  /** 文章内容md */
+  contentMd?: string
+  /** 文章url */
+  url?: string
+  /** 文章是否置顶 */
+  isStick?: number | string
+  /** 文章状态 */
+  status?: number | string
+  /** 文章是否热门 */
+  isHot?: number | string
+  /** 文章是否AI生成 */
+  isAi?: number | string
+  /** 文章创建时间 */
+  createTime?: string
+  /** 文章更新时间 */
+  updateTime?: string
+  /** 文章标签列表 */
+  tagList?: TagVO[]
+}
+
+export type ApiResultArticleVO = {
+  /** 响应是否成功 */
+  success?: boolean
+  /** 失败码 */
+  errCode?: number | string
+  /** 失败信息 */
+  errMsg?: string
+  /**  */
+  data?: ArticleVO
   /**  */
   addition?: Addition
 }

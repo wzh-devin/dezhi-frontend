@@ -21,8 +21,8 @@ import { useRouter } from 'vue-router'
  */
 const loginPage = reactive<LoginPage>({
   loginForm: {
-    username: 'admin',
-    password: '123456',
+    username: '',
+    password: '',
   },
   rememberMe: false,
 })
