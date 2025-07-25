@@ -10,7 +10,7 @@ export enum StatusEnum {
   /**
    * 禁用
    */
-  DISABLED = 'DISABLED',
+  IS_DELETED = 'IS_DELETED',
 
   /**
    * 正常

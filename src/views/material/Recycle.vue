@@ -86,7 +86,11 @@ const tableColumns: ColumnConfig[] = [
 const pageInit = async (addition: { pageNum: number; pageSize: number }) => {
   pageInfo.loading = true
   materialStore
-    .getMaterialListAction({ ...addition, status: StatusEnum.DISABLED, fileType: fileTypeFilter.value as FileTypeEnum })
+    .getMaterialListAction({
+      ...addition,
+      status: StatusEnum.IS_DELETED,
+      fileType: fileTypeFilter.value as FileTypeEnum,
+    })
     .then(
       (res) => {
         // 重置属性

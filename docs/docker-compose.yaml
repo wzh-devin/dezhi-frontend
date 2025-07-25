@@ -1,0 +1,11 @@
+services:
+    dezhi-frontend:
+        image: xxx
+        container_name: dezhi-frontend
+        restart: always
+        ports:
+            - "13002:13002"
+        volumes:
+            - ./nginx/logs:/var/log/nginx
+        environment:
+            BACKEND_API_URL: ${BACKEND_API_URL}
