@@ -15,7 +15,6 @@ import {
   EyeInvisibleOutlined,
 } from '@ant-design/icons-vue'
 import useArticleStore from '@/store/article/list'
-import useCategoryStore from '@/store/article/category'
 import { errMsgExtract } from '@/global/string-format.ts'
 import dayjs from 'dayjs'
 import { ContentHeader, ContentTable } from '@/components/content-cmp'
@@ -32,7 +31,6 @@ import { message } from 'ant-design-vue'
 import { useRouter } from 'vue-router'
 
 const articleStore = useArticleStore()
-const categoryStore = useCategoryStore()
 const router = useRouter()
 
 // 选择的行Keys

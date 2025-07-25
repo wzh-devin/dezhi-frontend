@@ -385,4 +385,4 @@ const getStatusClass = (status?: number | string) => {
     border-color: #ffe58f;
   }
 }
-</style> 
+</style>

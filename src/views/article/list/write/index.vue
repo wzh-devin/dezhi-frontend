@@ -8,6 +8,10 @@
  */
 </script>
 
-<template></template>
+<template>
+  <div>
+    <h1>撰写文章</h1>
+  </div>
+</template>
 
 <style scoped lang="less"></style>
