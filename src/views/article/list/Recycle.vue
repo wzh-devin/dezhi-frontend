@@ -2,38 +2,22 @@
 /**
  * 2025/7/14 0:42
  * @author <a href="https://github.com/wzh-devin">devin</a>
- * @description 文章管理
+ * @description 文章回收站页面
  * @version 1.0
  * @since 1.0
  */
-import { onMounted, reactive, ref, computed, h } from 'vue'
-import {
-  PlusOutlined,
-  DeleteOutlined,
-  EditOutlined,
-  CloudUploadOutlined,
-  EyeInvisibleOutlined,
-} from '@ant-design/icons-vue'
+import { onMounted, reactive, ref, computed } from 'vue'
 import useArticleStore from '@/store/article/list'
 import useCategoryStore from '@/store/article/category'
 import { errMsgExtract } from '@/global/string-format.ts'
 import dayjs from 'dayjs'
-import { ContentHeader, ContentTable } from '@/components/content-cmp'
-import type {
-  ButtonConfig,
-  FilterConfig,
-  SearchConfig,
-  ColumnConfig,
-  PaginationConfig,
-  RowSelectionConfig,
-} from '@/components/content-cmp'
+import { ContentHeader, ContentTable, type RowSelectionConfig } from '@/components/content-cmp'
+import type { ButtonConfig, FilterConfig, SearchConfig, ColumnConfig, PaginationConfig } from '@/components/content-cmp'
 import type { ApiResultObject, ArticleVO, CategoryVO } from '@/service/typings.ts'
 import { message } from 'ant-design-vue'
-import { useRouter } from 'vue-router'
 
 const articleStore = useArticleStore()
 const categoryStore = useCategoryStore()
-const router = useRouter()
 
 // 选择的行Keys
 const selectedRowKeys = ref<(string | number)[]>([])
@@ -89,16 +73,10 @@ const tableColumns: ColumnConfig[] = [
     width: 100,
   },
   {
-    title: '更新时间',
+    title: '删除时间',
     dataIndex: 'updateTime',
     key: 'updateTime',
     width: 180,
-  },
-  {
-    title: '操作',
-    dataIndex: 'action',
-    key: 'action',
-    width: 200,
   },
 ]
 
@@ -110,8 +88,8 @@ const pageInit = async (addition: { pageNum: number; pageSize: number }) => {
   articleStore
     .getArticleListAction({
       ...addition,
-      status: 'IS_PUBLISH',
-      delFlag: 'NORMAL',
+      status: 'DRAFT',
+      delFlag: 'IS_DELETED',
       categoryName: categoryFilter.value,
       title: searchKeyword.value,
     })
@@ -131,10 +109,23 @@ const pageInit = async (addition: { pageNum: number; pageSize: number }) => {
 }
 
 /**
+ * 初始化分类列表
+ */
+const initCategoryList = async () => {
+  try {
+    const res = await categoryStore.getCategoryListAction({ pageNum: 1, pageSize: 100 })
+    categoryList.value = res.data ?? []
+  } catch (error) {
+    errMsgExtract(error as ApiResultObject)
+  }
+}
+
+/**
  * 页面挂载初始化
  */
 onMounted(() => {
   pageInit(pageInfo.addition)
+  initCategoryList()
 })
 
 /**
@@ -149,17 +140,17 @@ const onSelectChange = (selectedKeys: (string | number)[]) => {
 const headerConfig = computed(() => ({
   leftButtons: [
     {
-      key: 'add',
-      label: '撰写文章',
+      key: 'recover',
+      label: '恢复文章',
       type: 'primary' as const,
-      icon: PlusOutlined,
-      onClick: handleWriteArticle,
+      onClick: handleRecoverArticles,
+      disabled: selectedRowKeys.value.length === 0,
     },
     {
-      key: 'batch-delete',
+      key: 'clear-recycle',
+      label: '清空回收站',
       type: 'primary' as const,
       danger: true,
-      label: '批量删除',
     },
   ] as ButtonConfig[],
   filters: [
@@ -178,18 +169,7 @@ const headerConfig = computed(() => ({
     width: '300px',
     onSearch: onSearch,
   } as SearchConfig,
-  rightButtons: [
-    {
-      key: 'recycle',
-      label: '回收站',
-      type: 'primary' as const,
-      danger: true,
-      icon: DeleteOutlined,
-      onClick: handleRecycleBin,
-    },
-  ] as ButtonConfig[],
-  selectedCount: selectedRowKeys.value.length,
-  content: `您确定要删除选中的 ${selectedRowKeys.value.length} 篇文章吗？删除后将移入回收站。`,
+  content: '回收站清空后无法回溯，请谨慎操作！！！',
 }))
 
 // 表格配置
@@ -211,20 +191,14 @@ const tableConfig = computed(() => ({
   scrollY: 420,
 }))
 
-const handleWriteArticle = () => {
-  router.push({ name: 'article-write' })
-}
-
-// 批量删除确认处理
-const handleBatchDeleteConfirm = async () => {
+// 清空回收站
+const handleClearRecycleConfirm = async () => {
   pageInfo.loading = true
   try {
-    await articleStore.delArticleAction((selectedRowKeys.value as string[]) ?? [])
-    // 清空选中的行
-    selectedRowKeys.value = []
+    await articleStore.cleanRecycleAction([])
     // 重新加载数据
     await pageInit(pageInfo.addition)
-    message.success('删除成功')
+    message.success('清空回收站成功')
   } catch (error) {
     errMsgExtract(error as ApiResultObject)
   } finally {
@@ -232,9 +206,24 @@ const handleBatchDeleteConfirm = async () => {
   }
 }
 
-const handleRecycleBin = () => {
-  // 处理回收站逻辑
-  router.push({ name: 'article-recycle' })
+// 恢复文章
+const handleRecoverArticles = async () => {
+  if (selectedRowKeys.value.length === 0) {
+    return
+  }
+  pageInfo.loading = true
+  try {
+    await articleStore.recoverArticleAction(selectedRowKeys.value as string[])
+    // 清空选中的行
+    selectedRowKeys.value = []
+    // 重新加载数据
+    await pageInit(pageInfo.addition)
+    message.success('文章恢复成功')
+  } catch (error) {
+    errMsgExtract(error as ApiResultObject)
+  } finally {
+    pageInfo.loading = false
+  }
 }
 
 const onSearch = (value: string) => {
@@ -262,45 +251,6 @@ const paginationHandler = (page: number, pageSize: number) => {
 }
 
 /**
- * 编辑文章
- */
-const handleEdit = (record: ArticleVO) => {
-  router.push({ name: 'article-write', params: { id: record.id } })
-}
-
-/**
- * 发布文章
- */
-const handlePublish = async (record: ArticleVO) => {
-  try {
-    await articleStore.editArticleAction({
-      id: record.id,
-      status: 1, // 发布状态
-    })
-    message.success('发布成功')
-    await pageInit(pageInfo.addition)
-  } catch (error) {
-    errMsgExtract(error as ApiResultObject)
-  }
-}
-
-/**
- * 下架文章
- */
-const handleUnpublish = async (record: ArticleVO) => {
-  try {
-    await articleStore.editArticleAction({
-      id: record.id,
-      status: 0, // 草稿状态
-    })
-    message.success('下架成功')
-    await pageInit(pageInfo.addition)
-  } catch (error) {
-    errMsgExtract(error as ApiResultObject)
-  }
-}
-
-/**
  * 获取状态文本
  */
 const getStatusText = (status?: number | string) => {
@@ -318,17 +268,15 @@ const getStatusClass = (status?: number | string) => {
 </script>
 
 <template>
-  <div class="article-management">
+  <div class="article-recycle">
     <!-- 头部操作栏 -->
     <ContentHeader
       :left-buttons="headerConfig.leftButtons"
       :filters="headerConfig.filters"
       :search="headerConfig.search"
-      :right-buttons="headerConfig.rightButtons"
-      :selected-count="headerConfig.selectedCount"
       :content="headerConfig.content"
       @filter-change="onFilterChange"
-      @batch-delete-confirm="handleBatchDeleteConfirm"
+      @batch-delete-confirm="handleClearRecycleConfirm"
     />
 
     <!-- 表格内容 -->
@@ -380,42 +328,16 @@ const getStatusClass = (status?: number | string) => {
         </a-tag>
       </template>
 
-      <!-- 更新时间列 -->
+      <!-- 删除时间列 -->
       <template #bodyCell-updateTime="{ record }">
         {{ dayjs(record.updateTime).format('YYYY-MM-DD HH:mm:ss') }}
-      </template>
-
-      <!-- 操作列 -->
-      <template #bodyCell-action="{ record }">
-        <div class="action-buttons">
-          <a-button type="link" size="small" :icon="h(EditOutlined)" @click="handleEdit(record)"> 编辑</a-button>
-          <a-button
-            v-if="record.status !== 1 && record.status !== '1'"
-            type="link"
-            size="small"
-            :icon="h(CloudUploadOutlined)"
-            @click="handlePublish(record)"
-          >
-            发布
-          </a-button>
-          <a-button
-            v-else
-            type="link"
-            size="small"
-            danger
-            :icon="h(EyeInvisibleOutlined)"
-            @click="handleUnpublish(record)"
-          >
-            下架
-          </a-button>
-        </div>
       </template>
     </ContentTable>
   </div>
 </template>
 
 <style scoped lang="less">
-.article-management {
+.article-recycle {
   padding: 24px;
   height: calc(100vh - 64px - 20px);
   background-color: transparent;
@@ -445,11 +367,6 @@ const getStatusClass = (status?: number | string) => {
     }
   }
 
-  .action-buttons {
-    display: flex;
-    gap: 8px;
-  }
-
   .category-tag {
     margin: 0;
     border-radius: 4px;
@@ -468,4 +385,4 @@ const getStatusClass = (status?: number | string) => {
     border-color: #ffe58f;
   }
 }
-</style>
+</style> 
