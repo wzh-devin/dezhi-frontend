@@ -8,6 +8,12 @@
  */
 </script>
 
-<template></template>
+<template>
+  <div>
+    <a-card>
+      <a-card-meta title="文章列表" />
+    </a-card>
+  </div>
+</template>
 
 <style scoped lang="less"></style>
