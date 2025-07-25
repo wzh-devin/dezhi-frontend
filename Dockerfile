@@ -35,4 +35,4 @@ COPY --from=builder /app/dist /usr/share/nginx/html
 EXPOSE 13002
 
 # 设置默认的后端API地址，启动nginx
-CMD ["/bin/sh", "-c", "export BACKEND_API_URL=${BACKEND_API_URL:-http://localhost:8080} && envsubst '$$BACKEND_API_URL' < /etc/nginx/templates/default.conf.template > /etc/nginx/conf.d/default.conf && nginx -g 'daemon off;'"]
+CMD ["/bin/sh", "-c", "export BACKEND_API_URL=${BACKEND_API_URL} && envsubst '$$BACKEND_API_URL' < /etc/nginx/templates/default.conf.template > /etc/nginx/conf.d/default.conf && nginx -g 'daemon off;'"]
