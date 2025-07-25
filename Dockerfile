@@ -34,5 +34,5 @@ COPY --from=builder /app/dist /usr/share/nginx/html
 # 暴露端口
 EXPOSE 13002
 
-# 启动nginx，使用envsubst处理环境变量
-CMD ["/bin/sh", "-c", "envsubst '$$BACKEND_API_URL' < /etc/nginx/templates/default.conf.template > /etc/nginx/conf.d/default.conf && nginx -g 'daemon off;'"]
+# 设置默认的后端API地址，启动nginx
+CMD ["/bin/sh", "-c", "export BACKEND_API_URL=${BACKEND_API_URL:-http://localhost:8080} && envsubst '$$BACKEND_API_URL' < /etc/nginx/templates/default.conf.template > /etc/nginx/conf.d/default.conf && nginx -g 'daemon off;'"]
