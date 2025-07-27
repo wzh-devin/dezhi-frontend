@@ -547,6 +547,13 @@ onBeforeUnmount(() => {
     margin-bottom: 24px;
     padding-bottom: 16px;
     border-bottom: 1px solid #f0f0f0;
+    width: 100%;
+
+    .form-item {
+      flex: 1;
+      margin-bottom: 0;
+      margin-right: 16px;
+    }
 
     h1 {
       margin: 0;
@@ -555,7 +562,7 @@ onBeforeUnmount(() => {
   }
 
   .article-form {
-    max-width: 1200px;
+    width: 100%;
 
     .form-item {
       margin-bottom: 24px;
