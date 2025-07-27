@@ -754,14 +754,55 @@ onBeforeUnmount(() => {
             line-height: 1.6;
           }
 
-          h1,
-          h2,
-          h3,
-          h4,
-          h5,
-          h6 {
-            margin: 24px 0 16px 0;
+          // 标题样式 - 设置合理的层级关系（紧凑间距）
+          h1 {
+            font-size: 28px;
+            font-weight: 700;
+            margin: 24px 0 12px 0;
+            line-height: 1.3;
+            color: #1a202c;
+            border-bottom: 2px solid #e2e8f0;
+            padding-bottom: 6px;
+          }
+
+          h2 {
+            font-size: 22px;
             font-weight: 600;
+            margin: 20px 0 10px 0;
+            line-height: 1.4;
+            color: #2d3748;
+          }
+
+          h3 {
+            font-size: 18px;
+            font-weight: 600;
+            margin: 16px 0 8px 0;
+            line-height: 1.4;
+            color: #2d3748;
+          }
+
+          h4 {
+            font-size: 16px;
+            font-weight: 600;
+            margin: 14px 0 6px 0;
+            line-height: 1.5;
+            color: #4a5568;
+          }
+
+          h5 {
+            font-size: 14px;
+            font-weight: 600;
+            margin: 12px 0 4px 0;
+            line-height: 1.5;
+            color: #4a5568;
+          }
+
+          h6 {
+            font-size: 13px;
+            font-weight: 600;
+            margin: 10px 0 2px 0;
+            line-height: 1.5;
+            color: #718096;
           }
 
           ul,
