@@ -44,6 +44,8 @@ const breadcrumbItems = computed(() => {
       routePath = '/article/tags'
     } else if (item === 'category') {
       routePath = '/article/category'
+    } else if (item === '/article/list/write') {
+      routePath = '/article/list/write'
     } else {
       routePath = `/${item}`
     }

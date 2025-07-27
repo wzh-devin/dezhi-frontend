@@ -33,6 +33,11 @@ const menuRoutes: Array<RouteRecordRaw> = [
             component: () => import('@/views/article/list/index.vue'),
           },
           {
+            path: 'list/write',
+            name: 'article-write',
+            component: () => import('@/views/article/list/write/index.vue'),
+          },
+          {
             path: 'tags',
             name: 'article-tags',
             component: () => import('@/views/article/tags/index.vue'),

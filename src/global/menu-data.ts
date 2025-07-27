@@ -86,6 +86,11 @@ const visibleMenuData: Array<IMenuData> = [
     parentKey: 'material',
     label: '回收站',
   },
+  {
+    key: 'write',
+    parentKey: 'list',
+    label: '撰写文章',
+  },
 ]
 
 /**
