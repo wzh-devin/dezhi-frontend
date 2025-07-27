@@ -21,7 +21,45 @@ import { TableHeader } from '@tiptap/extension-table-header'
 import { TableCell } from '@tiptap/extension-table-cell'
 import CodeBlockLowlight from '@tiptap/extension-code-block-lowlight'
 import Placeholder from '@tiptap/extension-placeholder'
+import { Extension } from '@tiptap/core'
 import { createLowlight } from 'lowlight'
+
+// 创建Tab键处理扩展
+const TabHandler = Extension.create({
+  name: 'tabHandler',
+  addKeyboardShortcuts() {
+    return {
+      Tab: () => {
+        const { state, dispatch } = this.editor.view
+        const { $from } = state.selection
+
+        // 检查是否在代码块中
+        if ($from.parent.type.name === 'codeBlock') {
+          dispatch(state.tr.insertText('  '))
+          return true
+        }
+        return false
+      },
+      'Shift-Tab': () => {
+        const { state, dispatch } = this.editor.view
+        const { $from } = state.selection
+
+        // 检查是否在代码块中
+        if ($from.parent.type.name === 'codeBlock') {
+          const beforeCursor = $from.nodeBefore
+          if (beforeCursor && beforeCursor.isText) {
+            const text = beforeCursor.text || ''
+            if (text.endsWith('  ')) {
+              dispatch(state.tr.delete($from.pos - 2, $from.pos))
+              return true
+            }
+          }
+        }
+        return false
+      },
+    }
+  },
+})
 
 // 创建 lowlight 实例并注册常用语言
 const lowlight = createLowlight()
@@ -86,6 +124,7 @@ const initEditor = async () => {
 
     editor.value = new Editor({
       element: document.querySelector('#tiptap-editor')!,
+
       extensions: [
         StarterKit.configure({
           // 禁用默认的代码块，使用带高亮的版本
@@ -95,6 +134,7 @@ const initEditor = async () => {
             levels: [1, 2, 3, 4, 5, 6],
           },
         }),
+        TabHandler,
         Highlight,
         TextAlign.configure({
           types: ['heading', 'paragraph'],
