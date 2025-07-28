@@ -8,7 +8,7 @@
  */
 import { ref, onMounted, onBeforeUnmount } from 'vue'
 import { message } from 'ant-design-vue'
-import { Editor } from '@tiptap/core'
+import { Editor } from '@tiptap/vue-3'
 import StarterKit from '@tiptap/starter-kit'
 import Highlight from '@tiptap/extension-highlight'
 import TextAlign from '@tiptap/extension-text-align'
@@ -21,48 +21,14 @@ import { TableHeader } from '@tiptap/extension-table-header'
 import { TableCell } from '@tiptap/extension-table-cell'
 import CodeBlockLowlight from '@tiptap/extension-code-block-lowlight'
 import Placeholder from '@tiptap/extension-placeholder'
-import { Extension } from '@tiptap/core'
+
 import { createLowlight } from 'lowlight'
-
-// 创建Tab键处理扩展
-const TabHandler = Extension.create({
-  name: 'tabHandler',
-  addKeyboardShortcuts() {
-    return {
-      Tab: () => {
-        const { state, dispatch } = this.editor.view
-        const { $from } = state.selection
-
-        // 检查是否在代码块中
-        if ($from.parent.type.name === 'codeBlock') {
-          dispatch(state.tr.insertText('  '))
-          return true
-        }
-        return false
-      },
-      'Shift-Tab': () => {
-        const { state, dispatch } = this.editor.view
-        const { $from } = state.selection
-
-        // 检查是否在代码块中
-        if ($from.parent.type.name === 'codeBlock') {
-          const beforeCursor = $from.nodeBefore
-          if (beforeCursor && beforeCursor.isText) {
-            const text = beforeCursor.text || ''
-            if (text.endsWith('  ')) {
-              dispatch(state.tr.delete($from.pos - 2, $from.pos))
-              return true
-            }
-          }
-        }
-        return false
-      },
-    }
-  },
-})
+import useMaterialStore from '@/store/material'
+import type { FileInfoVO } from '@/service/typings.ts'
 
 // 创建 lowlight 实例并注册常用语言
 const lowlight = createLowlight()
+const materialStore = useMaterialStore()
 
 // 异步加载常用编程语言
 const loadLanguages = async () => {
@@ -107,6 +73,7 @@ const content = ref('')
 const loading = ref(true)
 const showMarkdownModal = ref(false)
 const showSaveModal = ref(false)
+const showImageModal = ref(false)
 
 // 文章表单数据
 const articleForm = ref({
@@ -115,6 +82,24 @@ const articleForm = ref({
   tags: [],
   status: 'draft',
 })
+
+// 图片素材数据
+const imageList = ref<FileInfoVO[]>([])
+const imageLoading = ref(false)
+const selectedImageIndexes = ref<number[]>([]) // 改为数组支持多选
+
+// 分页数据
+const pagination = ref({
+  current: 1,
+  pageSize: 8, // 每页8张图片 (2行 * 4列)
+  total: 0,
+})
+
+// 分页显示文本
+const paginationShowTotal = (total: number) => {
+  const selectedCount = selectedImageIndexes.value.length
+  return `共 ${total} 张图片${selectedCount > 0 ? ` · 已选中 ${selectedCount} 张` : ''}`
+}
 
 // 初始化编辑器
 const initEditor = async () => {
@@ -125,6 +110,38 @@ const initEditor = async () => {
     editor.value = new Editor({
       element: document.querySelector('#tiptap-editor')!,
 
+      // 添加键盘事件处理
+      editorProps: {
+        handleKeyDown: (view, event) => {
+          // 只在代码块中处理Tab键
+          const { state } = view
+          const { $from } = state.selection
+
+          // 检查是否在代码块中
+          if ($from.parent.type.name === 'codeBlock') {
+            if (event.key === 'Tab') {
+              event.preventDefault()
+
+              if (event.shiftKey) {
+                // Shift+Tab: 删除缩进
+                const { from } = state.selection
+                const textBefore = state.doc.textBetween(Math.max(0, from - 2), from)
+                if (textBefore === '  ') {
+                  const tr = state.tr.delete(from - 2, from)
+                  view.dispatch(tr)
+                }
+              } else {
+                // Tab: 添加缩进
+                const tr = state.tr.insertText('  ')
+                view.dispatch(tr)
+              }
+              return true
+            }
+          }
+          return false
+        },
+      },
+
       extensions: [
         StarterKit.configure({
           // 禁用默认的代码块，使用带高亮的版本
@@ -134,7 +151,6 @@ const initEditor = async () => {
             levels: [1, 2, 3, 4, 5, 6],
           },
         }),
-        TabHandler,
         Highlight,
         TextAlign.configure({
           types: ['heading', 'paragraph'],
@@ -197,11 +213,9 @@ const setHeading = (level: number) => {
 }
 
 const toggleBulletList = () => {
-  console.log('toggleBulletList called')
   editor.value?.chain().focus().toggleBulletList().run()
 }
 const toggleOrderedList = () => {
-  console.log('toggleOrderedList called')
   editor.value?.chain().focus().toggleOrderedList().run()
 }
 const toggleBlockquote = () => editor.value?.chain().focus().toggleBlockquote().run()
@@ -211,13 +225,94 @@ const setTextAlign = (alignment: string) => {
   editor.value?.chain().focus().setTextAlign(alignment).run()
 }
 
+// 插入图片
 const insertImage = () => {
-  const url = window.prompt('请输入图片URL:')
-  if (url) {
-    editor.value?.chain().focus().setImage({ src: url }).run()
+  showImageModal.value = true
+  selectedImageIndexes.value = [] // 重置选中状态
+  pagination.value.current = 1 // 重置分页到第一页
+  loadImageList()
+}
+
+// 获取图片列表
+const loadImageList = async () => {
+  imageLoading.value = true
+  try {
+    const result = await materialStore.getMaterialListAction({
+      pageNum: pagination.value.current,
+      pageSize: pagination.value.pageSize,
+      status: 'NORMAL',
+    })
+    imageList.value = result.data as FileInfoVO[]
+    pagination.value.total = Number(result.addition?.total || 0)
+  } catch (e: unknown) {
+    const errorMessage = e instanceof Error ? e.message : '获取图片列表失败'
+    message.error(errorMessage)
+  } finally {
+    imageLoading.value = false
   }
 }
 
+// 分页变化处理
+const handlePageChange = (page: number) => {
+  pagination.value.current = page
+  selectedImageIndexes.value = [] // 切换页面时重置选中状态
+  loadImageList()
+}
+
+// 多选图片处理函数
+const selectImage = (image: FileInfoVO, index: number) => {
+  console.log(image)
+  if (selectedImageIndexes.value.includes(index)) {
+    // 如果点击的是已选中的图片，则取消选中
+    selectedImageIndexes.value = selectedImageIndexes.value.filter((i) => i !== index)
+  } else {
+    // 否则添加到选中列表
+    selectedImageIndexes.value.push(index)
+  }
+}
+
+// 确认插入图片
+const confirmInsertImage = () => {
+  if (selectedImageIndexes.value.length > 0) {
+    const selectedImages = imageList.value.filter((_, index) => selectedImageIndexes.value.includes(index))
+    if (selectedImages.length > 0) {
+      // 插入所有选中的图片
+      selectedImages.forEach((image, index) => {
+        if (image.url) {
+          editor.value
+            ?.chain()
+            .focus()
+            .setImage({
+              src: image.url,
+              alt: image.name || `图片${index + 1}`,
+            })
+            .run()
+
+          // 在每张图片后面添加一个换行（除了最后一张）
+          if (index < selectedImages.length - 1) {
+            editor.value?.chain().focus().insertContent('<br>').run()
+          }
+        }
+      })
+
+      showImageModal.value = false
+      selectedImageIndexes.value = []
+      message.success(`已成功插入 ${selectedImages.length} 张图片`)
+    } else {
+      message.warning('请先选择一张图片')
+    }
+  } else {
+    message.warning('请先选择一张图片')
+  }
+}
+
+// 取消图片选择
+const cancelImageSelect = () => {
+  showImageModal.value = false
+  selectedImageIndexes.value = []
+}
+
+// 插入链接
 const insertLink = () => {
   const url = window.prompt('请输入链接URL:')
   if (url) {
@@ -255,7 +350,6 @@ const cancelSave = () => {
   showSaveModal.value = false
 }
 
-// Markdown 帮助提示
 const showMarkdownHelp = () => {
   showMarkdownModal.value = true
 }
@@ -265,7 +359,6 @@ const closeMarkdownHelp = () => {
 }
 
 onMounted(() => {
-  // 使用 nextTick 确保 DOM 元素已经渲染
   setTimeout(async () => {
     await initEditor()
   }, 100)
@@ -312,7 +405,7 @@ onBeforeUnmount(() => {
             <button @click="redo" class="toolbar-btn" title="重做">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M21 7v6h-6" />
-                <path d="M3 17a9 9 0 919-9 9 9 0 016 2.3l3-2.3" />
+                <path d="M3 17a9 9 0 01 9-9 9 9 0 01 6 2.3l3-2.3" />
               </svg>
             </button>
           </div>
@@ -569,6 +662,85 @@ onBeforeUnmount(() => {
             <a-radio value="published">发布</a-radio>
           </a-radio-group>
         </div>
+      </div>
+    </a-modal>
+
+    <!-- 图片选择弹窗 -->
+    <a-modal
+      v-model:open="showImageModal"
+      title="📷 选择图片"
+      width="1000px"
+      @ok="confirmInsertImage"
+      @cancel="cancelImageSelect"
+      :ok-text="selectedImageIndexes.length > 0 ? '插入图片' : '请先选择图片'"
+      cancel-text="取消"
+      :ok-button-props="{ disabled: selectedImageIndexes.length === 0 }"
+      :body-style="{ padding: '20px' }"
+    >
+      <div class="image-select-content">
+        <a-spin :spinning="imageLoading">
+          <div v-if="imageList.length === 0 && !imageLoading" class="empty-state">
+            <p>暂无图片素材</p>
+          </div>
+          <div v-else>
+            <div class="image-grid" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px">
+              <div
+                v-for="(image, index) in imageList"
+                :key="`img-${index}`"
+                class="image-item"
+                :class="{ selected: selectedImageIndexes.includes(index) }"
+                @click="selectImage(image, index)"
+                style="width: 100%; position: relative"
+              >
+                <div class="image-preview" style="position: relative">
+                  <img :src="image.url" :alt="image.name" style="width: 100%; height: 150px; object-fit: cover" />
+                  <!-- 选中标识 -->
+                  <div
+                    v-show="selectedImageIndexes.includes(index)"
+                    style="
+                      position: absolute;
+                      top: 4px;
+                      right: 4px;
+                      width: 22px;
+                      height: 22px;
+                      background: rgba(255, 255, 255, 0.95);
+                      border-radius: 50%;
+                      display: flex;
+                      align-items: center;
+                      justify-content: center;
+                      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+                      z-index: 1000;
+                    "
+                  >
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+                      <circle cx="12" cy="12" r="12" fill="#1890ff" />
+                      <path
+                        d="M8 12l2.5 2.5L16 9"
+                        stroke="white"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      />
+                    </svg>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!-- 分页组件 -->
+            <div class="pagination-wrapper" v-if="pagination.total > pagination.pageSize">
+              <a-pagination
+                v-model:current="pagination.current"
+                :total="pagination.total"
+                :page-size="pagination.pageSize"
+                :show-size-changer="false"
+                :show-quick-jumper="false"
+                :show-total="paginationShowTotal"
+                @change="handlePageChange"
+                size="small"
+              />
+            </div>
+          </div>
+        </a-spin>
       </div>
     </a-modal>
   </div>
@@ -1056,8 +1228,11 @@ onBeforeUnmount(() => {
           }
 
           mark {
-            background: #fff566;
-            padding: 0 2px;
+            background: rgba(24, 144, 255, 0.15);
+            color: #1890ff;
+            padding: 2px 4px;
+            border-radius: 3px;
+            font-weight: 500;
           }
         }
       }
@@ -1158,6 +1333,170 @@ onBeforeUnmount(() => {
       :deep(.ant-radio-wrapper) {
         margin-right: 16px;
         font-size: 14px;
+      }
+    }
+  }
+
+  // 图片选择弹窗样式
+  .image-select-content {
+    .empty-state {
+      text-align: center;
+      padding: 60px 0;
+      color: #999;
+
+      p {
+        margin: 0;
+        font-size: 16px;
+      }
+    }
+
+    .image-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr) !important; /* 固定4列 */
+      gap: 16px;
+      max-height: 400px;
+      overflow-y: auto;
+      padding: 8px;
+    }
+
+    .pagination-wrapper {
+      display: flex;
+      justify-content: center;
+      padding: 16px 0 8px 0;
+      border-top: 1px solid #f0f0f0;
+      margin-top: 16px;
+    }
+
+    .image-item {
+      border: 2px solid #f0f0f0;
+      border-radius: 8px;
+      overflow: hidden;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      width: 100%;
+      position: relative;
+
+      &:hover {
+        border-color: #1890ff;
+        box-shadow: 0 4px 12px rgba(24, 144, 255, 0.15);
+        transform: translateY(-2px);
+      }
+
+      &.selected {
+        border-color: #1890ff !important;
+        box-shadow: 0 6px 16px rgba(24, 144, 255, 0.3);
+        background: rgba(24, 144, 255, 0.08);
+        transform: translateY(-2px);
+
+        &:hover {
+          border-color: #40a9ff;
+          box-shadow: 0 8px 20px rgba(24, 144, 255, 0.4);
+        }
+      }
+    }
+
+    .image-preview {
+      position: relative;
+      width: 100% !important;
+      height: 150px !important;
+      overflow: hidden;
+
+      img {
+        width: 100% !important;
+        height: 100% !important;
+        object-fit: cover;
+        display: block;
+      }
+
+      /* 图片选中状态标识 - 右上角位置 */
+
+      .image-selected-badge {
+        position: absolute !important;
+        top: 4px !important;
+        right: 4px !important;
+        left: auto !important;
+        bottom: auto !important;
+        width: 22px !important;
+        height: 22px !important;
+        background: rgba(255, 255, 255, 0.95) !important;
+        border-radius: 50% !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15) !important;
+        z-index: 1000 !important;
+        animation: badge-appear 0.2s ease-out !important;
+
+        svg {
+          width: 14px !important;
+          height: 14px !important;
+        }
+      }
+
+      @keyframes badge-appear {
+        0% {
+          transform: scale(0);
+          opacity: 0;
+        }
+        50% {
+          transform: scale(1.1);
+        }
+        100% {
+          transform: scale(1);
+          opacity: 1;
+        }
+      }
+
+      .image-overlay {
+        position: absolute;
+        top: 0;
+        right: 0;
+        background: rgba(0, 0, 0, 0.7);
+        padding: 4px 8px;
+        border-bottom-left-radius: 4px;
+
+        .image-info {
+          display: flex;
+          gap: 8px;
+
+          .image-type,
+          .image-size {
+            background: rgba(255, 255, 255, 0.9);
+            color: #333;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-size: 10px;
+            font-weight: 500;
+          }
+        }
+      }
+    }
+
+    .image-details {
+      padding: 12px;
+
+      .image-name {
+        font-weight: 500;
+        font-size: 12px;
+        color: #333;
+        margin-bottom: 4px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      .image-meta {
+        display: flex;
+        justify-content: space-between;
+        font-size: 10px;
+        color: #666;
+
+        span {
+          &:first-child {
+            color: #1890ff;
+            font-weight: 500;
+          }
+        }
       }
     }
   }
