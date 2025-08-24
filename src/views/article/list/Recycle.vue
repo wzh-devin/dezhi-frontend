@@ -8,7 +8,6 @@
  */
 import { onMounted, reactive, ref, computed } from 'vue'
 import useArticleStore from '@/store/article/list'
-import useCategoryStore from '@/store/article/category'
 import { errMsgExtract } from '@/global/string-format.ts'
 import dayjs from 'dayjs'
 import { ContentHeader, ContentTable, type RowSelectionConfig } from '@/components/content-cmp'

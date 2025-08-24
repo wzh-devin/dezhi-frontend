@@ -19,7 +19,13 @@ const handleCancel = () => {
 </script>
 
 <template>
-  <AModal :open="props.modelValue" title="📝 支持的 Markdown 快捷键" :footer="null" width="600px" @cancel="handleCancel">
+  <AModal
+    :open="props.modelValue"
+    title="📝 支持的 Markdown 快捷键"
+    :footer="null"
+    width="600px"
+    @cancel="handleCancel"
+  >
     <div class="markdown-help-content">
       <div class="help-section">
         <h4>📋 标题</h4>
