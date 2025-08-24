@@ -224,6 +224,61 @@ export type FileInfoVO = {
   createTime?: string
 }
 
+export type ApiResultDashboardVO = {
+  /** 响应是否成功 */
+  success?: boolean
+  /** 失败码 */
+  errCode?: number | string
+  /** 失败信息 */
+  errMsg?: string
+  /**  */
+  data?: DashboardVO
+  /**  */
+  addition?: Addition
+}
+
+export type ArticleVO = {
+  /** 文章id */
+  id?: string
+  /**  */
+  category?: CategoryVO
+  /** 文章标题 */
+  title?: string
+  /** 文章摘要 */
+  summary?: string
+  /** 文章内容 */
+  content?: string
+  /** 文章内容md */
+  contentMd?: string
+  /** 文章url */
+  url?: string
+  /** 文章是否置顶 */
+  isStick?: number | string
+  /** 文章状态 */
+  status?: number | string
+  /** 文章是否热门 */
+  isHot?: number | string
+  /** 文章是否AI生成 */
+  isAi?: number | string
+  /** 文章创建时间 */
+  createTime?: string
+  /** 文章更新时间 */
+  updateTime?: string
+  /** 文章标签列表 */
+  tagList?: TagVO[]
+}
+
+export type DashboardVO = {
+  /** 文章数量 */
+  articleCount?: number | string
+  /** 发布文章数量 */
+  publishArticleCount?: number | string
+  /** 文章列表修改时间前五 */
+  articleTop5List?: ArticleVO[]
+  /** 评论列表前五 */
+  commentTop5List?: string[]
+}
+
 export type ApiResultListCategoryVO = {
   /** 响应是否成功 */
   success?: boolean
@@ -273,37 +328,6 @@ export type ApiResultArticleVO = {
   data?: ArticleVO
   /**  */
   addition?: Addition
-}
-
-export type ArticleVO = {
-  /** 文章id */
-  id?: string
-  /**  */
-  category?: CategoryVO
-  /** 文章标题 */
-  title?: string
-  /** 文章摘要 */
-  summary?: string
-  /** 文章内容 */
-  content?: string
-  /** 文章内容md */
-  contentMd?: string
-  /** 文章url */
-  url?: string
-  /** 文章是否置顶 */
-  isStick?: number | string
-  /** 文章状态 */
-  status?: number | string
-  /** 文章是否热门 */
-  isHot?: number | string
-  /** 文章是否AI生成 */
-  isAi?: number | string
-  /** 文章创建时间 */
-  createTime?: string
-  /** 文章更新时间 */
-  updateTime?: string
-  /** 文章标签列表 */
-  tagList?: TagVO[]
 }
 
 export type ApiResultListArticleVO = {
