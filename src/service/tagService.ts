@@ -58,7 +58,7 @@ export async function editTag(
 /**
  * 删除标签 POST /api/v1/tag/delBatch
  */
-export async function delTags(data?: number[], options?: Record<string, unknown>): Promise<ApiResultVoid> {
+export async function delTags(data?: string[], options?: Record<string, unknown>): Promise<ApiResultVoid> {
   return post({
     url: `/api/v1/tag/delBatch`,
     data,

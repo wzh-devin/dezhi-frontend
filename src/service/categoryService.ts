@@ -58,7 +58,7 @@ export async function editCategory(
 /**
  * 删除类别 POST /api/v1/category/delBatch
  */
-export async function delCategories(data?: number[], options?: Record<string, unknown>): Promise<ApiResultVoid> {
+export async function delCategories(data?: string[], options?: Record<string, unknown>): Promise<ApiResultVoid> {
   return post({
     url: `/api/v1/category/delBatch`,
     data,

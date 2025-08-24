@@ -71,6 +71,7 @@ const handlePageChange = (page: number) => {
 
 // 多选图片处理函数
 const handleSelectImage = (image: FileInfoVO, index: number) => {
+  console.log(image)
   if (selectedImageIndexes.value.includes(index)) {
     selectedImageIndexes.value = selectedImageIndexes.value.filter((i) => i !== index)
   } else {
