@@ -1,5 +1,28 @@
-import { get, post } from '@/utils/http/axios'
-import type { ApiResultVoid, ArticleSaveVO, ApiResultListArticleVO, ApiResultArticleVO } from './typings'
+import { get, post, del } from '@/utils/http/axios'
+import type { ApiResultVoid, ArticleSaveVO, ApiResultArticleVO, ApiResultListArticleVO } from './typings'
+
+/**
+ *  POST /api/v1/article/{id}
+ */
+export async function updateStatus(
+  pathVars: {
+    /**  */
+    id: string
+  },
+  params?: {
+    /**  */
+    status: 'DRAFT' | 'IS_PUBLISH'
+  },
+  options?: Record<string, unknown>,
+): Promise<ApiResultVoid> {
+  return post({
+    url: `/api/v1/article/${pathVars.id}`,
+    params: {
+      ...params,
+    },
+    ...(options || {}),
+  })
+}
 
 /**
  * 批量恢复文章 POST /api/v1/article/recoverArticle
@@ -79,25 +102,6 @@ export async function delArticle(
 }
 
 /**
- * 清空回收站 POST /api/v1/article/cleanRecycle
- */
-export async function cleanRecycle(
-  data?: {
-    /** id列表 */
-    idList?: string[]
-  },
-  options?: Record<string, unknown>,
-): Promise<ApiResultVoid> {
-  return post({
-    url: `/api/v1/article/cleanRecycle`,
-    data: {
-      ...data,
-    },
-    ...(options || {}),
-  })
-}
-
-/**
  * 添加文章 GET /api/v1/article/save
  */
 export async function saveArticle(
@@ -117,6 +121,16 @@ export async function saveArticle(
 }
 
 /**
+ * 初始化新增 GET /api/v1/article/saveArticleInit
+ */
+export async function saveArticleInit(options?: Record<string, unknown>): Promise<ApiResultArticleVO> {
+  return get({
+    url: `/api/v1/article/saveArticleInit`,
+    ...(options || {}),
+  })
+}
+
+/**
  * 分页查询文章 GET /api/v1/article/page
  */
 export async function page(
@@ -130,7 +144,7 @@ export async function page(
     /** 文章类别 */
     categoryName?: string
     /** 文章状态 */
-    status: 'DRAFT' | 'IS_PUBLISH'
+    status?: 'DRAFT' | 'IS_PUBLISH'
     /** 删除状态 */
     delFlag: 'NORMAL' | 'IS_DELETED'
   },
@@ -157,6 +171,16 @@ export async function getArticleInfo(
 ): Promise<ApiResultArticleVO> {
   return get({
     url: `/api/v1/article/getArticleInfo/${pathVars.articleId}`,
+    ...(options || {}),
+  })
+}
+
+/**
+ * 清空回收站 DELETE /api/v1/article/cleanRecycle
+ */
+export async function cleanRecycle(options?: Record<string, unknown>): Promise<ApiResultVoid> {
+  return del({
+    url: `/api/v1/article/cleanRecycle`,
     ...(options || {}),
   })
 }

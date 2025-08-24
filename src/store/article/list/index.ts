@@ -14,6 +14,8 @@ import {
   page,
   recoverArticle,
   saveArticle,
+  saveArticleInit,
+  updateStatus,
 } from '@/service/articleService.ts'
 import type { ApiResultArticleVO, ApiResultListArticleVO, ApiResultVoid, ArticleSaveVO } from '@/service/typings.ts'
 
@@ -34,7 +36,7 @@ const useArticleStore = defineStore('article', {
       /** 文章类别 */
       categoryName?: string
       /** 文章状态 */
-      status: 'DRAFT' | 'IS_PUBLISH'
+      status?: 'DRAFT' | 'IS_PUBLISH'
       /** 删除状态 */
       delFlag: 'NORMAL' | 'IS_DELETED'
     }): Promise<ApiResultListArticleVO> {
@@ -55,6 +57,13 @@ const useArticleStore = defineStore('article', {
      */
     async saveArticleAction(articleSaveVO: ArticleSaveVO): Promise<ApiResultVoid> {
       return await saveArticle({ articleSaveVO })
+    },
+
+    /**
+     * 文章初始化新增
+     */
+    async saveArticleInitAction(): Promise<ApiResultArticleVO> {
+      return await saveArticleInit()
     },
 
     /**
@@ -110,6 +119,22 @@ const useArticleStore = defineStore('article', {
      */
     async cleanRecycleAction(idList: string[]): Promise<ApiResultVoid> {
       return await cleanRecycle({ idList })
+    },
+
+    /**
+     * 更新文章状态
+     * @param id
+     * @param status
+     */
+    async updateStatusAction(id: string, status: 'DRAFT' | 'IS_PUBLISH'): Promise<ApiResultVoid> {
+      return await updateStatus(
+        {
+          id,
+        },
+        {
+          status,
+        },
+      )
     },
   },
 })

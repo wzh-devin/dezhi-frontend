@@ -31,8 +31,8 @@ const pageInfo = reactive({
   addition: {
     pageNum: ref(1),
     pageSize: ref(10),
-    total: ref(0),
   },
+  total: ref(0),
   dataSource: reactive<FileInfoVO[]>([]),
   loading: ref<boolean>(false),
 })
@@ -161,7 +161,7 @@ const tableConfig = computed(() => ({
   pagination: {
     current: pageInfo.addition.pageNum,
     pageSize: pageInfo.addition.pageSize,
-    total: pageInfo.addition.total,
+    total: pageInfo.total,
     onChange: paginationHandler,
   } as PaginationConfig,
   scrollY: 420,

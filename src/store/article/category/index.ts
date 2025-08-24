@@ -7,10 +7,16 @@
  */
 import { defineStore } from 'pinia'
 import type { ApiResultListCategoryVO, CategoryVO } from '@/service/typings.ts'
-import { delCategories, editCategory, page, saveCategory } from '@/service/categoryService.ts'
+import { delCategories, editCategory, getCategoryOptional, page, saveCategory } from '@/service/categoryService.ts'
+
+interface CategoryState {
+  categoryOptional: Array<{ label: string; value: string }>
+}
 
 const useCategoryStore = defineStore('category', {
-  state: () => ({}),
+  state: (): CategoryState => ({
+    categoryOptional: [],
+  }),
   actions: {
     /**
      * 标签列表
@@ -46,6 +52,19 @@ const useCategoryStore = defineStore('category', {
      */
     async editCategoryAction(data: CategoryVO) {
       await editCategory(data)
+    },
+
+    /**
+     * 获取标签可选项.
+     */
+    async getCategoryOptionalAction(): Promise<Array<{ label: string; value: string }>> {
+      const categoryList = (await getCategoryOptional()).data as CategoryVO[]
+      return categoryList.map((category) => {
+        return {
+          label: category.name,
+          value: category.id,
+        }
+      }) as Array<{ label: string; value: string }>
     },
   },
 })

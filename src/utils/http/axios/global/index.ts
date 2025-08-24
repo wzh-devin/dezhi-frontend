@@ -39,8 +39,9 @@ axiosInstance.interceptors.response.use(
     return response
   },
   (error) => {
+    console.log(error)
     // 抛出错误信息
-    if (error.response.status == 4003) {
+    if (error.response.status === 401 && error.response.data.errCode === 2001) {
       console.log('用户登录失效 || 未登录')
       // 用户登录失效 || 未登录
       localStorage.removeItem(TOKEN_KEY)

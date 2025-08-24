@@ -238,6 +238,8 @@ export type ApiResultListCategoryVO = {
 }
 
 export type ArticleSaveVO = {
+  /** 文章id */
+  id?: string
   /** 文章类别id */
   categoryId?: string
   /** 文章标题 */
@@ -260,15 +262,15 @@ export type ArticleSaveVO = {
   tagIdList?: string[]
 }
 
-export type ApiResultListArticleVO = {
+export type ApiResultArticleVO = {
   /** 响应是否成功 */
   success?: boolean
   /** 失败码 */
   errCode?: number | string
   /** 失败信息 */
   errMsg?: string
-  /** 响应数据 */
-  data?: ArticleVO[]
+  /**  */
+  data?: ArticleVO
   /**  */
   addition?: Addition
 }
@@ -304,15 +306,15 @@ export type ArticleVO = {
   tagList?: TagVO[]
 }
 
-export type ApiResultArticleVO = {
+export type ApiResultListArticleVO = {
   /** 响应是否成功 */
   success?: boolean
   /** 失败码 */
   errCode?: number | string
   /** 失败信息 */
   errMsg?: string
-  /**  */
-  data?: ArticleVO
+  /** 响应数据 */
+  data?: ArticleVO[]
   /**  */
   addition?: Addition
 }

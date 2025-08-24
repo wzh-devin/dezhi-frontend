@@ -6,7 +6,7 @@
  * @since 1.0
  */
 import { defineStore } from 'pinia'
-import { delTags, editTag, page, saveTag } from '@/service/tagService.ts'
+import { delTags, editTag, getTagOptional, page, saveTag } from '@/service/tagService.ts'
 import type { ApiResultListTagVO, TagVO } from '@/service/typings.ts'
 
 const useTagStore = defineStore('tags', {
@@ -46,6 +46,18 @@ const useTagStore = defineStore('tags', {
      */
     async editTagAction(data: TagVO) {
       await editTag(data)
+    },
+    /**
+     * 获取标签可选项.
+     */
+    async getTagOptionalAction(): Promise<Array<{ label: string; value: string }>> {
+      const tagList = (await getTagOptional()).data as TagVO[]
+      return tagList.map((tag) => {
+        return {
+          label: tag.name,
+          value: tag.id,
+        }
+      }) as Array<{ label: string; value: string }>
     },
   },
 })

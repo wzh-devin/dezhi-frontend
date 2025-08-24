@@ -6,205 +6,87 @@
  * @version 1.0
  * @since 1.0
  */
-import { ref, onMounted, onBeforeUnmount } from 'vue'
+import { reactive, ref, onMounted } from 'vue'
 import { message } from 'ant-design-vue'
 import { Editor } from '@tiptap/vue-3'
-import StarterKit from '@tiptap/starter-kit'
-import Highlight from '@tiptap/extension-highlight'
-import TextAlign from '@tiptap/extension-text-align'
-import Underline from '@tiptap/extension-underline'
-import Image from '@tiptap/extension-image'
-import Link from '@tiptap/extension-link'
-import { Table } from '@tiptap/extension-table'
-import { TableRow } from '@tiptap/extension-table-row'
-import { TableHeader } from '@tiptap/extension-table-header'
-import { TableCell } from '@tiptap/extension-table-cell'
-import CodeBlockLowlight from '@tiptap/extension-code-block-lowlight'
-import Placeholder from '@tiptap/extension-placeholder'
+import type { ArticleSaveVO, FileInfoVO } from '@/service/typings.ts'
+import EditorToolbar from './cmp/EditorToolbar.vue'
+import TiptapEditor from './cmp/TiptapEditor.vue'
+import ImageSelectModal from './cmp/ImageSelectModal.vue'
+import MarkdownHelpModal from './cmp/MarkdownHelpModal.vue'
+import SaveArticleModal from './cmp/SaveArticleModal.vue'
+import useArticleStore from '@/store/article/list'
+import { useRoute, useRouter } from 'vue-router'
+import useCategoryStore from '@/store/article/category'
+import useTagStore from '@/store/article/tags'
 
-import { createLowlight } from 'lowlight'
-import useMaterialStore from '@/store/material'
-import type { FileInfoVO } from '@/service/typings.ts'
+const articleStore = useArticleStore()
+const route = useRoute()
+const router = useRouter()
+const categoryStore = useCategoryStore()
+const tagStore = useTagStore()
 
-// 创建 lowlight 实例并注册常用语言
-const lowlight = createLowlight()
-const materialStore = useMaterialStore()
+// 编辑器实例
+const editorInstance = ref<Editor | null>(null)
+const editorContent = ref('')
 
-// 异步加载常用编程语言
-const loadLanguages = async () => {
-  try {
-    // 动态导入常用编程语言
-    const [javascript, typescript, css, html, json, python, java, cpp, bash] = await Promise.all([
-      import('highlight.js/lib/languages/javascript'),
-      import('highlight.js/lib/languages/typescript'),
-      import('highlight.js/lib/languages/css'),
-      import('highlight.js/lib/languages/xml'), // xml 包含 html
-      import('highlight.js/lib/languages/json'),
-      import('highlight.js/lib/languages/python'),
-      import('highlight.js/lib/languages/java'),
-      import('highlight.js/lib/languages/cpp'),
-      import('highlight.js/lib/languages/bash'),
-    ])
+// 弹窗状态管理
+const isMarkdownModalVisible = ref(false)
+const isSaveModalVisible = ref(false)
+const isImageModalVisible = ref(false)
 
-    // 注册语言
-    lowlight.register('javascript', javascript.default)
-    lowlight.register('js', javascript.default)
-    lowlight.register('typescript', typescript.default)
-    lowlight.register('ts', typescript.default)
-    lowlight.register('css', css.default)
-    lowlight.register('html', html.default)
-    lowlight.register('xml', html.default)
-    lowlight.register('json', json.default)
-    lowlight.register('python', python.default)
-    lowlight.register('py', python.default)
-    lowlight.register('java', java.default)
-    lowlight.register('cpp', cpp.default)
-    lowlight.register('c++', cpp.default)
-    lowlight.register('bash', bash.default)
-    lowlight.register('shell', bash.default)
-  } catch (error) {
-    console.warn('加载语言包失败:', error)
-  }
-}
+// 加载状态管理
+const isInitializing = ref(false)
+const isSaving = ref(false)
 
-// Tiptap 编辑器实例
-const editor = ref<Editor | null>(null)
-const content = ref('')
-const loading = ref(true)
-const showMarkdownModal = ref(false)
-const showSaveModal = ref(false)
-const showImageModal = ref(false)
+// 当前文章ID
+const currentArticleId = ref<string>('')
 
 // 文章表单数据
-const articleForm = ref({
+const articleFormData = reactive<{
+  title: string
+  summary: string
+  categoryId: string
+  tagIdList: string[]
+  isStick: number
+  status: 'DRAFT' | 'IS_PUBLISHED'
+  url: string
+  isAi: number
+  categoryOptional: Array<{ label: string; value: string }>
+  tagOptional: Array<{ label: string; value: string }>
+}>({
   title: '',
-  category: '',
-  tags: [],
-  status: 'draft',
+  summary: '',
+  categoryId: '',
+  tagIdList: [],
+  isStick: 0,
+  status: 'DRAFT',
+  url: '',
+  isAi: 0,
+  categoryOptional: [],
+  tagOptional: [],
 })
 
-// 图片素材数据
-const imageList = ref<FileInfoVO[]>([])
-const imageLoading = ref(false)
-const selectedImageIndexes = ref<number[]>([]) // 改为数组支持多选
-
-// 分页数据
-const pagination = ref({
-  current: 1,
-  pageSize: 8, // 每页8张图片 (2行 * 4列)
-  total: 0,
-})
-
-// 分页显示文本
-const paginationShowTotal = (total: number) => {
-  const selectedCount = selectedImageIndexes.value.length
-  return `共 ${total} 张图片${selectedCount > 0 ? ` · 已选中 ${selectedCount} 张` : ''}`
-}
-
-// 初始化编辑器
-const initEditor = async () => {
-  try {
-    // 先加载语言包
-    await loadLanguages()
-
-    editor.value = new Editor({
-      element: document.querySelector('#tiptap-editor')!,
-
-      // 添加键盘事件处理
-      editorProps: {
-        handleKeyDown: (view, event) => {
-          // 只在代码块中处理Tab键
-          const { state } = view
-          const { $from } = state.selection
-
-          // 检查是否在代码块中
-          if ($from.parent.type.name === 'codeBlock') {
-            if (event.key === 'Tab') {
-              event.preventDefault()
-
-              if (event.shiftKey) {
-                // Shift+Tab: 删除缩进
-                const { from } = state.selection
-                const textBefore = state.doc.textBetween(Math.max(0, from - 2), from)
-                if (textBefore === '  ') {
-                  const tr = state.tr.delete(from - 2, from)
-                  view.dispatch(tr)
-                }
-              } else {
-                // Tab: 添加缩进
-                const tr = state.tr.insertText('  ')
-                view.dispatch(tr)
-              }
-              return true
-            }
-          }
-          return false
-        },
-      },
-
-      extensions: [
-        StarterKit.configure({
-          // 禁用默认的代码块，使用带高亮的版本
-          codeBlock: false,
-          // 配置标题级别以支持所有级别
-          heading: {
-            levels: [1, 2, 3, 4, 5, 6],
-          },
-        }),
-        Highlight,
-        TextAlign.configure({
-          types: ['heading', 'paragraph'],
-        }),
-        Underline,
-        Image.configure({
-          inline: true,
-          allowBase64: true,
-        }),
-        Link.configure({
-          openOnClick: false,
-        }),
-        Table.configure({
-          resizable: true,
-        }),
-        TableRow,
-        TableHeader,
-        TableCell,
-        // 添加代码高亮扩展
-        CodeBlockLowlight.configure({
-          lowlight,
-          defaultLanguage: 'javascript',
-        }),
-        // 添加占位符扩展
-        Placeholder.configure({
-          placeholder: '开始撰写你的文章...',
-        }),
-      ],
-      content: '',
-      onUpdate: ({ editor }) => {
-        content.value = editor.getHTML()
-      },
-    })
-
-    loading.value = false
-  } catch (error) {
-    console.error('Tiptap 编辑器初始化失败:', error)
-    message.error('编辑器初始化失败，请刷新页面重试')
-    loading.value = false
-  }
+// 编辑器准备完成回调
+const handleEditorReady = (editor: Editor) => {
+  editorInstance.value = editor
 }
 
 // 工具栏功能函数
-const toggleBold = () => editor.value?.chain().focus().toggleBold().run()
-const toggleItalic = () => editor.value?.chain().focus().toggleItalic().run()
-const toggleUnderline = () => editor.value?.chain().focus().toggleUnderline().run()
-const toggleStrike = () => editor.value?.chain().focus().toggleStrike().run()
-const toggleHighlight = () => editor.value?.chain().focus().toggleHighlight().run()
+const handleUndo = () => editorInstance.value?.chain().focus().undo().run()
+const handleRedo = () => editorInstance.value?.chain().focus().redo().run()
 
-const setHeading = (level: number) => {
+const handleToggleBold = () => editorInstance.value?.chain().focus().toggleBold().run()
+const handleToggleItalic = () => editorInstance.value?.chain().focus().toggleItalic().run()
+const handleToggleUnderline = () => editorInstance.value?.chain().focus().toggleUnderline().run()
+const handleToggleStrike = () => editorInstance.value?.chain().focus().toggleStrike().run()
+const handleToggleHighlight = () => editorInstance.value?.chain().focus().toggleHighlight().run()
+
+const handleSetHeading = (level: number) => {
   if (level === 0) {
-    editor.value?.chain().focus().setParagraph().run()
+    editorInstance.value?.chain().focus().setParagraph().run()
   } else {
-    editor.value
+    editorInstance.value
       ?.chain()
       .focus()
       .toggleHeading({ level: level as 1 | 2 | 3 | 4 | 5 | 6 })
@@ -212,537 +94,237 @@ const setHeading = (level: number) => {
   }
 }
 
-const toggleBulletList = () => {
-  editor.value?.chain().focus().toggleBulletList().run()
-}
-const toggleOrderedList = () => {
-  editor.value?.chain().focus().toggleOrderedList().run()
-}
-const toggleBlockquote = () => editor.value?.chain().focus().toggleBlockquote().run()
-const toggleCodeBlock = () => editor.value?.chain().focus().toggleCodeBlock().run()
+const handleToggleBulletList = () => editorInstance.value?.chain().focus().toggleBulletList().run()
+const handleToggleOrderedList = () => editorInstance.value?.chain().focus().toggleOrderedList().run()
+const handleToggleBlockquote = () => editorInstance.value?.chain().focus().toggleBlockquote().run()
+const handleToggleCodeBlock = () => editorInstance.value?.chain().focus().toggleCodeBlock().run()
 
-const setTextAlign = (alignment: string) => {
-  editor.value?.chain().focus().setTextAlign(alignment).run()
+const handleSetTextAlign = (alignment: string) => {
+  editorInstance.value?.chain().focus().setTextAlign(alignment).run()
 }
 
-// 插入图片
-const insertImage = () => {
-  showImageModal.value = true
-  selectedImageIndexes.value = [] // 重置选中状态
-  pagination.value.current = 1 // 重置分页到第一页
-  loadImageList()
+// 插入功能
+const handleInsertImage = () => {
+  isImageModalVisible.value = true
 }
 
-// 获取图片列表
-const loadImageList = async () => {
-  imageLoading.value = true
-  try {
-    const result = await materialStore.getMaterialListAction({
-      pageNum: pagination.value.current,
-      pageSize: pagination.value.pageSize,
-      status: 'NORMAL',
-    })
-    imageList.value = result.data as FileInfoVO[]
-    pagination.value.total = Number(result.addition?.total || 0)
-  } catch (e: unknown) {
-    const errorMessage = e instanceof Error ? e.message : '获取图片列表失败'
-    message.error(errorMessage)
-  } finally {
-    imageLoading.value = false
-  }
-}
+const handleConfirmInsertImage = (selectedImages: FileInfoVO[]) => {
+  if (selectedImages.length > 0) {
+    selectedImages.forEach((image, index) => {
+      if (image.url) {
+        editorInstance.value
+          ?.chain()
+          .focus()
+          .setImage({
+            src: image.url,
+            alt: image.name || `图片${index + 1}`,
+          })
+          .run()
 
-// 分页变化处理
-const handlePageChange = (page: number) => {
-  pagination.value.current = page
-  selectedImageIndexes.value = [] // 切换页面时重置选中状态
-  loadImageList()
-}
-
-// 多选图片处理函数
-const selectImage = (image: FileInfoVO, index: number) => {
-  console.log(image)
-  if (selectedImageIndexes.value.includes(index)) {
-    // 如果点击的是已选中的图片，则取消选中
-    selectedImageIndexes.value = selectedImageIndexes.value.filter((i) => i !== index)
-  } else {
-    // 否则添加到选中列表
-    selectedImageIndexes.value.push(index)
-  }
-}
-
-// 确认插入图片
-const confirmInsertImage = () => {
-  if (selectedImageIndexes.value.length > 0) {
-    const selectedImages = imageList.value.filter((_, index) => selectedImageIndexes.value.includes(index))
-    if (selectedImages.length > 0) {
-      // 插入所有选中的图片
-      selectedImages.forEach((image, index) => {
-        if (image.url) {
-          editor.value
-            ?.chain()
-            .focus()
-            .setImage({
-              src: image.url,
-              alt: image.name || `图片${index + 1}`,
-            })
-            .run()
-
-          // 在每张图片后面添加一个换行（除了最后一张）
-          if (index < selectedImages.length - 1) {
-            editor.value?.chain().focus().insertContent('<br>').run()
-          }
+        if (index < selectedImages.length - 1) {
+          editorInstance.value?.chain().focus().insertContent('<br>').run()
         }
-      })
+      }
+    })
 
-      showImageModal.value = false
-      selectedImageIndexes.value = []
-      message.success(`已成功插入 ${selectedImages.length} 张图片`)
-    } else {
-      message.warning('请先选择一张图片')
+    message.success(`已成功插入 ${selectedImages.length} 张图片`)
+  }
+}
+
+const handleInsertLink = () => {
+  const linkUrl = window.prompt('请输入链接URL:')
+  if (linkUrl) {
+    editorInstance.value?.chain().focus().setLink({ href: linkUrl }).run()
+  }
+}
+
+// 文章保存功能
+const handleSaveArticle = async () => {
+  try {
+    // 初始化弹窗中的下拉菜单数据
+    articleFormData.categoryOptional = await categoryStore.getCategoryOptionalAction()
+    articleFormData.tagOptional = await tagStore.getTagOptionalAction()
+
+    // 如果是编辑模式，获取文章详细信息并回填到弹窗
+    if (currentArticleId.value) {
+      const result = await articleStore.getArticleInfoAction(currentArticleId.value)
+      if (result.data) {
+        // 回填文章信息到弹窗表单
+        // 注意：不覆盖标题，保持用户在页面标题框中输入的内容
+        articleFormData.summary = result.data.summary || ''
+        articleFormData.categoryId = result.data.category?.id || ''
+        articleFormData.tagIdList = (result.data.tagList?.map((tag) => tag.id).filter((id) => id) as string[]) || []
+        articleFormData.isStick = Number(result.data.isStick) || 0
+        articleFormData.status = result.data.status === 1 ? 'IS_PUBLISHED' : 'DRAFT'
+        articleFormData.url = result.data.url || ''
+        articleFormData.isAi = Number(result.data.isAi) || 0
+      }
     }
-  } else {
-    message.warning('请先选择一张图片')
+
+    isSaveModalVisible.value = true
+  } catch (error) {
+    console.error('获取文章信息失败:', error)
+    message.error('获取文章信息失败，请重试')
   }
 }
 
-// 取消图片选择
-const cancelImageSelect = () => {
-  showImageModal.value = false
-  selectedImageIndexes.value = []
-}
+const handleConfirmSaveArticle = async (formData: ArticleSaveVO) => {
+  try {
+    isSaving.value = true
+    const articleContent = editorContent.value
 
-// 插入链接
-const insertLink = () => {
-  const url = window.prompt('请输入链接URL:')
-  if (url) {
-    editor.value?.chain().focus().setLink({ href: url }).run()
+    // 状态值转换：前端使用字符串，后端需要数字
+    const statusMapping = {
+      DRAFT: 0,
+      IS_PUBLISHED: 1,
+    }
+
+    // 构建符合editArticle接口的参数结构
+    const saveData = {
+      id: currentArticleId.value,
+      title: formData.title, // 使用用户在弹窗中输入的标题
+      categoryId: formData.categoryId,
+      tagIdList: formData.tagIdList,
+      content: articleContent,
+      summary: formData.summary || '',
+      contentMd: articleContent, // 假设内容就是markdown格式
+      url: formData.url || '',
+      isStick: formData.isStick || 0,
+      status: statusMapping[formData.status as keyof typeof statusMapping] || 0,
+      isAi: formData.isAi || 0,
+    }
+
+    await articleStore.editArticleAction(saveData)
+
+    // 保存成功后，同步更新页面标题
+    articleFormData.title = formData.title || ''
+
+    message.success('文章保存成功')
+
+    // 直接跳转到文章列表
+    router.push({ name: 'article-list' })
+  } catch (error) {
+    console.error('文章保存失败:', error)
+    message.error('文章保存失败，请重试')
+  } finally {
+    isSaving.value = false
   }
 }
 
-const undo = () => editor.value?.chain().focus().undo().run()
-const redo = () => editor.value?.chain().focus().redo().run()
-
-const getContent = () => {
-  return editor.value?.getHTML() || ''
+// Markdown帮助
+const handleShowMarkdownHelp = () => {
+  isMarkdownModalVisible.value = true
 }
 
-const saveArticle = () => {
-  showSaveModal.value = true
-}
+// 页面初始化
+const initializePage = async () => {
+  try {
+    isInitializing.value = true
 
-const confirmSaveArticle = () => {
-  const articleContent = getContent()
-  const saveData = {
-    title: articleForm.value.title,
-    content: articleContent,
-    category: articleForm.value.category,
-    tags: articleForm.value.tags,
-    status: articleForm.value.status,
+    // 清空编辑器内容
+    editorContent.value = ''
+
+    // 检查是否是编辑模式（有articleId参数）
+    const articleId = route.params.articleId as string
+
+    if (articleId && articleId !== 'new') {
+      // 编辑模式：加载现有文章
+      currentArticleId.value = articleId
+      const result = await articleStore.getArticleInfoAction(articleId)
+      if (result.data) {
+        articleFormData.title = result.data.title || ''
+        editorContent.value = result.data.content || ''
+      }
+    } else {
+      // 新建模式：调用初始化接口创建新文章
+      const result = await articleStore.saveArticleInitAction()
+      if (result.data && result.data.id) {
+        currentArticleId.value = result.data.id
+        // 更新路由参数，避免页面刷新时丢失文章ID
+        await router.replace({
+          name: route.name,
+          params: { ...route.params, articleId: result.data.id },
+        })
+        message.success('文章初始化成功，开始撰写吧！')
+      }
+    }
+  } catch (error) {
+    console.error('页面初始化失败:', error)
+    message.error('页面初始化失败，请重试')
+  } finally {
+    isInitializing.value = false
   }
-
-  console.log('保存文章数据:', saveData)
-  message.success('文章保存成功')
-  showSaveModal.value = false
 }
 
-const cancelSave = () => {
-  showSaveModal.value = false
-}
-
-const showMarkdownHelp = () => {
-  showMarkdownModal.value = true
-}
-
-const closeMarkdownHelp = () => {
-  showMarkdownModal.value = false
-}
-
+// 页面挂载时初始化
 onMounted(() => {
-  setTimeout(async () => {
-    await initEditor()
-  }, 100)
-})
-
-onBeforeUnmount(() => {
-  if (editor.value) {
-    editor.value.destroy()
-  }
+  initializePage()
 })
 </script>
 
 <template>
   <div class="write-article-container">
-    <div class="article-header">
-      <!-- 文章标题 -->
-      <div class="form-item">
-        <a-input v-model:value="articleForm.title" placeholder="请输入文章标题" size="large" />
-      </div>
-      <div class="header-actions">
-        <a-button type="primary" @click="saveArticle">保存文章</a-button>
-      </div>
+    <!-- 初始化加载状态 -->
+    <div v-if="isInitializing" class="loading-container">
+      <ASpin size="large">
+        <template #tip>正在初始化文章...</template>
+      </ASpin>
     </div>
 
-    <div class="article-form">
-      <!-- 富文本编辑器 -->
-      <div class="form-item">
-        <!-- 加载状态 -->
-        <div v-if="loading" class="loading-container">
-          <a-spin size="large" />
-          <p>编辑器加载中...</p>
+    <!-- 主要内容 -->
+    <div v-else class="article-content">
+      <div class="article-header">
+        <!-- 文章标题 -->
+        <div class="form-item">
+          <AInput v-model:value="articleFormData.title" placeholder="请输入文章标题" />
         </div>
+        <div class="header-actions">
+          <AButton
+            type="primary"
+            :loading="isSaving"
+            :disabled="isInitializing || !currentArticleId"
+            @click="handleSaveArticle"
+          >
+            保存文章
+          </AButton>
+        </div>
+      </div>
 
+      <div class="article-form">
         <!-- 编辑器工具栏 -->
-        <div v-else class="editor-toolbar">
-          <!-- 撤销/重做 -->
-          <div class="toolbar-group">
-            <button @click="undo" class="toolbar-btn" title="撤销">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M3 7v6h6" />
-                <path d="M21 17a9 9 0 00-9-9 9 9 0 00-6 2.3L3 13" />
-              </svg>
-            </button>
-            <button @click="redo" class="toolbar-btn" title="重做">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M21 7v6h-6" />
-                <path d="M3 17a9 9 0 01 9-9 9 9 0 01 6 2.3l3-2.3" />
-              </svg>
-            </button>
-          </div>
+        <EditorToolbar
+          @undo="handleUndo"
+          @redo="handleRedo"
+          @setHeading="handleSetHeading"
+          @toggleBulletList="handleToggleBulletList"
+          @toggleOrderedList="handleToggleOrderedList"
+          @toggleBlockquote="handleToggleBlockquote"
+          @toggleBold="handleToggleBold"
+          @toggleItalic="handleToggleItalic"
+          @toggleUnderline="handleToggleUnderline"
+          @toggleStrike="handleToggleStrike"
+          @toggleHighlight="handleToggleHighlight"
+          @setTextAlign="handleSetTextAlign"
+          @insertLink="handleInsertLink"
+          @insertImage="handleInsertImage"
+          @toggleCodeBlock="handleToggleCodeBlock"
+          @showMarkdownHelp="handleShowMarkdownHelp"
+        />
 
-          <div class="toolbar-divider"></div>
-
-          <!-- 标题样式 -->
-          <div class="toolbar-group">
-            <a-select @change="setHeading" placeholder="H1" size="middle" class="heading-select" :bordered="false">
-              <a-select-option :value="0">正文</a-select-option>
-              <a-select-option :value="1">H1</a-select-option>
-              <a-select-option :value="2">H2</a-select-option>
-              <a-select-option :value="3">H3</a-select-option>
-            </a-select>
-          </div>
-
-          <div class="toolbar-divider"></div>
-
-          <!-- 列表 -->
-          <div class="toolbar-group">
-            <button @click="toggleBulletList" class="toolbar-btn" title="无序列表">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <line x1="8" y1="6" x2="21" y2="6" />
-                <line x1="8" y1="12" x2="21" y2="12" />
-                <line x1="8" y1="18" x2="21" y2="18" />
-                <line x1="3" y1="6" x2="3.01" y2="6" />
-                <line x1="3" y1="12" x2="3.01" y2="12" />
-                <line x1="3" y1="18" x2="3.01" y2="18" />
-              </svg>
-            </button>
-            <button @click="toggleOrderedList" class="toolbar-btn" title="有序列表">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <line x1="10" y1="6" x2="21" y2="6" />
-                <line x1="10" y1="12" x2="21" y2="12" />
-                <line x1="10" y1="18" x2="21" y2="18" />
-                <path d="M4 6h1v4" />
-                <path d="M4 10h2" />
-                <path d="M6 18H4c0-1 2-2 2-3s-1-1.5-2-1" />
-              </svg>
-            </button>
-          </div>
-
-          <div class="toolbar-divider"></div>
-
-          <!-- 快捷格式 -->
-          <div class="toolbar-group">
-            <button @click="toggleBlockquote" class="toolbar-btn" title="引用">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path
-                  d="M3 21c3 0 7-1 7-8V5c0-1.25-.756-2.017-2-2H4c-1.25 0-2 .75-2 1.972V11c0 1.25.75 2 2 2 1 0 1 0 1 1v1c0 1-1 2-2 2s-1 .008-1 1.031V20c0 1 0 1 1 1z"
-                />
-                <path
-                  d="M15 21c3 0 7-1 7-8V5c0-1.25-.757-2.017-2-2h-4c-1.25 0-2 .75-2 1.972V11c0 1.25.75 2 2 2h.75c0 2.25.25 4-2.75 4v3c0 1 0 1 1 1z"
-                />
-              </svg>
-            </button>
-          </div>
-
-          <div class="toolbar-divider"></div>
-
-          <!-- 文本格式 -->
-          <div class="toolbar-group">
-            <button @click="toggleBold" class="toolbar-btn" title="粗体">
-              <strong style="font-size: 14px; font-weight: 700">B</strong>
-            </button>
-            <button @click="toggleItalic" class="toolbar-btn" title="斜体">
-              <em style="font-size: 14px; font-style: italic">I</em>
-            </button>
-            <button @click="toggleUnderline" class="toolbar-btn" title="下划线">
-              <span style="font-size: 14px; text-decoration: underline">U</span>
-            </button>
-            <button @click="toggleStrike" class="toolbar-btn" title="删除线">
-              <span style="font-size: 14px; text-decoration: line-through">S</span>
-            </button>
-            <button @click="toggleHighlight" class="toolbar-btn" title="高亮">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M9 11H5a2 2 0 0 0-2 2v3c0 1.1.9 2 2 2h4" />
-                <path d="M11 13.5V21c0 1.1.9 2 2 2h3c1.1 0 2-.9 2-2v-7.5" />
-                <path d="M11 4H9L7 2 5 4h2" />
-                <circle cx="12" cy="9" r="3" />
-              </svg>
-            </button>
-          </div>
-
-          <div class="toolbar-divider"></div>
-
-          <!-- 对齐方式 -->
-          <div class="toolbar-group">
-            <button @click="setTextAlign('left')" class="toolbar-btn" title="左对齐">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <line x1="17" y1="10" x2="3" y2="10" />
-                <line x1="21" y1="6" x2="3" y2="6" />
-                <line x1="21" y1="14" x2="3" y2="14" />
-                <line x1="17" y1="18" x2="3" y2="18" />
-              </svg>
-            </button>
-            <button @click="setTextAlign('center')" class="toolbar-btn" title="居中">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <line x1="18" y1="10" x2="6" y2="10" />
-                <line x1="21" y1="6" x2="3" y2="6" />
-                <line x1="21" y1="14" x2="3" y2="14" />
-                <line x1="18" y1="18" x2="6" y2="18" />
-              </svg>
-            </button>
-            <button @click="setTextAlign('right')" class="toolbar-btn" title="右对齐">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <line x1="21" y1="10" x2="7" y2="10" />
-                <line x1="21" y1="6" x2="3" y2="6" />
-                <line x1="21" y1="14" x2="3" y2="14" />
-                <line x1="21" y1="18" x2="7" y2="18" />
-              </svg>
-            </button>
-          </div>
-
-          <div class="toolbar-divider"></div>
-
-          <!-- 插入 -->
-          <div class="toolbar-group">
-            <button @click="insertLink" class="toolbar-btn" title="插入链接">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" />
-                <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" />
-              </svg>
-            </button>
-            <button @click="insertImage" class="toolbar-btn" title="插入图片">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
-                <circle cx="8.5" cy="8.5" r="1.5" />
-                <path d="M21 15l-5-5L5 21" />
-              </svg>
-            </button>
-            <button @click="toggleCodeBlock" class="toolbar-btn" title="代码块">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <polyline points="16,18 22,12 16,6" />
-                <polyline points="8,6 2,12 8,18" />
-              </svg>
-            </button>
-          </div>
-
-          <div class="toolbar-divider"></div>
-
-          <!-- Markdown 帮助 -->
-          <div class="toolbar-group">
-            <button @click="showMarkdownHelp" class="toolbar-btn" title="Markdown 快捷键帮助">
-              <span style="font-size: 16px; font-weight: 600; color: inherit">?</span>
-            </button>
-          </div>
-        </div>
-
-        <!-- Tiptap 编辑器容器 -->
-        <div v-show="!loading" class="editor-container">
-          <div id="tiptap-editor" class="tiptap-editor"></div>
-        </div>
+        <!-- Tiptap 编辑器 -->
+        <TiptapEditor v-model="editorContent" @ready="handleEditorReady" />
       </div>
     </div>
+
+    <!-- 弹窗组件 -->
+    <!-- 图片选择弹窗 -->
+    <ImageSelectModal v-model="isImageModalVisible" @confirm="handleConfirmInsertImage" />
 
     <!-- Markdown 帮助弹窗 -->
-    <a-modal
-      v-model:open="showMarkdownModal"
-      title="📝 支持的 Markdown 快捷键"
-      :footer="null"
-      width="600px"
-      @cancel="closeMarkdownHelp"
-    >
-      <div class="markdown-help-content">
-        <div class="help-section">
-          <h4>📋 标题</h4>
-          <div class="help-example">
-            <code># 一级标题</code><br />
-            <code>## 二级标题</code><br />
-            <code>### 三级标题</code>
-          </div>
-        </div>
-
-        <div class="help-section">
-          <h4>🎨 文本格式</h4>
-          <div class="help-example">
-            <code>**粗体** 或 __粗体__</code><br />
-            <code>*斜体* 或 _斜体_</code><br />
-            <code>~~删除线~~</code><br />
-            <code>`行内代码`</code>
-          </div>
-        </div>
-
-        <div class="help-section">
-          <h4>📝 列表</h4>
-          <div class="help-example">
-            <code>- 无序列表项</code><br />
-            <code>* 也是无序列表</code><br />
-            <code>1. 有序列表项</code><br />
-            <code>2. 继续编号</code>
-          </div>
-        </div>
-
-        <div class="help-section">
-          <h4>🔗 其他</h4>
-          <div class="help-example">
-            <code>&gt; 引用文本</code><br />
-            <code>--- 或 *** (分隔线)</code><br />
-            <code>```javascript (代码块)</code>
-          </div>
-        </div>
-
-        <div class="help-tip">💡 <strong>提示：</strong>输入这些符号后按空格即可自动转换！</div>
-      </div>
-    </a-modal>
+    <MarkdownHelpModal v-model="isMarkdownModalVisible" />
 
     <!-- 保存文章设置弹窗 -->
-    <a-modal
-      v-model:open="showSaveModal"
-      title="📝 保存文章设置"
-      width="600px"
-      @ok="confirmSaveArticle"
-      @cancel="cancelSave"
-      ok-text="保存文章"
-      cancel-text="取消"
-    >
-      <div class="save-modal-content">
-        <div class="form-item">
-          <label>文章标题</label>
-          <a-input v-model:value="articleForm.title" placeholder="请输入文章标题" size="large" />
-        </div>
-
-        <div class="form-item">
-          <label>分类</label>
-          <a-select v-model:value="articleForm.category" placeholder="选择分类" style="width: 100%" size="large">
-            <a-select-option value="tech">技术</a-select-option>
-            <a-select-option value="life">生活</a-select-option>
-            <a-select-option value="thoughts">感悟</a-select-option>
-          </a-select>
-        </div>
-
-        <div class="form-item">
-          <label>标签</label>
-          <a-select
-            v-model:value="articleForm.tags"
-            mode="tags"
-            placeholder="选择或输入标签"
-            style="width: 100%"
-            size="large"
-          >
-            <a-select-option value="Vue">Vue</a-select-option>
-            <a-select-option value="JavaScript">JavaScript</a-select-option>
-            <a-select-option value="TypeScript">TypeScript</a-select-option>
-            <a-select-option value="React">React</a-select-option>
-            <a-select-option value="Node.js">Node.js</a-select-option>
-          </a-select>
-        </div>
-
-        <div class="form-item">
-          <label>状态</label>
-          <a-radio-group v-model:value="articleForm.status" size="large">
-            <a-radio value="draft">草稿</a-radio>
-            <a-radio value="published">发布</a-radio>
-          </a-radio-group>
-        </div>
-      </div>
-    </a-modal>
-
-    <!-- 图片选择弹窗 -->
-    <a-modal
-      v-model:open="showImageModal"
-      title="📷 选择图片"
-      width="1000px"
-      @ok="confirmInsertImage"
-      @cancel="cancelImageSelect"
-      :ok-text="selectedImageIndexes.length > 0 ? '插入图片' : '请先选择图片'"
-      cancel-text="取消"
-      :ok-button-props="{ disabled: selectedImageIndexes.length === 0 }"
-      :body-style="{ padding: '20px' }"
-    >
-      <div class="image-select-content">
-        <a-spin :spinning="imageLoading">
-          <div v-if="imageList.length === 0 && !imageLoading" class="empty-state">
-            <p>暂无图片素材</p>
-          </div>
-          <div v-else>
-            <div class="image-grid" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px">
-              <div
-                v-for="(image, index) in imageList"
-                :key="`img-${index}`"
-                class="image-item"
-                :class="{ selected: selectedImageIndexes.includes(index) }"
-                @click="selectImage(image, index)"
-                style="width: 100%; position: relative"
-              >
-                <div class="image-preview" style="position: relative">
-                  <img :src="image.url" :alt="image.name" style="width: 100%; height: 150px; object-fit: cover" />
-                  <!-- 选中标识 -->
-                  <div
-                    v-show="selectedImageIndexes.includes(index)"
-                    style="
-                      position: absolute;
-                      top: 4px;
-                      right: 4px;
-                      width: 22px;
-                      height: 22px;
-                      background: rgba(255, 255, 255, 0.95);
-                      border-radius: 50%;
-                      display: flex;
-                      align-items: center;
-                      justify-content: center;
-                      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-                      z-index: 1000;
-                    "
-                  >
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
-                      <circle cx="12" cy="12" r="12" fill="#1890ff" />
-                      <path
-                        d="M8 12l2.5 2.5L16 9"
-                        stroke="white"
-                        stroke-width="2"
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                      />
-                    </svg>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <!-- 分页组件 -->
-            <div class="pagination-wrapper" v-if="pagination.total > pagination.pageSize">
-              <a-pagination
-                v-model:current="pagination.current"
-                :total="pagination.total"
-                :page-size="pagination.pageSize"
-                :show-size-changer="false"
-                :show-quick-jumper="false"
-                :show-total="paginationShowTotal"
-                @change="handlePageChange"
-                size="small"
-              />
-            </div>
-          </div>
-        </a-spin>
-      </div>
-    </a-modal>
+    <SaveArticleModal v-model="isSaveModalVisible" :initialData="articleFormData" @confirm="handleConfirmSaveArticle" />
   </div>
 </template>
 
@@ -751,6 +333,13 @@ onBeforeUnmount(() => {
   padding: 24px;
   background: #fff;
   min-height: 100vh;
+
+  .loading-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 400px;
+  }
 
   .article-header {
     display: flex;
@@ -765,6 +354,11 @@ onBeforeUnmount(() => {
       flex: 1;
       margin-bottom: 0;
       margin-right: 16px;
+    }
+
+    .header-actions {
+      display: flex;
+      gap: 8px;
     }
 
     h1 {
@@ -784,719 +378,6 @@ onBeforeUnmount(() => {
         margin-bottom: 8px;
         font-weight: 500;
         color: #262626;
-      }
-    }
-
-    .loading-container {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      padding: 60px 0;
-      color: #999;
-
-      p {
-        margin-top: 16px;
-        margin-bottom: 0;
-      }
-    }
-
-    .editor-toolbar {
-      display: flex;
-      align-items: center;
-      padding: 8px 12px;
-      background: #ffffff;
-      border: 1px solid #e1e5e9;
-      border-bottom: none;
-      border-radius: 8px 8px 0 0;
-      gap: 2px;
-      min-height: 44px;
-      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
-
-      .toolbar-group {
-        display: flex;
-        align-items: center;
-        gap: 2px;
-      }
-
-      .toolbar-divider {
-        width: 1px;
-        height: 20px;
-        background: #e1e5e9;
-        margin: 0 6px;
-      }
-
-      .toolbar-btn {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        width: 32px;
-        height: 32px;
-        border: 1px solid transparent;
-        background: #ffffff;
-        border-radius: 6px;
-        color: #374151;
-        cursor: pointer;
-        transition: all 0.15s ease;
-        font-family: inherit;
-        font-size: 14px;
-        font-weight: 500;
-
-        &:hover {
-          background: #f8fafc;
-          border-color: #d1d5db;
-          color: #111827;
-        }
-
-        &:active {
-          background: #f1f5f9;
-          border-color: #9ca3af;
-          color: #111827;
-          transform: translateY(1px);
-        }
-
-        svg {
-          display: block;
-          width: 16px;
-          height: 16px;
-        }
-      }
-
-      .heading-select {
-        min-width: 70px;
-
-        :deep(.ant-select-selector) {
-          border: 1px solid transparent !important;
-          box-shadow: none !important;
-          background: #ffffff !important;
-          height: 32px;
-          line-height: 32px;
-          padding: 0 8px;
-          border-radius: 6px;
-          transition: all 0.15s ease;
-
-          .ant-select-selection-item {
-            line-height: 30px;
-            font-size: 14px;
-            color: #374151;
-            font-weight: 500;
-          }
-
-          .ant-select-selection-placeholder {
-            line-height: 30px;
-            font-size: 14px;
-            color: #6b7280;
-            font-weight: 500;
-          }
-        }
-
-        :deep(.ant-select-arrow) {
-          color: #6b7280;
-        }
-
-        &:hover {
-          :deep(.ant-select-selector) {
-            background: #f8fafc !important;
-            border-color: #d1d5db !important;
-          }
-        }
-
-        &.ant-select-focused {
-          :deep(.ant-select-selector) {
-            background: #f1f5f9 !important;
-            border-color: #9ca3af !important;
-          }
-        }
-      }
-    }
-
-    .editor-container {
-      border: 1px solid #e1e5e9;
-      border-top: none;
-      border-radius: 0 0 8px 8px;
-      overflow: hidden;
-      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
-
-      .tiptap-editor {
-        min-height: 500px;
-        padding: 20px 24px;
-        outline: none;
-        background: #ffffff;
-
-        :deep(.ProseMirror) {
-          outline: none;
-          min-height: 500px;
-          font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
-          font-size: 16px;
-          line-height: 1.6;
-          color: #1f2937;
-
-          // 占位符样式
-          p.is-editor-empty:first-child::before {
-            color: #9ca3af;
-            content: attr(data-placeholder);
-            float: left;
-            height: 0;
-            pointer-events: none;
-            font-style: italic;
-          }
-
-          // 强制覆盖可能的CSS重置，确保列表样式正确显示
-          ul,
-          ol {
-            list-style: revert !important;
-            margin: 16px 0 !important;
-            padding-left: 24px !important;
-          }
-
-          ul {
-            list-style-type: disc !important;
-          }
-
-          ol {
-            list-style-type: decimal !important;
-          }
-
-          li {
-            display: list-item !important;
-            list-style-position: outside !important;
-            margin: 4px 0 !important;
-          }
-
-          // 重置可能影响列表的样式
-          * {
-            box-sizing: border-box;
-          }
-
-          p {
-            margin: 0 0 16px 0;
-            line-height: 1.6;
-          }
-
-          // 标题样式 - 设置合理的层级关系（紧凑间距）
-          h1 {
-            font-size: 28px;
-            font-weight: 700;
-            margin: 24px 0 12px 0;
-            line-height: 1.3;
-            color: #1a202c;
-            border-bottom: 2px solid #e2e8f0;
-            padding-bottom: 6px;
-          }
-
-          h2 {
-            font-size: 22px;
-            font-weight: 600;
-            margin: 20px 0 10px 0;
-            line-height: 1.4;
-            color: #2d3748;
-          }
-
-          h3 {
-            font-size: 18px;
-            font-weight: 600;
-            margin: 16px 0 8px 0;
-            line-height: 1.4;
-            color: #2d3748;
-          }
-
-          h4 {
-            font-size: 16px;
-            font-weight: 600;
-            margin: 14px 0 6px 0;
-            line-height: 1.5;
-            color: #4a5568;
-          }
-
-          h5 {
-            font-size: 14px;
-            font-weight: 600;
-            margin: 12px 0 4px 0;
-            line-height: 1.5;
-            color: #4a5568;
-          }
-
-          h6 {
-            font-size: 13px;
-            font-weight: 600;
-            margin: 10px 0 2px 0;
-            line-height: 1.5;
-            color: #718096;
-          }
-
-          ul,
-          ol {
-            margin: 16px 0;
-            padding-left: 24px;
-          }
-
-          ul {
-            list-style-type: disc;
-          }
-
-          ol {
-            list-style-type: decimal;
-          }
-
-          li {
-            margin: 4px 0;
-            list-style-position: outside;
-          }
-
-          ul > li {
-            list-style-type: disc !important;
-            display: list-item !important;
-          }
-
-          ol > li {
-            list-style-type: decimal !important;
-            display: list-item !important;
-          }
-
-          // 确保嵌套列表也能正确显示
-          ul ul > li {
-            list-style-type: circle !important;
-          }
-
-          ul ul ul > li {
-            list-style-type: square !important;
-          }
-
-          blockquote {
-            margin: 24px 0;
-            padding: 16px 20px;
-            border-left: 4px solid #3b82f6;
-            background: #f8fafc;
-            color: #64748b;
-            font-style: italic;
-            border-radius: 0 8px 8px 0;
-            line-height: 1.6;
-            position: relative;
-
-            // 确保文本垂直居中
-            display: flex;
-            align-items: center;
-            min-height: 48px;
-
-            p {
-              margin: 0;
-              flex: 1;
-            }
-          }
-
-          pre {
-            background: #1e293b;
-            border: 1px solid #334155;
-            border-radius: 8px;
-            padding: 20px;
-            overflow-x: auto;
-            margin: 24px 0;
-            position: relative;
-
-            code {
-              background: none;
-              padding: 0;
-              color: #e2e8f0;
-              font-size: 14px;
-              font-family: 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Courier New', monospace;
-            }
-
-            // 添加语言标签样式
-            &::before {
-              content: attr(data-language);
-              position: absolute;
-              top: 8px;
-              right: 12px;
-              font-size: 12px;
-              color: #64748b;
-              text-transform: uppercase;
-              letter-spacing: 0.5px;
-            }
-
-            // 代码高亮样式
-            .hljs-comment,
-            .hljs-quote {
-              color: #64748b;
-              font-style: italic;
-            }
-
-            .hljs-keyword,
-            .hljs-selector-tag,
-            .hljs-addition {
-              color: #f472b6;
-            }
-
-            .hljs-number,
-            .hljs-string,
-            .hljs-meta .hljs-string,
-            .hljs-literal,
-            .hljs-doctag,
-            .hljs-regexp {
-              color: #34d399;
-            }
-
-            .hljs-title,
-            .hljs-section,
-            .hljs-name,
-            .hljs-selector-id,
-            .hljs-selector-class {
-              color: #60a5fa;
-            }
-
-            .hljs-attribute,
-            .hljs-attr,
-            .hljs-variable,
-            .hljs-template-variable,
-            .hljs-class .hljs-title,
-            .hljs-type {
-              color: #fbbf24;
-            }
-
-            .hljs-symbol,
-            .hljs-bullet,
-            .hljs-subst,
-            .hljs-meta,
-            .hljs-meta .hljs-keyword,
-            .hljs-selector-attr,
-            .hljs-selector-pseudo,
-            .hljs-link {
-              color: #f87171;
-            }
-
-            .hljs-built_in,
-            .hljs-deletion {
-              color: #ef4444;
-            }
-
-            .hljs-formula {
-              background: #374151;
-            }
-
-            .hljs-emphasis {
-              font-style: italic;
-            }
-
-            .hljs-strong {
-              font-weight: bold;
-            }
-          }
-
-          code {
-            background: #f6f8fa;
-            padding: 2px 4px;
-            border-radius: 3px;
-            font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, Courier, monospace;
-          }
-
-          img {
-            max-width: 100%;
-            height: auto;
-            border-radius: 4px;
-          }
-
-          hr {
-            margin: 24px 0;
-            border: none;
-            border-top: 2px solid #e8e8e8;
-          }
-
-          table {
-            border-collapse: collapse;
-            margin: 16px 0;
-            width: 100%;
-
-            td,
-            th {
-              border: 1px solid #d9d9d9;
-              padding: 8px 12px;
-              text-align: left;
-            }
-
-            th {
-              background: #fafafa;
-              font-weight: 600;
-            }
-          }
-
-          a {
-            color: #1890ff;
-            text-decoration: none;
-
-            &:hover {
-              text-decoration: underline;
-            }
-          }
-
-          mark {
-            background: rgba(24, 144, 255, 0.15);
-            color: #1890ff;
-            padding: 2px 4px;
-            border-radius: 3px;
-            font-weight: 500;
-          }
-        }
-      }
-    }
-
-    .article-settings {
-      .setting-row {
-        display: flex;
-        align-items: center;
-        margin-bottom: 16px;
-
-        span {
-          min-width: 60px;
-          margin-right: 12px;
-          color: #595959;
-        }
-      }
-    }
-  }
-
-  // Markdown 帮助弹窗样式
-  .markdown-help-content {
-    .help-section {
-      margin-bottom: 24px;
-
-      h4 {
-        margin: 0 0 12px 0;
-        color: #374151;
-        font-size: 16px;
-        font-weight: 600;
-      }
-
-      .help-example {
-        background: #f8fafc;
-        padding: 12px 16px;
-        border-radius: 6px;
-        border-left: 4px solid #3b82f6;
-
-        code {
-          display: inline-block;
-          background: #e2e8f0;
-          color: #1e293b;
-          padding: 2px 6px;
-          border-radius: 4px;
-          font-family: 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Courier New', monospace;
-          font-size: 13px;
-          margin: 2px 0;
-        }
-
-        br {
-          line-height: 1.8;
-        }
-      }
-    }
-
-    .help-tip {
-      background: #f0f9ff;
-      border: 1px solid #0ea5e9;
-      border-radius: 8px;
-      padding: 16px;
-      color: #0c4a6e;
-      font-size: 14px;
-      text-align: center;
-
-      strong {
-        color: #075985;
-      }
-    }
-  }
-
-  // 保存文章设置弹窗样式
-  .save-modal-content {
-    .form-item {
-      margin-bottom: 24px;
-
-      label {
-        display: block;
-        margin-bottom: 8px;
-        color: #374151;
-        font-size: 14px;
-        font-weight: 500;
-      }
-
-      :deep(.ant-input),
-      :deep(.ant-select-selector),
-      :deep(.ant-radio-group) {
-        border-radius: 8px;
-      }
-
-      :deep(.ant-select-selector) {
-        border: 1px solid #d1d5db;
-
-        &:hover {
-          border-color: #3b82f6;
-        }
-      }
-
-      :deep(.ant-radio-wrapper) {
-        margin-right: 16px;
-        font-size: 14px;
-      }
-    }
-  }
-
-  // 图片选择弹窗样式
-  .image-select-content {
-    .empty-state {
-      text-align: center;
-      padding: 60px 0;
-      color: #999;
-
-      p {
-        margin: 0;
-        font-size: 16px;
-      }
-    }
-
-    .image-grid {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr) !important; /* 固定4列 */
-      gap: 16px;
-      max-height: 400px;
-      overflow-y: auto;
-      padding: 8px;
-    }
-
-    .pagination-wrapper {
-      display: flex;
-      justify-content: center;
-      padding: 16px 0 8px 0;
-      border-top: 1px solid #f0f0f0;
-      margin-top: 16px;
-    }
-
-    .image-item {
-      border: 2px solid #f0f0f0;
-      border-radius: 8px;
-      overflow: hidden;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      width: 100%;
-      position: relative;
-
-      &:hover {
-        border-color: #1890ff;
-        box-shadow: 0 4px 12px rgba(24, 144, 255, 0.15);
-        transform: translateY(-2px);
-      }
-
-      &.selected {
-        border-color: #1890ff !important;
-        box-shadow: 0 6px 16px rgba(24, 144, 255, 0.3);
-        background: rgba(24, 144, 255, 0.08);
-        transform: translateY(-2px);
-
-        &:hover {
-          border-color: #40a9ff;
-          box-shadow: 0 8px 20px rgba(24, 144, 255, 0.4);
-        }
-      }
-    }
-
-    .image-preview {
-      position: relative;
-      width: 100% !important;
-      height: 150px !important;
-      overflow: hidden;
-
-      img {
-        width: 100% !important;
-        height: 100% !important;
-        object-fit: cover;
-        display: block;
-      }
-
-      /* 图片选中状态标识 - 右上角位置 */
-
-      .image-selected-badge {
-        position: absolute !important;
-        top: 4px !important;
-        right: 4px !important;
-        left: auto !important;
-        bottom: auto !important;
-        width: 22px !important;
-        height: 22px !important;
-        background: rgba(255, 255, 255, 0.95) !important;
-        border-radius: 50% !important;
-        display: flex !important;
-        align-items: center !important;
-        justify-content: center !important;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15) !important;
-        z-index: 1000 !important;
-        animation: badge-appear 0.2s ease-out !important;
-
-        svg {
-          width: 14px !important;
-          height: 14px !important;
-        }
-      }
-
-      @keyframes badge-appear {
-        0% {
-          transform: scale(0);
-          opacity: 0;
-        }
-        50% {
-          transform: scale(1.1);
-        }
-        100% {
-          transform: scale(1);
-          opacity: 1;
-        }
-      }
-
-      .image-overlay {
-        position: absolute;
-        top: 0;
-        right: 0;
-        background: rgba(0, 0, 0, 0.7);
-        padding: 4px 8px;
-        border-bottom-left-radius: 4px;
-
-        .image-info {
-          display: flex;
-          gap: 8px;
-
-          .image-type,
-          .image-size {
-            background: rgba(255, 255, 255, 0.9);
-            color: #333;
-            padding: 2px 6px;
-            border-radius: 3px;
-            font-size: 10px;
-            font-weight: 500;
-          }
-        }
-      }
-    }
-
-    .image-details {
-      padding: 12px;
-
-      .image-name {
-        font-weight: 500;
-        font-size: 12px;
-        color: #333;
-        margin-bottom: 4px;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-      }
-
-      .image-meta {
-        display: flex;
-        justify-content: space-between;
-        font-size: 10px;
-        color: #666;
-
-        span {
-          &:first-child {
-            color: #1890ff;
-            font-weight: 500;
-          }
-        }
       }
     }
   }

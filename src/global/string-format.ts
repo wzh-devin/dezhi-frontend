@@ -15,9 +15,9 @@ import type { ApiResultObject } from '@/service/typings.ts'
  */
 const errMsgExtract = (error: ApiResultObject) => {
   const errCode = error?.errCode ?? ''
-  const errData = error?.data
+  const errMsg = error?.errMsg ?? ''
 
-  return message.error(`${errData}【${errCode}】`)
+  return message.error(`${errMsg}【${errCode}】`)
 }
 
 export { errMsgExtract }

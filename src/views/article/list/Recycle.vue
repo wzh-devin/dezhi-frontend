@@ -17,7 +17,6 @@ import type { ApiResultObject, ArticleVO, CategoryVO } from '@/service/typings.t
 import { message } from 'ant-design-vue'
 
 const articleStore = useArticleStore()
-const categoryStore = useCategoryStore()
 
 // 选择的行Keys
 const selectedRowKeys = ref<(string | number)[]>([])
@@ -33,8 +32,8 @@ const pageInfo = reactive({
   addition: {
     pageNum: ref(1),
     pageSize: ref(10),
-    total: ref(0),
   },
+  total: ref(0),
   dataSource: reactive<ArticleVO[]>([]),
   loading: ref<boolean>(false),
 })
@@ -96,6 +95,7 @@ const pageInit = async (addition: { pageNum: number; pageSize: number }) => {
     .then(
       (res) => {
         // 重置属性
+        console.log(res.data)
         pageInfo.dataSource = res.data ?? []
         Object.assign(pageInfo.addition, res.addition ?? {})
         // 停止加载
@@ -109,23 +109,10 @@ const pageInit = async (addition: { pageNum: number; pageSize: number }) => {
 }
 
 /**
- * 初始化分类列表
- */
-const initCategoryList = async () => {
-  try {
-    const res = await categoryStore.getCategoryListAction({ pageNum: 1, pageSize: 100 })
-    categoryList.value = res.data ?? []
-  } catch (error) {
-    errMsgExtract(error as ApiResultObject)
-  }
-}
-
-/**
  * 页面挂载初始化
  */
 onMounted(() => {
   pageInit(pageInfo.addition)
-  initCategoryList()
 })
 
 /**
@@ -185,7 +172,7 @@ const tableConfig = computed(() => ({
   pagination: {
     current: pageInfo.addition.pageNum,
     pageSize: pageInfo.addition.pageSize,
-    total: pageInfo.addition.total,
+    total: pageInfo.total,
     onChange: paginationHandler,
   } as PaginationConfig,
   scrollY: 420,

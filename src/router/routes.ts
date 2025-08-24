@@ -33,9 +33,14 @@ const menuRoutes: Array<RouteRecordRaw> = [
             component: () => import('@/views/article/list/index.vue'),
           },
           {
-            path: 'list/write',
+            path: 'list/write/:articleId?',
             name: 'article-write',
             component: () => import('@/views/article/list/write/index.vue'),
+          },
+          {
+            path: 'list/recycle',
+            name: 'article-recycle',
+            component: () => import('@/views/article/list/Recycle.vue'),
           },
           {
             path: 'tags',

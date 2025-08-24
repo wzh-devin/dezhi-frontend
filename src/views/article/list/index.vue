@@ -47,8 +47,8 @@ const pageInfo = reactive({
   addition: {
     pageNum: ref(1),
     pageSize: ref(10),
-    total: ref(0),
   },
+  total: ref(0),
   dataSource: reactive<ArticleVO[]>([]),
   loading: ref<boolean>(false),
 })
@@ -108,7 +108,6 @@ const pageInit = async (addition: { pageNum: number; pageSize: number }) => {
   articleStore
     .getArticleListAction({
       ...addition,
-      status: 'IS_PUBLISH',
       delFlag: 'NORMAL',
       categoryName: categoryFilter.value,
       title: searchKeyword.value,
@@ -203,14 +202,15 @@ const tableConfig = computed(() => ({
   pagination: {
     current: pageInfo.addition.pageNum,
     pageSize: pageInfo.addition.pageSize,
-    total: pageInfo.addition.total,
+    total: pageInfo.total,
     onChange: paginationHandler,
   } as PaginationConfig,
   scrollY: 420,
 }))
 
-const handleWriteArticle = () => {
-  router.push({ name: 'article-write' })
+const handleWriteArticle = async () => {
+  const article = (await articleStore.saveArticleInitAction()).data
+  await router.push({ name: 'article-write', params: { articleId: article?.id } })
 }
 
 // 批量删除确认处理
@@ -263,7 +263,7 @@ const paginationHandler = (page: number, pageSize: number) => {
  * 编辑文章
  */
 const handleEdit = (record: ArticleVO) => {
-  router.push({ name: 'article-write', params: { id: record.id } })
+  router.push({ name: 'article-write', params: { articleId: record.id } })
 }
 
 /**
@@ -271,10 +271,7 @@ const handleEdit = (record: ArticleVO) => {
  */
 const handlePublish = async (record: ArticleVO) => {
   try {
-    await articleStore.editArticleAction({
-      id: record.id,
-      status: 1, // 发布状态
-    })
+    await articleStore.updateStatusAction(record.id as string, 'IS_PUBLISH')
     message.success('发布成功')
     await pageInit(pageInfo.addition)
   } catch (error) {
@@ -287,10 +284,7 @@ const handlePublish = async (record: ArticleVO) => {
  */
 const handleUnpublish = async (record: ArticleVO) => {
   try {
-    await articleStore.editArticleAction({
-      id: record.id,
-      status: 0, // 草稿状态
-    })
+    await articleStore.updateStatusAction(record.id as string, 'DRAFT')
     message.success('下架成功')
     await pageInit(pageInfo.addition)
   } catch (error) {

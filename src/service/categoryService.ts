@@ -58,7 +58,7 @@ export async function editCategory(
 /**
  * 删除类别 POST /api/v1/category/delBatch
  */
-export async function delCategories(data?: string[], options?: Record<string, unknown>): Promise<ApiResultVoid> {
+export async function delCategories(data?: number[], options?: Record<string, unknown>): Promise<ApiResultVoid> {
   return post({
     url: `/api/v1/category/delBatch`,
     data,
@@ -85,6 +85,16 @@ export async function page(
     params: {
       ...params,
     },
+    ...(options || {}),
+  })
+}
+
+/**
+ * 获取类别下拉列表 GET /api/v1/category/getCategoryOptional
+ */
+export async function getCategoryOptional(options?: Record<string, unknown>): Promise<ApiResultListCategoryVO> {
+  return get({
+    url: `/api/v1/category/getCategoryOptional`,
     ...(options || {}),
   })
 }
