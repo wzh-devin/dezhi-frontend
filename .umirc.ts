@@ -1,8 +1,9 @@
-import {defineConfig} from "umi";
-import {routes} from "./config/router";
+import { defineConfig } from 'umi'
+import { routes } from './config/router'
 
 export default defineConfig({
-    routes,
-    antd: {},
-    npmClient: 'pnpm',
-});
+  plugins: ['@umijs/plugins/dist/antd'],
+  antd: {},
+  routes,
+  npmClient: 'pnpm',
+})
