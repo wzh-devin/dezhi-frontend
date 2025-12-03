@@ -7,4 +7,15 @@
  * @since 1.0.0
  */
 
-export const routes = []
+export const routes = [
+  {
+    path: '/',
+    component: '@/layouts/Web',
+    routes: [
+      {
+        path: '/',
+        component: '@/pages/Web/Home',
+      },
+    ],
+  },
+]
