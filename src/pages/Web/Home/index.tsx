@@ -26,7 +26,7 @@ const LeftSideBar: FC = () => {
   return (
     <div className={styles['left-sidebar']}>
       {/* 作者信息卡片 */}
-      <Card className={styles['author-info-card']} bordered={false}>
+      <Card className={styles['author-info-card']}>
         <div className={styles['author-header']}>
           <div className={styles['author-label']}>博主资料</div>
           <div className={styles['author-settings']}>蜂巢</div>
@@ -66,7 +66,6 @@ const LeftSideBar: FC = () => {
           </div>
         }
         className={styles['recommend-card']}
-        bordered={false}
       >
         {recommendArticles.map((article, index) => (
           <div key={index} className={styles['recommend-item']}>
@@ -179,7 +178,7 @@ const RightContent: FC = () => {
         <Row gutter={[24, 24]}>
           {articles.map((article, index) => (
             <Col span={12} key={index}>
-              <Card className={styles['article-card']} bordered={false}>
+              <Card className={styles['article-card']}>
                 <div
                   className={styles['article-image-wrapper']}
                   style={{ backgroundImage: `url(${article.image})` }}
