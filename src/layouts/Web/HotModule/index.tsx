@@ -93,7 +93,7 @@ const HotModule: FC = () => {
                   <Card
                     className={styles['hot-article-card']}
                     style={{ backgroundColor: article.bgColor }}
-                    bodyStyle={{ padding: '20px' }}
+                    styles={{ body: { padding: '20px' } }}
                   >
                     <div className={styles['article-icon']}>{article.icon}</div>
                     <h4 className={styles['article-title']}>{article.title}</h4>

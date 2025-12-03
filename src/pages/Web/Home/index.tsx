@@ -9,15 +9,8 @@
 import React, { memo, useState, useRef } from 'react'
 import type { FC } from 'react'
 import { Row, Col, Avatar, Tag, Card } from 'antd'
-import {
-  GithubOutlined,
-  CameraOutlined,
-  EyeOutlined,
-  LikeOutlined,
-  ClockCircleOutlined,
-} from '@ant-design/icons'
+import { GithubOutlined, CameraOutlined } from '@ant-design/icons'
 import styles from './index.less'
-
 
 /**
  * 左侧信息栏组件
@@ -165,10 +158,7 @@ const RightContent: FC = () => {
       {/* 内容导航栏 */}
       <div className={styles['content-nav']}>
         <div className={styles['nav-tabs-wrapper']}>
-          <div
-            className={styles['nav-scroll-container']}
-            ref={scrollContainerRef}
-          >
+          <div className={styles['nav-scroll-container']} ref={scrollContainerRef}>
             {contentTabs.map((tab) => (
               <div
                 key={tab.key}
@@ -195,9 +185,7 @@ const RightContent: FC = () => {
                   style={{ backgroundImage: `url(${article.image})` }}
                 >
                   <div className={styles['article-overlay']}>
-                    <Tag className={styles['article-category']}>
-                      {article.category}
-                    </Tag>
+                    <Tag className={styles['article-category']}>{article.category}</Tag>
                   </div>
                 </div>
                 <div className={styles['article-info']}>
@@ -205,9 +193,7 @@ const RightContent: FC = () => {
                     <Tag color="blue" className={styles['article-tag']}>
                       {article.tag}
                     </Tag>
-                    <span className={styles['article-date']}>
-                      {article.date}
-                    </span>
+                    <span className={styles['article-date']}>{article.date}</span>
                   </div>
                   <h3 className={styles['article-title']}>{article.title}</h3>
                 </div>
