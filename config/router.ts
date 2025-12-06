@@ -18,4 +18,8 @@ export const routes = [
       },
     ],
   },
+  {
+    path: '/admin/login',
+    component: '@/pages/Admin/Login',
+  },
 ]
