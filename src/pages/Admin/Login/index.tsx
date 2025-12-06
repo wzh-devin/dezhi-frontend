@@ -8,7 +8,7 @@
  */
 import React, { memo, useEffect, useState } from 'react'
 import type { FC } from 'react'
-import { Input, Checkbox, Button, message, Form } from 'antd'
+import { Input, Checkbox, Button, message } from 'antd'
 import { UserOutlined, LockOutlined } from '@ant-design/icons'
 import style from './index.less'
 import { login } from '@/service/userService'
