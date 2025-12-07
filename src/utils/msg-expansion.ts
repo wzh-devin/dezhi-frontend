@@ -9,15 +9,12 @@
 import { ApiResultObject } from '@/service/typings'
 
 export interface ApiError extends Error {
-  response?: ApiResultObject
+  response?: {
+    config: any
+    data: ApiResultObject
+    headers: any
+    request: any
+    status: number
+    statusText: string
+  }
 }
-
-/**
- * 错误处理
- * @param error
- */
-const errorHandler = (error: ApiError) => {
-  return error.response?.data.errMsg ?? '请求失败'
-}
-
-export { errorHandler }

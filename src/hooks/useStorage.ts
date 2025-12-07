@@ -30,7 +30,7 @@ const useStorage = <T>(
     () =>
       new BrowserStorage({
         type: options?.type || 'local',
-        namespace: options?.namespace || 'app',
+        namespace: options?.namespace || 'dezhi',
         encrypt: options?.encrypt || false,
       }),
   )

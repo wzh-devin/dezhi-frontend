@@ -8,18 +8,15 @@
  */
 import React, { memo, useEffect, useState } from 'react'
 import type { FC } from 'react'
-import { Input, Checkbox, Button, message } from 'antd'
+import { Input, Checkbox, Button, message, Form } from 'antd'
 import { UserOutlined, LockOutlined } from '@ant-design/icons'
 import style from './index.less'
 import { login } from '@/service/userService'
 import { useStorage } from '@/hooks/useStorage'
 import { useRequest } from '@@/plugin-request'
-import { errorHandler } from '@/utils/msg-expansion'
 
 const Login: FC = () => {
-  const [username, setUsername] = useState('')
-  const [password, setPassword] = useState('')
-  const [rememberMe, setRememberMe] = useState(false)
+  const [form] = Form.useForm()
   const [loading, setLoading] = useState(false)
 
   const { setValue: setToken } = useStorage<string>('token', '')
@@ -35,7 +32,7 @@ const Login: FC = () => {
     'userInfo',
     {
       username: '',
-      rememberMeChecked: rememberMe,
+      rememberMeChecked: false,
     },
     {
       type: 'local',
@@ -45,45 +42,39 @@ const Login: FC = () => {
 
   /**
    * 执行登录功能
-   * @param e
    */
-  const { run: handleLoginRun } = useRequest(
-    () => {
-      return login({
-        username,
-        password,
-      })
-    },
-    {
-      manual: true,
-      onSuccess: (result) => {
-        setToken(result as string)
+  const { run: handleLoginRun } = useRequest(login, {
+    manual: true,
+    onSuccess: (result) => {
+      setToken(result as string)
 
-        handleRememberMe()
+      handleRememberMe()
 
-        setLoading(false)
-        message.success('登录成功').then()
-      },
-      onError: (error) => {
-        setLoading(false)
-        message.error(errorHandler(error)).then()
-      },
+      setLoading(false)
+      message.success('登录成功').then()
     },
-  )
+    onError: (error) => {
+      setLoading(false)
+    },
+  })
 
   /**
    * 提交登录信息
-   * @param e
    */
-  const onSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    handleLoginRun()
+  const onSubmit = () => {
+    setLoading(true)
+    handleLoginRun({
+      username: form.getFieldValue('username'),
+      password: form.getFieldValue('password'),
+    })
   }
 
   /**
    * 处理记住账号行为
    */
   const handleRememberMe = () => {
+    const rememberMe = form.getFieldValue('rememberMe')
+    const username = form.getFieldValue('username')
     if (rememberMe) {
       // 记住账号
       setUserInfo({
@@ -98,37 +89,14 @@ const Login: FC = () => {
 
   // 监听是否记住账号行为
   useEffect(() => {
-    console.log('userInfo')
     const { username, rememberMeChecked } = userInfo
     if (username) {
-      setUsername(username)
-      setRememberMe(rememberMeChecked)
+      form.setFieldsValue({
+        username,
+        rememberMe: rememberMeChecked,
+      })
     }
   }, [])
-
-  /**
-   * 处理用户名输入
-   * @param e
-   */
-  const handleUsernameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setUsername(e.target.value)
-  }
-
-  /**
-   * 处理密码输入
-   * @param e
-   */
-  const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setPassword(e.target.value)
-  }
-
-  /**
-   * 处理记住账号行为
-   * @param e
-   */
-  const handleRememberChange = (e: any) => {
-    setRememberMe(e.target.checked)
-  }
 
   return (
     <div className={style['admin-login']}>
@@ -168,51 +136,66 @@ const Login: FC = () => {
         </div>
 
         {/* Login Form */}
-        <form onSubmit={onSubmit} className={style['admin-login__form']}>
+        <Form
+          form={form}
+          onFinish={onSubmit}
+          className={style['admin-login__form']}
+          initialValues={{ rememberMe: false }}
+        >
           <div className={style['admin-login__inputs']}>
-            <Input
-              className={style['admin-login__input']}
-              placeholder="用户名 / 邮箱"
-              prefix={<UserOutlined className={style['admin-login__input-icon']} />}
-              value={username}
-              onChange={handleUsernameChange}
-              maxLength={100}
-            />
+            <Form.Item
+              name="username"
+              rules={[
+                { required: true, message: '请输入用户名或邮箱' },
+                { max: 100, message: '用户名最多100个字符' },
+              ]}
+            >
+              <Input
+                className={style['admin-login__input']}
+                placeholder="用户名 / 邮箱"
+                prefix={<UserOutlined className={style['admin-login__input-icon']} />}
+                maxLength={100}
+              />
+            </Form.Item>
 
-            <Input.Password
-              className={style['admin-login__input']}
-              placeholder="密码"
-              prefix={<LockOutlined className={style['admin-login__input-icon']} />}
-              value={password}
-              onChange={handlePasswordChange}
-              minLength={6}
-              maxLength={16}
-            />
+            <Form.Item
+              name="password"
+              rules={[
+                { required: true, message: '请输入密码' },
+                { min: 6, message: '密码至少6个字符' },
+                { max: 16, message: '密码最多16个字符' },
+              ]}
+            >
+              <Input.Password
+                className={style['admin-login__input']}
+                placeholder="密码"
+                prefix={<LockOutlined className={style['admin-login__input-icon']} />}
+                maxLength={16}
+              />
+            </Form.Item>
           </div>
 
           <div className={style['admin-login__options']}>
-            <Checkbox
-              checked={rememberMe}
-              onChange={handleRememberChange}
-              className={style['admin-login__remember']}
-            >
-              记住账号
-            </Checkbox>
+            <Form.Item name="rememberMe" valuePropName="checked" noStyle>
+              <Checkbox className={style['admin-login__remember']}>记住账号</Checkbox>
+            </Form.Item>
             <a href="#" className={style['admin-login__forgot']}>
               忘记密码?
             </a>
           </div>
 
-          <Button
-            type="primary"
-            htmlType="submit"
-            className={style['admin-login__submit']}
-            loading={loading}
-            block
-          >
-            登 录
-          </Button>
-        </form>
+          <Form.Item>
+            <Button
+              type="primary"
+              htmlType="submit"
+              className={style['admin-login__submit']}
+              loading={loading}
+              block
+            >
+              登 录
+            </Button>
+          </Form.Item>
+        </Form>
 
         {/* Footer */}
         <div className={style['admin-login__footer']}>
@@ -234,7 +217,7 @@ const Login: FC = () => {
             <path d="m19.07 4.93-1.41 1.41" />
             <path d="M17.5 7.5A5 5 0 0 0 12 4a5 5 0 0 0-5 5c0 1.5.5 2.5 2 4l3 3 3-3c1.5-1.5 2-2.5 2-4Z" />
           </svg>
-          <span>Designed for Spring, Built for Dezhi</span>
+          <span>Welcome Dezhi Login</span>
         </div>
       </div>
     </div>

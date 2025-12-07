@@ -237,6 +237,20 @@
 
   // Override Ant Design Styles (using :global for antd classes)
   :global {
+    // Reset Form.Item default styles
+    .ant-form-item {
+      margin-bottom: 0;
+    }
+
+    .ant-form-item-explain {
+      font-size: 12px;
+      min-height: 22px;
+    }
+
+    .ant-form-item-explain-error {
+      color: #ef4444;
+    }
+
     .ant-input-affix-wrapper {
       height: 44px;
       border-radius: 8px;
