@@ -9,7 +9,7 @@
 const OpenApiTool = require('openapi-tool')
 const { resolve } = require('path')
 
-const url = 'http://localhost:12001/api/v1/v3/api-docs'
+const url = 'http://localhost:14001/api/v1/v3/api-docs'
 const outputDir = resolve(__dirname, '../', 'src', 'service')
 
 const firstUpperCase = (str) => {

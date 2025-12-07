@@ -1,0 +1,95 @@
+// 顶部导航栏样式
+.top-nav-bar {
+  background: #f0f2f5;
+  height: 64px;
+  padding: 0;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+
+  .nav-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 24px;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    // Logo样式
+    .logo {
+      display: flex;
+      align-items: center;
+
+      .logo-icon {
+        height: 40px;
+
+        .logo-svg {
+          height: 100%;
+          width: auto;
+
+          .logo-text {
+            fill: #ff6b35;
+            font-size: 16px;
+            font-weight: bold;
+            font-family: Arial, sans-serif;
+          }
+        }
+      }
+    }
+
+    // 菜单栏样式
+    .nav-menu {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex: 1;
+      justify-content: center;
+
+      .menu-item {
+        padding: 6px 16px;
+        color: #333333;
+        cursor: pointer;
+        border-radius: 16px;
+        transition: all 0.3s ease;
+        font-size: 14px;
+        font-weight: 400;
+        line-height: 1.5;
+        height: 32px;
+        display: flex;
+        align-items: center;
+
+        &:hover {
+          background: rgba(255, 107, 53, 0.1);
+          color: #ff6b35;
+        }
+
+        &.menu-item-active {
+          background: #ff6b35;
+          color: #ffffff;
+          font-weight: 500;
+        }
+      }
+    }
+
+    // 右侧图标样式
+    .nav-right {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+
+      .nav-icon {
+        font-size: 18px;
+        color: #666666;
+        cursor: pointer;
+        transition: all 0.3s ease;
+
+        &:hover {
+          transform: scale(1.1);
+          color: #ff6b35;
+        }
+      }
+    }
+  }
+}

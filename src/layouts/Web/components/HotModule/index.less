@@ -1,0 +1,146 @@
+// Hot模块样式
+.hot-module {
+  margin-bottom: 24px;
+
+  // 左侧作者信息卡片
+  .author-card {
+    height: 322px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border: 1px solid #e8e8e8;
+
+    :global {
+      .ant-card-body {
+        padding: 32px;
+        height: 100%;
+      }
+    }
+
+    .author-content {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      height: 100%;
+      color: #ffffff;
+
+      .author-greeting {
+        .greeting-title {
+          font-size: 28px;
+          font-weight: bold;
+          color: #ffffff;
+          margin-bottom: 8px;
+        }
+
+        .greeting-subtitle {
+          font-size: 14px;
+          color: rgba(255, 255, 255, 0.8);
+          margin-bottom: 16px;
+        }
+
+        .author-name {
+          font-size: 24px;
+          font-weight: bold;
+          color: #ffffff;
+          margin-bottom: 4px;
+        }
+
+        .author-desc {
+          font-size: 14px;
+          color: rgba(255, 255, 255, 0.8);
+          margin-bottom: 0;
+        }
+      }
+
+      .author-actions {
+        display: flex;
+        gap: 12px;
+
+        .action-button {
+          flex: 1;
+          background: #1890ff;
+          border: none;
+          border-radius: 8px;
+          height: 40px;
+          font-weight: 500;
+
+          &:hover {
+            background: #40a9ff;
+          }
+        }
+
+        .action-button-secondary {
+          flex: 1;
+          background: #faad14;
+          color: #ffffff;
+          border: none;
+          border-radius: 8px;
+          height: 40px;
+          font-weight: 500;
+
+          &:hover {
+            background: #ffc53d;
+            color: #ffffff;
+          }
+        }
+      }
+    }
+  }
+
+  // 右侧热门文章列表
+  .hot-articles {
+    .hot-article-card {
+      height: 150px;
+      border-radius: 12px;
+      border: 1px solid #e8e8e8;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      overflow: hidden;
+
+      &:hover {
+        transform: translateY(-2px);
+        border-color: #d9d9d9;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      }
+
+      :global {
+        .ant-card-body {
+          height: 100%;
+          display: flex;
+          flex-direction: column;
+          justify-content: center;
+        }
+      }
+
+      .article-icon {
+        font-size: 32px;
+        margin-bottom: 12px;
+        line-height: 1;
+      }
+
+      .article-title {
+        font-size: 16px;
+        font-weight: bold;
+        color: #ffffff;
+        margin-bottom: 8px;
+        line-height: 1.4;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      .article-subtitle {
+        font-size: 13px;
+        color: rgba(255, 255, 255, 0.9);
+        line-height: 1.4;
+        margin: 0;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+    }
+  }
+}
