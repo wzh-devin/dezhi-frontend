@@ -1,0 +1,144 @@
+/**
+ * 2025/12/7 21:55.
+ *
+ * @author <a href="https://github.com/wzh-devin">devin</a>
+ * @description 后台左侧菜单栏样式
+ * @version 1.0.0
+ * @since 1.0.0
+ */
+
+@header-height: 56px;
+
+.admin-sider {
+  position: fixed !important;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  z-index: 100;
+  height: 100vh;
+  overflow: auto;
+  background: #ffffff !important;
+  border-right: 1px solid #f0f0f0;
+
+  :global(.ant-layout-sider-children) {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+  }
+
+  // Logo
+  &__logo {
+    height: @header-height;
+    display: flex;
+    align-items: center;
+    padding: 0 16px;
+    gap: 10px;
+    border-bottom: 1px solid #f0f0f0;
+    flex-shrink: 0;
+
+    &-icon {
+      width: 32px;
+      height: 32px;
+      background: linear-gradient(135deg, #1890ff 0%, #096dd9 100%);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #ffffff;
+      font-size: 16px;
+      font-weight: 600;
+      flex-shrink: 0;
+    }
+
+    &-text {
+      font-size: 16px;
+      font-weight: 600;
+      color: #1a1a1a;
+      white-space: nowrap;
+      overflow: hidden;
+    }
+  }
+
+  // 菜单
+  &__menu {
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    border-right: none !important;
+    padding: 8px;
+
+    :global(.ant-menu-item) {
+      margin: 4px 0;
+      border-radius: 8px;
+      height: 40px;
+      line-height: 40px;
+
+      &:hover {
+        background: #f0f7ff;
+      }
+    }
+
+    :global(.ant-menu-item.ant-menu-item-selected) {
+      background: #e6f4ff;
+      color: #1890ff;
+
+      &::after {
+        display: none;
+      }
+    }
+
+    :global(.ant-menu-submenu .ant-menu-submenu-title) {
+      margin: 4px 0;
+      border-radius: 8px;
+      height: 40px;
+      line-height: 40px;
+
+      &:hover {
+        background: #f0f7ff;
+      }
+    }
+
+    :global(.ant-menu-submenu .ant-menu-sub) {
+      background: transparent !important;
+    }
+
+    :global(.ant-menu-submenu .ant-menu-sub .ant-menu-item) {
+      padding-left: 48px !important;
+    }
+
+    :global(.ant-menu-item-icon) {
+      font-size: 16px;
+    }
+
+    :global(.ant-menu-submenu-title .ant-menu-item-icon) {
+      font-size: 16px;
+    }
+
+    :global(.ant-menu-inline-collapsed) {
+      padding: 8px 4px;
+    }
+
+    :global(.ant-menu-inline-collapsed .ant-menu-item) {
+      padding: 0 !important;
+      justify-content: center;
+    }
+
+    :global(.ant-menu-inline-collapsed .ant-menu-submenu-title) {
+      padding: 0 !important;
+      justify-content: center;
+    }
+  }
+
+  // 版本号
+  &__version {
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #999999;
+    font-size: 12px;
+    border-top: 1px solid #f0f0f0;
+    flex-shrink: 0;
+  }
+}
+

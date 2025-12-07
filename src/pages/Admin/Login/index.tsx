@@ -13,7 +13,7 @@ import { UserOutlined, LockOutlined } from '@ant-design/icons'
 import style from './index.less'
 import { login } from '@/service/userService'
 import { useStorage } from '@/hooks/useStorage'
-import { useRequest } from '@@/plugin-request'
+import { useRequest, history } from 'umi'
 
 const Login: FC = () => {
   const [form] = Form.useForm()
@@ -52,6 +52,9 @@ const Login: FC = () => {
 
       setLoading(false)
       message.success('登录成功').then()
+
+      // 跳转页面
+      history.push('/admin/dashboard')
     },
     onError: (error) => {
       setLoading(false)

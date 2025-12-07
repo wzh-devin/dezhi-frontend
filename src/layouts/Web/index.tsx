@@ -11,8 +11,8 @@ import { memo } from 'react'
 import { Layout } from 'antd'
 import { Outlet } from 'umi'
 import styles from './index.less'
-import TopNavBar from '@/layouts/Web/TopNavBar'
-import HotModule from '@/layouts/Web/HotModule'
+import TopNavBar from '@/layouts/Web/components/TopNavBar'
+import HotModule from '@/layouts/Web/components/HotModule'
 
 const { Content } = Layout
 

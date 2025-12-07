@@ -9,7 +9,7 @@
 import { RequestConfig } from 'umi'
 import { BrowserStorage } from '@/utils/storage-utils'
 import { message } from 'antd'
-import { ApiError } from '@/utils/msg-expansion'
+import { ApiError } from '@/service/typings'
 
 const handleError = (error: any) => {
   const apiError: ApiError = error as ApiError

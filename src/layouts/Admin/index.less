@@ -1,0 +1,30 @@
+/**
+ * 2025/12/7 21:55.
+ *
+ * @author <a href="https://github.com/wzh-devin">devin</a>
+ * @description 后台布局样式
+ * @version 1.0.0
+ * @since 1.0.0
+ */
+
+@sider-width: 220px;
+@sider-collapsed-width: 64px;
+@header-height: 56px;
+
+.admin-layout {
+  min-height: 100vh;
+
+  // 内容区域
+  &__content {
+    margin-left: @sider-width;
+    margin-top: @header-height;
+    padding: 24px;
+    background: #f5f7fa;
+    min-height: calc(100vh - @header-height);
+    transition: margin-left 0.2s;
+
+    &--collapsed {
+      margin-left: @sider-collapsed-width;
+    }
+  }
+}
