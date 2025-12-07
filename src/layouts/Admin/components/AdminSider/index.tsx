@@ -15,7 +15,6 @@ import {
   TagsOutlined,
   FolderOutlined,
   SettingOutlined,
-  HistoryOutlined,
   RobotOutlined,
   FileOutlined,
 } from '@ant-design/icons'
