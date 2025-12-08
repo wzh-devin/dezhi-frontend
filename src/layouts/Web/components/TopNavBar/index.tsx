@@ -67,7 +67,7 @@ const TopNavBar: FC = () => {
           <SettingOutlined
             className={styles['nav-icon']}
             onClick={() => {
-              history.push('/admin')
+              history.push('/admin/login')
             }}
           />
         </div>

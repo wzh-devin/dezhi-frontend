@@ -149,13 +149,13 @@ const Login: FC = () => {
             <Form.Item
               name="username"
               rules={[
-                { required: true, message: '请输入用户名或邮箱' },
+                { required: true, message: '请输入用户名' },
                 { max: 100, message: '用户名最多100个字符' },
               ]}
             >
               <Input
                 className={style['admin-login__input']}
-                placeholder="用户名 / 邮箱"
+                placeholder="用户名"
                 prefix={<UserOutlined className={style['admin-login__input-icon']} />}
                 maxLength={100}
               />
