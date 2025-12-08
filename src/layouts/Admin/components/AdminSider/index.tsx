@@ -13,10 +13,8 @@ import {
   DashboardOutlined,
   FileTextOutlined,
   TagsOutlined,
-  FolderOutlined,
   SettingOutlined,
   RobotOutlined,
-  FileOutlined,
   FolderOpenTwoTone,
   PictureTwoTone,
 } from '@ant-design/icons'

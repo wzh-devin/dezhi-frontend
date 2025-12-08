@@ -16,7 +16,6 @@ import {
   FileOutlined,
   FilePdfOutlined,
   FileZipOutlined,
-  PlayCircleOutlined,
   EllipsisOutlined,
 } from '@ant-design/icons'
 import type { FileVO } from '@/service/typings'

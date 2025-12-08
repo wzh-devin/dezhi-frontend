@@ -9,7 +9,7 @@
 import React, { memo } from 'react'
 import type { FC } from 'react'
 import { Input } from 'antd'
-import { SearchOutlined, FilterOutlined } from '@ant-design/icons'
+import { SearchOutlined } from '@ant-design/icons'
 import style from './index.less'
 
 // 文件类型标签
