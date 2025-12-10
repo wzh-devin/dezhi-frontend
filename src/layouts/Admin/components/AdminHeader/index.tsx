@@ -8,8 +8,8 @@
  */
 import React, { memo, useMemo } from 'react'
 import type { FC } from 'react'
-import { useLocation } from 'umi'
-import { Layout, Input, Avatar, Breadcrumb, Dropdown, Tooltip } from 'antd'
+import { history, useLocation, useRequest } from 'umi'
+import { Layout, Input, Avatar, Breadcrumb, Dropdown, Tooltip, message } from 'antd'
 import {
   MenuFoldOutlined,
   MenuUnfoldOutlined,
@@ -23,6 +23,8 @@ import {
 } from '@ant-design/icons'
 import type { MenuProps } from 'antd'
 import style from './index.less'
+import { useStorage } from '@/hooks/useStorage'
+import { logout } from '@/service/userService'
 
 const { Header } = Layout
 
@@ -47,6 +49,16 @@ interface AdminHeaderProps {
 
 const AdminHeader: FC<AdminHeaderProps> = ({ collapsed, onToggleCollapsed }) => {
   const location = useLocation()
+  const { value: token, setValue: setToken, remove: removeToken } = useStorage('token', '')
+
+  const { run: handleLogoutRun } = useRequest(logout, {
+    manual: true,
+    onSuccess: () => {
+      history.push('/admin/login')
+      removeToken()
+      message.success('退出登录成功').then()
+    },
+  })
 
   // 根据当前路径生成面包屑数据
   const breadcrumbItems = useMemo(() => {
@@ -75,7 +87,11 @@ const AdminHeader: FC<AdminHeaderProps> = ({ collapsed, onToggleCollapsed }) => 
     { key: 'profile', label: '个人中心' },
     { key: 'settings', label: '账号设置' },
     { type: 'divider' },
-    { key: 'logout', label: '退出登录' },
+    {
+      key: 'logout',
+      label: '退出登录',
+      onClick: handleLogoutRun,
+    },
   ]
 
   return (

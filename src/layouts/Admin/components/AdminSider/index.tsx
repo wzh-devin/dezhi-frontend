@@ -13,10 +13,10 @@ import {
   DashboardOutlined,
   FileTextOutlined,
   TagsOutlined,
-  FolderOutlined,
   SettingOutlined,
   RobotOutlined,
-  FileOutlined,
+  FolderOpenTwoTone,
+  PictureTwoTone,
 } from '@ant-design/icons'
 import type { MenuProps } from 'antd'
 import style from './index.less'
@@ -40,9 +40,9 @@ const menuItems: MenuItem[] = [
   getMenuItem('内容管理', 'content', <FileTextOutlined />, [
     getMenuItem('文章管理', '/admin/content/article', <FileTextOutlined />),
     getMenuItem('标签管理', '/admin/content/tags', <TagsOutlined />),
-    getMenuItem('分类管理', '/admin/content/category', <FolderOutlined />),
+    getMenuItem('分类管理', '/admin/content/category', <FolderOpenTwoTone />),
   ]),
-  getMenuItem('文件素材管理', '/admin/file', <FileOutlined />),
+  getMenuItem('文件素材管理', '/admin/file', <PictureTwoTone />),
   getMenuItem('系统管理', 'system', <SettingOutlined />, [
     getMenuItem('系统配置', '/admin/system/config', <SettingOutlined />),
     getMenuItem('AI智能体配置', '/admin/system/ai-config', <RobotOutlined />),

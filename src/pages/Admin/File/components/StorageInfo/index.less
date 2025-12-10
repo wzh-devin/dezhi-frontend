@@ -1,0 +1,107 @@
+/**
+ * 2025/12/8.
+ *
+ * @author <a href="https://github.com/wzh-devin">devin</a>
+ * @description 存储空间信息组件样式
+ * @version 1.0.0
+ * @since 1.0.0
+ */
+
+.storage-info {
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+}
+
+// 存储空间头部
+.storage-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+
+  &__title {
+    font-size: 16px;
+    font-weight: 600;
+    color: #1a1a1a;
+  }
+
+  &__icon {
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #e6f7ff;
+    border-radius: 8px;
+    font-size: 18px;
+    color: #1890ff;
+  }
+}
+
+.storage-usage {
+  margin-bottom: 12px;
+
+  &__used {
+    font-size: 36px;
+    font-weight: 700;
+    color: #1a1a1a;
+    line-height: 1;
+  }
+
+  &__total {
+    font-size: 14px;
+    color: #666666;
+  }
+}
+
+.storage-progress {
+  margin-bottom: 8px;
+
+  :global {
+    .ant-progress-inner {
+      height: 8px;
+      border-radius: 4px;
+    }
+
+    .ant-progress-bg {
+      height: 8px !important;
+      border-radius: 4px;
+    }
+  }
+}
+
+.storage-hint {
+  font-size: 12px;
+  color: #999999;
+  margin-bottom: 24px;
+}
+
+.storage-detail {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  padding-top: 20px;
+  border-top: 1px solid #f0f0f0;
+  margin-top: auto;
+
+  &__item {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  &__label {
+    font-size: 12px;
+    color: #999999;
+  }
+
+  &__value {
+    font-size: 16px;
+    font-weight: 600;
+    color: #1a1a1a;
+  }
+}
+

@@ -26,7 +26,7 @@ const handleError = (error: any) => {
         localStorage.removeItem('token')
         // 跳转登录页面
         setTimeout(() => {
-          window.location.href = '/login'
+          window.location.href = '/admin/login'
         }, 1000)
         break
       case 403:

@@ -10,7 +10,7 @@
  * @version 1.0.0
  * @since 1.0.0
  */
-import { StorageItem, StorageOptions, StorageType } from '@/types/storage.types'
+import { StorageItem, StorageOptions, StorageType } from '@/types/storage'
 
 export class BrowserStorage {
   private storage: Storage

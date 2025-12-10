@@ -11,6 +11,7 @@ import type { FC } from 'react'
 import styles from './index.less'
 import { SearchOutlined, SettingOutlined } from '@ant-design/icons'
 import { Layout } from 'antd'
+import { history } from 'umi'
 
 const { Header } = Layout
 
@@ -63,7 +64,12 @@ const TopNavBar: FC = () => {
         {/* 右侧搜索和设置 */}
         <div className={styles['nav-right']}>
           <SearchOutlined className={styles['nav-icon']} />
-          <SettingOutlined className={styles['nav-icon']} />
+          <SettingOutlined
+            className={styles['nav-icon']}
+            onClick={() => {
+              history.push('/admin/login')
+            }}
+          />
         </div>
       </div>
     </Header>

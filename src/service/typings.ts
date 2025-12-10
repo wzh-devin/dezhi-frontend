@@ -1,304 +1,294 @@
-export interface ApiError extends Error {
-  response?: {
-    config: any
-    data: ApiResultObject
-    headers: any
-    request: any
-    status: number
-    statusText: string
-  }
-}
-
 export type Addition = {
   /** 当前页码 */
-  pageNum?: number
+  pageNum?: number;
   /** 当前页码的总条数 */
-  pageSize?: number
+  pageSize?: number;
   /** 总记录数 */
-  total?: number
+  total?: number;
 }
 
 export type ApiResultObject = {
   /** 响应是否成功 */
-  success?: boolean
+  success?: boolean;
   /** 失败码 */
-  errCode?: number
+  errCode?: number;
   /** 失败信息 */
-  errMsg?: string
+  errMsg?: string;
   /** 响应数据 */
-  data?: any
+  data?: any;
   /**  */
-  addition?: Addition
+  addition?: Addition;
 }
 
 export type ApiResultVoid = {
   /** 响应是否成功 */
-  success?: boolean
+  success?: boolean;
   /** 失败码 */
-  errCode?: number
+  errCode?: number;
   /** 失败信息 */
-  errMsg?: string
+  errMsg?: string;
   /** 响应数据 */
-  data?: any
+  data?: any;
   /**  */
-  addition?: Addition
+  addition?: Addition;
 }
 
 export type LoginVO = {
   /** 用户名 */
-  username?: string
+  username?: string;
   /** 密码 */
-  password?: string
+  password?: string;
 }
 
 export type ApiResultString = {
   /** 响应是否成功 */
-  success?: boolean
+  success?: boolean;
   /** 失败码 */
-  errCode?: number
+  errCode?: number;
   /** 失败信息 */
-  errMsg?: string
+  errMsg?: string;
   /** 响应数据 */
-  data?: string
+  data?: string;
   /**  */
-  addition?: Addition
+  addition?: Addition;
 }
 
 export type UserUpdateVO = {
   /** 主键id */
-  id?: string
+  id?: string;
   /** 用户名 */
-  username?: string
+  username?: string;
   /** 密码 */
-  password?: string
+  password?: string;
   /** 邮箱 */
-  email?: string
+  email?: string;
 }
 
 export type TagUpdateVO = {
   /** 主键id */
-  id?: string
+  id?: string;
   /** 标签名称 */
-  name?: string
+  name?: string;
   /** 标签颜色 */
-  color?: string
+  color?: string;
 }
 
 export type TagSaveVO = {
   /** 标签名称 */
-  name?: string
+  name?: string;
   /** 标签颜色 */
-  color?: string
+  color?: string;
 }
 
 export type CommonDeleteVO = {
   /** id列表 */
-  idList?: string[]
+  idList?: string[];
 }
 
 export type ApiResultUploadSession = {
   /** 响应是否成功 */
-  success?: boolean
+  success?: boolean;
   /** 失败码 */
-  errCode?: number
+  errCode?: number;
   /** 失败信息 */
-  errMsg?: string
+  errMsg?: string;
   /**  */
-  data?: UploadSession
+  data?: UploadSession;
   /**  */
-  addition?: Addition
+  addition?: Addition;
 }
 
 export type UploadSession = {
   /**  */
-  uploadId?: string
+  uploadId?: string;
   /**  */
-  minioUploadId?: string
+  minioUploadId?: string;
   /**  */
-  bucketName?: string
+  bucketName?: string;
   /**  */
-  originalName?: string
+  originalName?: string;
   /**  */
-  finalName?: string
+  finalName?: string;
   /**  */
-  fileHash?: string
+  fileHash?: string;
   /**  */
-  totalSize?: number
+  totalSize?: number;
   /**  */
-  totalChunks?: number
+  totalChunks?: number;
   /**  */
-  competedChunks?: number[]
+  competedChunks?: number[];
   /**  */
-  status?: 'UPLOADING' | 'FINISHED' | 'FAILED'
+  status?: ('UPLOADING' | 'FINISHED' | 'FAILED');
   /**  */
-  createTime?: number
+  createTime?: number;
 }
 
 export type InitiateUploadRequest = {
   /** 原始文件名 */
-  originalName?: string
+  originalName?: string;
   /** 文件hash值 */
-  fileHash?: string
+  fileHash?: string;
   /** 文件大小 */
-  fileSize?: number
+  fileSize?: number;
   /** 分片总数 */
-  totalChunks?: number
+  totalChunks?: number;
 }
 
 export type ApiResultFileVO = {
   /** 响应是否成功 */
-  success?: boolean
+  success?: boolean;
   /** 失败码 */
-  errCode?: number
+  errCode?: number;
   /** 失败信息 */
-  errMsg?: string
+  errMsg?: string;
   /**  */
-  data?: FileVO
+  data?: FileVO;
   /**  */
-  addition?: Addition
+  addition?: Addition;
 }
 
 export type FileVO = {
   /** 主键id */
-  id?: string
+  id?: string;
   /** 文件原始名称 */
-  originalName?: string
+  originalName?: string;
   /** 存储的文件名称 */
-  finalName?: string
+  finalName?: string;
   /** 存储桶名称 */
-  bucketName?: string
+  bucketName?: string;
   /** 文件哈希值 */
-  hash?: string
+  hash?: string;
   /** 文件大小 */
-  size?: number
+  size?: number;
   /** 文件MIME类型 */
-  type?: string
-  /** 文件扩展名 */
-  extension?: string
+  mimeType?: string;
+  /** 文件类型 */
+  type?: ('IMAGE' | 'PDF' | 'ZIP');
   /** 文件存储类型 */
-  storageType?: string
+  storageType?: ('MINIO');
   /** 文件url地址 */
-  url?: string
+  url?: string;
   /** 是否被删除（0: 正常; 1: 已删除） */
-  isDeleted?: number
+  isDeleted?: number;
   /** 文件状态（UPLOADING, FINISHED, FAILED） */
-  status?: string
+  status?: ('UPLOADING' | 'FINISHED' | 'FAILED');
   /** 创建时间 */
-  createTime?: string
+  createTime?: string;
   /** 更新时间 */
-  updateTime?: string
+  updateTime?: string;
 }
 
 export type FileQueryVO = {
   /** 当前页码 */
-  pageNum?: number
+  pageNum?: number;
   /** 每页数量 */
-  pageSize?: number
+  pageSize?: number;
   /** 存储类型 */
-  storageType?: string
+  storageType?: ('MINIO');
   /** 文件类型 */
-  type?: string
+  type?: ('IMAGE' | 'PDF' | 'ZIP');
   /** 删除状态 */
-  deleted?: 'DELETED' | 'NORMAL'
+  deleted?: ('NORMAL' | 'DELETED');
   /** 文件名关键词 */
-  keyword?: string
+  keyword?: string;
 }
 
 export type ApiResultListFileVO = {
   /** 响应是否成功 */
-  success?: boolean
+  success?: boolean;
   /** 失败码 */
-  errCode?: number
+  errCode?: number;
   /** 失败信息 */
-  errMsg?: string
+  errMsg?: string;
   /** 响应数据 */
-  data?: FileVO[]
+  data?: FileVO[];
   /**  */
-  addition?: Addition
+  addition?: Addition;
 }
 
 export type CategoryUpdateVO = {
   /** 主键id */
-  id?: string
+  id?: string;
   /** 分类名称 */
-  name?: string
+  name?: string;
 }
 
 export type CategorySaveVO = {
   /** 分类名称 */
-  name?: string
+  name?: string;
 }
 
 export type ApiResultUserVO = {
   /** 响应是否成功 */
-  success?: boolean
+  success?: boolean;
   /** 失败码 */
-  errCode?: number
+  errCode?: number;
   /** 失败信息 */
-  errMsg?: string
+  errMsg?: string;
   /**  */
-  data?: UserVO
+  data?: UserVO;
   /**  */
-  addition?: Addition
+  addition?: Addition;
 }
 
 export type UserVO = {
   /** 用户名 */
-  username?: string
+  username?: string;
   /** 邮箱 */
-  email?: string
+  email?: string;
   /** 创建时间 */
-  createTime?: string
+  createTime?: string;
   /** 更新时间 */
-  updateTime?: string
+  updateTime?: string;
 }
 
 export type ApiResultListTagVO = {
   /** 响应是否成功 */
-  success?: boolean
+  success?: boolean;
   /** 失败码 */
-  errCode?: number
+  errCode?: number;
   /** 失败信息 */
-  errMsg?: string
+  errMsg?: string;
   /** 响应数据 */
-  data?: TagVO[]
+  data?: TagVO[];
   /**  */
-  addition?: Addition
+  addition?: Addition;
 }
 
 export type TagVO = {
   /** 主键id */
-  id?: string
+  id?: string;
   /** 标签名称 */
-  name?: string
+  name?: string;
   /** 标签颜色 */
-  color?: string
+  color?: string;
   /** 创建时间 */
-  createTime?: string
+  createTime?: string;
   /** 更新时间 */
-  updateTime?: string
+  updateTime?: string;
 }
 
 export type ApiResultListCategoryVO = {
   /** 响应是否成功 */
-  success?: boolean
+  success?: boolean;
   /** 失败码 */
-  errCode?: number
+  errCode?: number;
   /** 失败信息 */
-  errMsg?: string
+  errMsg?: string;
   /** 响应数据 */
-  data?: CategoryVO[]
+  data?: CategoryVO[];
   /**  */
-  addition?: Addition
+  addition?: Addition;
 }
 
 export type CategoryVO = {
   /** 主键id */
-  id?: string
+  id?: string;
   /** 分类名称 */
-  name?: string
+  name?: string;
   /** 创建时间 */
-  createTime?: string
+  createTime?: string;
   /** 更新时间 */
-  updateTime?: string
+  updateTime?: string;
 }
+

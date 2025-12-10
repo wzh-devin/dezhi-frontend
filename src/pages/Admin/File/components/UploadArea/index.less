@@ -1,0 +1,224 @@
+/**
+ * 2025/12/8.
+ *
+ * @author <a href="https://github.com/wzh-devin">devin</a>
+ * @description 文件上传区域组件样式
+ * @version 1.0.0
+ * @since 1.0.0
+ */
+
+.upload-area {
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+}
+
+// 上传拖拽区域
+.upload-dragger {
+  position: relative;
+  flex: 1;
+  min-height: 200px;
+  height: 100%;
+  border: 2px dashed #d9d9d9;
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  overflow: hidden;
+  background: #ffffff;
+
+  &:hover {
+    border-color: #1890ff;
+    background: #fafafa;
+  }
+
+  &--dragging {
+    border-color: #1890ff;
+    background: #e6f7ff;
+  }
+
+  &__input {
+    display: none;
+  }
+
+  &__content {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    pointer-events: none;
+  }
+
+  &__icon {
+    width: 64px;
+    height: 64px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #e6f7ff;
+    border-radius: 50%;
+    margin-bottom: 16px;
+    color: #1890ff;
+    font-size: 32px;
+    transition: transform 0.2s ease;
+
+    .upload-dragger:hover & {
+      transform: scale(1.1);
+    }
+  }
+
+  &__text {
+    font-size: 16px;
+    font-weight: 500;
+    color: #1a1a1a;
+    margin: 0 0 8px 0;
+  }
+
+  &__hint {
+    font-size: 14px;
+    color: #999999;
+    margin: 0;
+  }
+
+  &__actions {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-top: 16px;
+    pointer-events: auto;
+  }
+
+  &__pending {
+    font-size: 14px;
+    color: #666666;
+  }
+
+  &__btn {
+    border-radius: 8px;
+    height: 36px;
+    padding: 0 20px;
+    font-weight: 500;
+  }
+
+  &__pattern {
+    position: absolute;
+    inset: 0;
+    opacity: 0.03;
+    pointer-events: none;
+    background-image: radial-gradient(#1890ff 1px, transparent 1px);
+    background-size: 16px 16px;
+  }
+}
+
+// 上传进度区域
+.upload-progress {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 500px;
+  padding: 0 24px;
+  pointer-events: none;
+
+  &__header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+
+  &__icon {
+    font-size: 24px;
+    color: #1890ff;
+  }
+
+  &__title {
+    font-size: 16px;
+    font-weight: 500;
+    color: #1a1a1a;
+  }
+
+  &__list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    max-height: 150px;
+    overflow-y: auto;
+    padding-right: 8px;
+
+    &::-webkit-scrollbar {
+      width: 4px;
+    }
+
+    &::-webkit-scrollbar-track {
+      background: #f5f5f5;
+      border-radius: 2px;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background: #d9d9d9;
+      border-radius: 2px;
+    }
+  }
+
+  &__item {
+    background: #fafafa;
+    border-radius: 8px;
+    padding: 12px;
+  }
+
+  &__info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+  }
+
+  &__name {
+    font-size: 14px;
+    font-weight: 500;
+    color: #1a1a1a;
+    max-width: 200px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  &__meta {
+    font-size: 12px;
+    color: #666666;
+  }
+
+  &__bar {
+    margin: 0;
+
+    :global {
+      .ant-progress-inner {
+        height: 6px;
+        border-radius: 3px;
+      }
+
+      .ant-progress-bg {
+        height: 6px !important;
+        border-radius: 3px;
+      }
+
+      .ant-progress-text {
+        font-size: 12px;
+        color: #666666;
+      }
+    }
+  }
+
+  &__pending {
+    margin-top: 12px;
+    font-size: 13px;
+    color: #999999;
+    text-align: center;
+  }
+}

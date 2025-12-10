@@ -8,7 +8,7 @@
  */
 import { BrowserStorage } from '@/utils/storage-utils'
 import { useCallback, useEffect, useState } from 'react'
-import { StorageType } from '@/types/storage.types'
+import { StorageType } from '@/types/storage'
 
 /**
  * 存储Hooks
