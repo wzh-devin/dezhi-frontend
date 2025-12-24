@@ -99,27 +99,27 @@ export type ApiResultUploadSession = {
 }
 
 export type UploadSession = {
-  /**  */
+  /** 会话id */
   uploadId?: string;
-  /**  */
+  /** Minio上传的会话id */
   minioUploadId?: string;
-  /**  */
+  /** 文件存储桶名称 */
   bucketName?: string;
-  /**  */
+  /** 文件原始名称 */
   originalName?: string;
-  /**  */
+  /** 文件最终名称 */
   finalName?: string;
-  /**  */
+  /** 文件hash */
   fileHash?: string;
-  /**  */
+  /** 文件总大小 */
   totalSize?: number;
-  /**  */
+  /** 文件总分片数 */
   totalChunks?: number;
-  /**  */
+  /** 已经上传的分片 */
   competedChunks?: number[];
-  /**  */
-  status?: ('UPLOADING' | 'FINISHED' | 'FAILED');
-  /**  */
+  /** 文件上传状态 */
+  status?: ('UPLOADING' | 'COMPLETED' | 'INSTANT' | 'FAILED');
+  /** 会话创建时间 */
   createTime?: number;
 }
 
@@ -169,9 +169,9 @@ export type FileVO = {
   /** 文件url地址 */
   url?: string;
   /** 是否被删除（0: 正常; 1: 已删除） */
-  isDeleted?: number;
+  deleted?: ('NORMAL' | 'DELETED');
   /** 文件状态（UPLOADING, FINISHED, FAILED） */
-  status?: ('UPLOADING' | 'FINISHED' | 'FAILED');
+  status?: ('UPLOADING' | 'COMPLETED' | 'INSTANT' | 'FAILED');
   /** 创建时间 */
   createTime?: string;
   /** 更新时间 */
