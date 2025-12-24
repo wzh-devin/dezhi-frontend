@@ -25,6 +25,7 @@ import {
 import {localStorage} from '@/utils/storage-utils'
 import {FileStatusEnum} from '@/global/enums/file-enums'
 import {UPLOAD_SESSION_KEY} from "../global/constant/storage-key";
+import {MAX_FILE_SIZE} from "../global/constant/config-constant";
 import {generateUUID} from "../utils/generator";
 
 // 上传任务信息
@@ -109,30 +110,57 @@ export const useChunkUpload = (onUploadComplete?: () => void): UseChunkUploadRet
 
     // 添加文件到上传队列
     const addFiles = useCallback((files: FileList | File[]) => {
-        const newTasks: UploadTask[] = Array.from(files).map(
-            (file) => {
-                const chunkSize = getRecommendedChunkSize(file.size)
-                const totalChunks = calculateChunkCount(file.size, chunkSize)
+        const fileArray = Array.from(files)
 
-                return {
-                    id: generateUUID(),
-                    file,
-                    fileName: file.name,
-                    fileSize: file.size,
-                    fileSizeFormatted: formatFileSize(file.size),
-                    status: FileStatusEnum.PENDING,
-                    progress: 0,
-                    hashProgress: 0,
-                    uploadedChunks: [],
-                    totalChunks,
-                    chunkSize,
-                    speed: 0,
-                    remainingTime: 0,
-                    uploadedBytes: 0,
-                }
+        // 过滤超出大小限制的文件
+        const validFiles: File[] = []
+        const oversizedFiles: File[] = []
+
+        fileArray.forEach((file) => {
+            if (file.size > MAX_FILE_SIZE) {
+                oversizedFiles.push(file)
+            } else {
+                validFiles.push(file)
+            }
+        })
+
+        // 提示超出大小限制的文件
+        if (oversizedFiles.length > 0) {
+            const maxSizeMB = Math.round(MAX_FILE_SIZE / (1024 * 1024))
+            oversizedFiles.forEach((file) => {
+                message.error({
+                    content: `文件 "${file.name}" 超出大小限制（最大 ${maxSizeMB}MB）`,
+                    duration: 3,
+                })
             })
+        }
 
-        setTasks((prev) => [...prev, ...newTasks])
+        // 只添加符合大小限制的文件
+        const newTasks: UploadTask[] = validFiles.map((file) => {
+            const chunkSize = getRecommendedChunkSize(file.size)
+            const totalChunks = calculateChunkCount(file.size, chunkSize)
+
+            return {
+                id: generateUUID(),
+                file,
+                fileName: file.name,
+                fileSize: file.size,
+                fileSizeFormatted: formatFileSize(file.size),
+                status: FileStatusEnum.PENDING,
+                progress: 0,
+                hashProgress: 0,
+                uploadedChunks: [],
+                totalChunks,
+                chunkSize,
+                speed: 0,
+                remainingTime: 0,
+                uploadedBytes: 0,
+            }
+        })
+
+        if (newTasks.length > 0) {
+            setTasks((prev) => [...prev, ...newTasks])
+        }
     }, [])
 
     // 计算文件哈希
