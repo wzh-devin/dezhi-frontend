@@ -1,0 +1,273 @@
+/**
+ * 2025/12/25.
+ *
+ * @author <a href="https://github.com/wzh-devin">devin</a>
+ * @description 内容管理表格组件样式
+ * @version 1.0.0
+ * @since 1.0.0
+ */
+
+.content-table-wrapper {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  overflow: hidden;
+  min-height: 0;
+  max-height: 100%;
+}
+
+// 表格滚动容器
+.table-scroll-container {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+
+  // 自定义滚动条样式
+  &::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 3px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: 3px;
+
+    &:hover {
+      background: #a1a1a1;
+    }
+  }
+}
+
+// 表格样式
+.content-table {
+  :global {
+    .ant-table {
+      background: transparent;
+    }
+
+    .ant-table-thead > tr > th {
+      background: #f9fafb;
+      border-bottom: 1px solid #f3f4f6;
+      font-weight: 600;
+      color: #6b7280;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      padding: 16px;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+
+      &::before {
+        display: none;
+      }
+    }
+
+    .ant-table-tbody > tr > td {
+      border-bottom: 1px solid #f3f4f6;
+      padding: 16px;
+      font-size: 14px;
+      color: #374151;
+    }
+
+    .ant-table-tbody > tr:hover > td {
+      background: #f9fafb;
+    }
+
+    .ant-table-tbody > tr:last-child > td {
+      border-bottom: none;
+    }
+
+    .ant-checkbox-inner {
+      width: 16px;
+      height: 16px;
+      border-radius: 4px;
+      border-color: #d1d5db;
+    }
+
+    .ant-checkbox-checked .ant-checkbox-inner {
+      background-color: #1a1a1a;
+      border-color: #1a1a1a;
+    }
+
+    .ant-checkbox:hover .ant-checkbox-inner {
+      border-color: #1a1a1a;
+    }
+  }
+}
+
+// 操作按钮
+.action-btns {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.edit-btn {
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #3b82f6;
+  border-radius: 6px;
+  
+  &:hover {
+    background: #eff6ff;
+    color: #3b82f6;
+  }
+}
+
+.delete-btn {
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #dc2626;
+  border-radius: 6px;
+  
+  &:hover {
+    background: #fef2f2;
+    color: #dc2626;
+  }
+}
+
+// 空状态
+.empty-state {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 80px 0;
+}
+
+// 分页
+.table-pagination {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 16px;
+  padding: 16px;
+  border-top: 1px solid #f3f4f6;
+
+  &__info {
+    font-size: 14px;
+    color: #374151;
+    margin-right: auto;
+  }
+
+  &__controls {
+    display: flex;
+    align-items: center;
+  }
+
+  :global {
+    .ant-pagination {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .ant-pagination-item {
+      min-width: 32px;
+      height: 32px;
+      line-height: 30px;
+      border-radius: 6px;
+      border: none;
+      background: transparent;
+      font-size: 14px;
+
+      a {
+        color: #374151;
+      }
+
+      &:hover {
+        background: #f5f5f5;
+
+        a {
+          color: #374151;
+        }
+      }
+
+      &-active {
+        background: #1a1a1a;
+        border-radius: 6px;
+
+        a {
+          color: #ffffff;
+        }
+
+        &:hover {
+          background: #333333;
+
+          a {
+            color: #ffffff;
+          }
+        }
+      }
+    }
+
+    .ant-pagination-prev,
+    .ant-pagination-next {
+      min-width: 32px;
+      height: 32px;
+      line-height: 30px;
+      border-radius: 6px;
+      border: none;
+      background: transparent;
+
+      .ant-pagination-item-link {
+        border: none;
+        background: transparent;
+        color: #9ca3af;
+        font-size: 14px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 100%;
+      }
+
+      &:hover:not(.ant-pagination-disabled) {
+        background: #f5f5f5;
+
+        .ant-pagination-item-link {
+          color: #374151;
+        }
+      }
+    }
+
+    .ant-pagination-disabled {
+      .ant-pagination-item-link {
+        color: rgba(0, 0, 0, 0.15);
+      }
+    }
+
+    .ant-select-selector {
+      border-radius: 6px !important;
+      height: 32px !important;
+      border-color: #e5e7eb !important;
+    }
+
+    .ant-pagination-options {
+      margin-left: 8px;
+    }
+
+    // 隐藏跳转器
+    .ant-pagination-jump-prev,
+    .ant-pagination-jump-next {
+      display: none;
+    }
+  }
+}
