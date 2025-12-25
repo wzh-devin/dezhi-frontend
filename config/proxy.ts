@@ -8,8 +8,8 @@
  */
 
 const proxyHost: Record<string, string> = {
-  dev: 'http://localhost:14001',
-  prod: 'https://localhost:14001',
+  dev: 'http://localhost:12010',
+  prod: 'https://localhost:12010',
 }
 
 export default {

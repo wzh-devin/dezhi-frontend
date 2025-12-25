@@ -8,22 +8,141 @@
  */
 
 .tags {
-  &__placeholder {
-    background: #ffffff;
-    border-radius: 12px;
-    padding: 48px;
-    text-align: center;
-    color: #999999;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  height: calc(100vh - 100px);
+}
 
-    h2 {
-      font-size: 24px;
-      color: #1a1a1a;
-      margin-bottom: 16px;
+// 标签项
+.tag-item {
+  margin: 0;
+  font-size: 12px;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-weight: 500;
+}
+
+// 颜色预览
+.color-preview {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  &__dot {
+    width: 16px;
+    height: 16px;
+    border-radius: 4px;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+  }
+
+  &__value {
+    font-size: 12px;
+    color: #6b7280;
+    font-family: 'Monaco', 'Menlo', 'Consolas', monospace;
+  }
+}
+
+// 弹窗样式
+.tags-modal {
+  :global {
+    .ant-modal-content {
+      border-radius: 12px;
+      overflow: hidden;
     }
 
-    p {
-      font-size: 14px;
+    .ant-modal-header {
+      border-bottom: 1px solid #f3f4f6;
+      padding: 16px 24px;
+      margin-bottom: 0;
+    }
+
+    .ant-modal-title {
+      font-weight: 600;
+      font-size: 16px;
+      color: #111827;
+    }
+
+    .ant-modal-body {
+      padding: 24px;
+    }
+
+    .ant-modal-footer {
+      border-top: 1px solid #f3f4f6;
+      padding: 12px 24px;
+      margin-top: 0;
+
+      .ant-btn {
+        border-radius: 8px;
+        height: 36px;
+        font-weight: 500;
+      }
+
+      .ant-btn-primary {
+        background: #1a1a1a;
+        border-color: #1a1a1a;
+
+        &:hover {
+          background: #333333;
+          border-color: #333333;
+        }
+      }
     }
   }
 }
 
+// 表单样式
+.tags-form {
+  :global {
+    .ant-form-item-label > label {
+      font-weight: 500;
+      color: #374151;
+      font-size: 14px;
+    }
+
+    .ant-input {
+      border-radius: 8px;
+      height: 40px;
+      border-color: #e5e7eb;
+      font-size: 14px;
+
+      &:hover,
+      &:focus {
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
+      }
+
+      &::placeholder {
+        color: #9ca3af;
+      }
+    }
+  }
+}
+
+// 颜色选择器包装
+.color-picker-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+
+// 颜色预览标签
+.color-preview-tag {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  span:first-child {
+    color: #6b7280;
+    font-size: 14px;
+  }
+
+  :global {
+    .ant-tag {
+      margin: 0;
+      font-size: 12px;
+      padding: 2px 8px;
+      border-radius: 4px;
+    }
+  }
+}
