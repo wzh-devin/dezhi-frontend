@@ -6,11 +6,12 @@
  * @version 1.0.0
  * @since 1.0.0
  */
+import SparkMD5 from 'spark-md5'
 
 /**
- * 文件哈希计算（SHA-256）
+ * 文件哈希计算（MD5）
  * @param file - 要计算哈希的文件
- * @returns Promise<string> - 返回十六进制格式的 SHA-256 哈希值
+ * @returns Promise<string> - 返回十六进制格式的 MD5 哈希值
  */
 export function calculateFileHash(file: File): Promise<string> {
   return new Promise((resolve, reject) => {
@@ -18,42 +19,18 @@ export function calculateFileHash(file: File): Promise<string> {
     const chunks = Math.ceil(file.size / chunkSize)
     let currentChunk = 0
 
-    // 分片哈希计算
+    const spark = new SparkMD5.ArrayBuffer()
     const reader = new FileReader()
 
-    // 累积所有分片数据
-    const buffers: ArrayBuffer[] = []
-
-    reader.onload = async (e) => {
+    reader.onload = (e) => {
       if (e.target?.result) {
-        buffers.push(e.target.result as ArrayBuffer)
+        spark.append(e.target.result as ArrayBuffer)
         currentChunk++
 
         if (currentChunk < chunks) {
           loadNext()
         } else {
-          try {
-            // 合并所有分片
-            const totalLength = buffers.reduce((acc, buf) => acc + buf.byteLength, 0)
-            const combined = new Uint8Array(totalLength)
-            let offset = 0
-
-            for (const buffer of buffers) {
-              combined.set(new Uint8Array(buffer), offset)
-              offset += buffer.byteLength
-            }
-
-            // 使用 Web Crypto API 计算 SHA-256
-            const hashBuffer = await crypto.subtle.digest('SHA-256', combined)
-
-            // 转换为十六进制字符串
-            const hashArray = Array.from(new Uint8Array(hashBuffer))
-            const hashHex = hashArray.map((b) => b.toString(16).padStart(2, '0')).join('')
-
-            resolve(hashHex)
-          } catch (error) {
-            reject(new Error('哈希计算失败'))
-          }
+          resolve(spark.end())
         }
       }
     }
@@ -62,7 +39,7 @@ export function calculateFileHash(file: File): Promise<string> {
       reject(new Error('文件读取失败'))
     }
 
-    function loadNext() {
+    const loadNext = () => {
       const start = currentChunk * chunkSize
       const end = Math.min(start + chunkSize, file.size)
       reader.readAsArrayBuffer(file.slice(start, end))
@@ -75,13 +52,12 @@ export function calculateFileHash(file: File): Promise<string> {
 /**
  * 文件哈希计算（增量式）
  * @param file - 要计算哈希的文件
- * @returns Promise<string> - 返回十六进制格式的 SHA-256 哈希值
+ * @returns Promise<string> - 返回十六进制格式的 MD5 哈希值
  */
 export async function calculateFileHashIncremental(file: File): Promise<string> {
   const chunkSize = 5 * 1024 * 1024
   const chunks = Math.ceil(file.size / chunkSize)
-
-  const allChunks: Uint8Array[] = []
+  const spark = new SparkMD5.ArrayBuffer()
 
   for (let i = 0; i < chunks; i++) {
     const start = i * chunkSize
@@ -89,30 +65,17 @@ export async function calculateFileHashIncremental(file: File): Promise<string> 
     const chunk = file.slice(start, end)
 
     const arrayBuffer = await chunk.arrayBuffer()
-    allChunks.push(new Uint8Array(arrayBuffer))
+    spark.append(arrayBuffer)
   }
 
-  // 合并所有分片
-  const totalLength = allChunks.reduce((sum, chunk) => sum + chunk.length, 0)
-  const combined = new Uint8Array(totalLength)
-  let offset = 0
-
-  for (const chunk of allChunks) {
-    combined.set(chunk, offset)
-    offset += chunk.length
-  }
-
-  // 计算 SHA-256
-  const hashBuffer = await crypto.subtle.digest('SHA-256', combined)
-  const hashArray = Array.from(new Uint8Array(hashBuffer))
-  return hashArray.map((b) => b.toString(16).padStart(2, '0')).join('')
+  return spark.end()
 }
 
 /**
  * 文件哈希计算（带进度回调）
  * @param file - 要计算哈希的文件
  * @param onProgress - 进度回调函数，参数为 0-100 的进度值
- * @returns Promise<string> - 返回十六进制格式的 SHA-256 哈希值
+ * @returns Promise<string> - 返回十六进制格式的 MD5 哈希值
  */
 export async function calculateFileHashWithProgress(
   file: File,
@@ -120,7 +83,7 @@ export async function calculateFileHashWithProgress(
 ): Promise<string> {
   const chunkSize = 10 * 1024 * 1024 // 10MB
   const chunks = Math.ceil(file.size / chunkSize)
-  const allData: Uint8Array[] = []
+  const spark = new SparkMD5.ArrayBuffer()
 
   for (let i = 0; i < chunks; i++) {
     const start = i * chunkSize
@@ -128,7 +91,7 @@ export async function calculateFileHashWithProgress(
     const chunk = file.slice(start, end)
 
     const arrayBuffer = await readChunk(chunk)
-    allData.push(new Uint8Array(arrayBuffer))
+    spark.append(arrayBuffer)
 
     // 更新进度
     if (onProgress) {
@@ -137,19 +100,7 @@ export async function calculateFileHashWithProgress(
     }
   }
 
-  // 合并所有数据
-  const totalLength = allData.reduce((sum, data) => sum + data.length, 0)
-  const combined = new Uint8Array(totalLength)
-  let offset = 0
-
-  for (const data of allData) {
-    combined.set(data, offset)
-    offset += data.length
-  }
-
-  // 计算 SHA-256 哈希
-  const hashBuffer = await crypto.subtle.digest('SHA-256', combined)
-  return bufferToHex(hashBuffer)
+  return spark.end()
 }
 
 /**
@@ -164,16 +115,6 @@ function readChunk(chunk: Blob): Promise<ArrayBuffer> {
     reader.onerror = () => reject(new Error('文件读取失败'))
     reader.readAsArrayBuffer(chunk)
   })
-}
-
-/**
- * 缓冲区转换为十六进制字符串
- * @param buffer - ArrayBuffer
- * @returns string - 十六进制字符串
- */
-function bufferToHex(buffer: ArrayBuffer): string {
-  const hashArray = Array.from(new Uint8Array(buffer))
-  return hashArray.map((b) => b.toString(16).padStart(2, '0')).join('')
 }
 
 /**
