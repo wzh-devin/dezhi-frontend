@@ -1,5 +1,5 @@
 # 使用node:20-alpine作为builder
-FROM docker.1ms.run/library/node:20-alpine AS builder
+FROM docker.1ms.run/library/node:20.18.0-alpine AS builder
 
 # 设置工作目录
 WORKDIR /app
