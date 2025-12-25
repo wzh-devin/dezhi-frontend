@@ -1,0 +1,19 @@
+services:
+  dezhi-frontend:
+    image:  ${ALIYUN_REGISTRY}/${ALIYUN_NAMESPACE}/dezhi-frontend:${IMAGE_TAG:-latest}
+    container_name: dezhi-frontend
+    restart: always
+    ports:
+      - "12011:80"
+    volumes:
+      - ./nginx:/app/config
+      - ./nginx/logs:/var/log/nginx
+    environment:
+      - SERVER_HOST=http://dezhi-server:12010
+    privileged: true
+    networks:
+      - dezhi
+
+networks:
+  dezhi:
+    driver: bridge
