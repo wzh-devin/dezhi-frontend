@@ -7,7 +7,7 @@
  * @since 1.0.0
  */
 import React, { memo } from 'react'
-import type { FC, ReactNode } from 'react'
+import type { ReactNode } from 'react'
 import { Table, Checkbox, Button, Tooltip, Spin, Empty, Pagination, ConfigProvider } from 'antd'
 import { EditOutlined, DeleteOutlined } from '@ant-design/icons'
 import zhCN from 'antd/locale/zh_CN'
@@ -162,10 +162,6 @@ function ContentTable<T extends { id?: string }>({
       ),
     },
   ]
-
-  // 计算起始序号
-  const getStartIndex = () => (pageNum - 1) * pageSize + 1
-  const getEndIndex = () => Math.min(pageNum * pageSize, total)
 
   return (
     <div className={style['content-table-wrapper']}>
