@@ -12,6 +12,7 @@ import { Table, Checkbox, Button, Tooltip, Spin, Empty, Pagination, ConfigProvid
 import { EditOutlined, DeleteOutlined } from '@ant-design/icons'
 import zhCN from 'antd/locale/zh_CN'
 import type { ColumnsType } from 'antd/es/table'
+import { PAGINATION_CONFIG } from '@/global/constant/config-constant'
 import style from './index.less'
 
 export interface ContentTableColumn<T> {
@@ -195,7 +196,7 @@ function ContentTable<T extends { id?: string }>({
                 pageSize={pageSize}
                 total={total}
                 showSizeChanger
-                pageSizeOptions={['10', '20', '50']}
+                pageSizeOptions={PAGINATION_CONFIG.pageSizeOptions}
                 onChange={onPageChange}
               />
             </ConfigProvider>

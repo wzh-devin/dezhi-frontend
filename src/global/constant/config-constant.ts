@@ -8,3 +8,15 @@
  */
 
 export const MAX_FILE_SIZE = 1024 * 1024 * 500;
+
+/**
+ * 分页配置
+ */
+export const PAGINATION_CONFIG = {
+  /** 默认每页条数 */
+  defaultPageSize: 10,
+  /** 每页条数选项 */
+  pageSizeOptions: ['10', '15', '30'],
+  /** 每页条数选项（数字类型） */
+  pageSizeOptionsNumber: [10, 15, 30],
+};

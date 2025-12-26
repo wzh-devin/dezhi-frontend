@@ -32,7 +32,7 @@ const handleError = (error: any) => {
                 message.error(data.errMsg).then()
                 break
             case 401:
-                message.error('未登录，请重新登录').then()
+                message.error(data.errMsg).then()
                 // 清除token
                 localStorage.removeItem('token')
                 // 跳转登录页面

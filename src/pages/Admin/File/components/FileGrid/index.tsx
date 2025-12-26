@@ -19,6 +19,7 @@ import {
   EllipsisOutlined,
 } from '@ant-design/icons'
 import type { FileVO } from '@/service/typings'
+import { PAGINATION_CONFIG } from '@/global/constant/config-constant'
 import style from './index.less'
 
 // 文件类型映射
@@ -168,7 +169,7 @@ const FileGrid: FC<FileGridProps> = ({
               total={total}
               showSizeChanger
               showQuickJumper
-              pageSizeOptions={['10', '15', '30']}
+              pageSizeOptions={PAGINATION_CONFIG.pageSizeOptions}
               showTotal={(total) => `共 ${total} 个文件`}
               onChange={onPageChange}
             />

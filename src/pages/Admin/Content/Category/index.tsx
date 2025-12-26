@@ -77,7 +77,6 @@ const Category: FC = () => {
       } catch (error: any) {
         if (error?.name === 'AbortError') return
         console.error('加载分类失败:', error)
-        message.error('加载分类失败')
       } finally {
         if (!abortController.signal.aborted) {
           setLoading(false)

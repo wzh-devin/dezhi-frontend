@@ -86,7 +86,6 @@ const Tags: FC = () => {
       } catch (error: any) {
         if (error?.name === 'AbortError') return
         console.error('加载标签失败:', error)
-        message.error('加载标签失败')
       } finally {
         if (!abortController.signal.aborted) {
           setLoading(false)
