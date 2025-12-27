@@ -24,9 +24,9 @@ import {
 } from '@/utils/file'
 import {localStorage} from '@/utils/storage-utils'
 import {FileStatusEnum} from '@/global/enums/file-enums'
-import {UPLOAD_SESSION_KEY} from "../global/constant/storage-key";
-import {MAX_FILE_SIZE} from "../global/constant/config-constant";
-import {generateUUID} from "../utils/generator";
+import {UPLOAD_SESSION_KEY} from '@/global/constant/storage-key';
+import {MAX_FILE_SIZE} from '@/global/constant/config-constant';
+import {generateUUID} from '@/utils/generator';
 
 // 上传任务信息
 export interface UploadTask {
@@ -129,10 +129,10 @@ export const useChunkUpload = (onUploadComplete?: () => void): UseChunkUploadRet
             const maxSizeMB = Math.round(MAX_FILE_SIZE / (1024 * 1024))
             oversizedFiles.forEach((file) => {
                 message.error({
-                    content: `文件 "${file.name}" 超出大小限制（最大 ${maxSizeMB}MB）`,
-                    duration: 3,
-                })
-            })
+                  content: `文件 "${file.name}" 超出大小限制（最大 ${maxSizeMB}MB）`,
+                  duration: 3,
+                }).then()
+             })
         }
 
         // 只添加符合大小限制的文件

@@ -7,9 +7,9 @@
  * @since 1.0.0
  */
 import React, { memo } from 'react'
-import type { FC } from 'react'
+import type { FC, ReactNode } from 'react'
 import { Button, Input } from 'antd'
-import { PlusOutlined, DeleteOutlined, SearchOutlined, FilterOutlined } from '@ant-design/icons'
+import { PlusOutlined, DeleteOutlined, SearchOutlined } from '@ant-design/icons'
 import style from './index.less'
 
 interface ContentToolbarProps {
@@ -29,6 +29,8 @@ interface ContentToolbarProps {
   onSearch: (value: string) => void
   /** 关键词变化事件 */
   onKeywordChange: (value: string) => void
+  /** 额外的按钮（放在右侧搜索框前面） */
+  extraButtons?: ReactNode
 }
 
 const ContentToolbar: FC<ContentToolbarProps> = ({
@@ -40,6 +42,7 @@ const ContentToolbar: FC<ContentToolbarProps> = ({
   onBatchDelete,
   onSearch,
   onKeywordChange,
+  extraButtons,
 }) => {
   return (
     <div className={style['content-toolbar']}>
@@ -64,6 +67,7 @@ const ContentToolbar: FC<ContentToolbarProps> = ({
         </Button>
       </div>
       <div className={style['content-toolbar__right']}>
+        {extraButtons}
         <Input
           placeholder={searchPlaceholder}
           prefix={<SearchOutlined />}
@@ -72,9 +76,6 @@ const ContentToolbar: FC<ContentToolbarProps> = ({
           onChange={(e) => onKeywordChange(e.target.value)}
           allowClear
         />
-        <div className={style['filter-btn']}>
-          <FilterOutlined />
-        </div>
       </div>
     </div>
   )

@@ -89,3 +89,15 @@ export async function pageTag (
     ...(options || {}),
   });
 }
+
+/**
+ * 获取标签下拉列表 GET /api/v1/tag/optional
+ */
+export async function optionalTag (
+  options?: Record<string, any>,
+) {
+  return request<ApiResultListTagVO>(`/api/v1/tag/optional`, {
+    method: 'GET',
+    ...(options || {}),
+  });
+}

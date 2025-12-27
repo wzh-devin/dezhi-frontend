@@ -20,6 +20,29 @@ export type ApiResultObject = {
   addition?: Addition;
 }
 
+export type ArticleUpdateVO = {
+  /** 主键id */
+  id?: string;
+  /** 分类id */
+  categoryId?: string;
+  /** 标签id列表 */
+  tagIdList?: string[];
+  /** 文章标题 */
+  title?: string;
+  /** 文章简介 */
+  summary?: string;
+  /** 文章内容 */
+  content?: string;
+  /** 文章内容markdown */
+  contentMd?: string;
+  /** 文章状态（DRAFT,PUBLISHED,DELETED） */
+  status?: ('NORMAL' | 'DRAFT' | 'PUBLISHED' | 'DELETED');
+  /** 是否置顶（0: 正常; 1: 置顶） */
+  top?: number;
+  /** 是否热门（0: 正常; 1: 热门） */
+  hot?: number;
+}
+
 export type ApiResultVoid = {
   /** 响应是否成功 */
   success?: boolean;
@@ -218,6 +241,63 @@ export type CategorySaveVO = {
   name?: string;
 }
 
+export type ApiResultArticleVO = {
+  /** 响应是否成功 */
+  success?: boolean;
+  /** 失败码 */
+  errCode?: number;
+  /** 失败信息 */
+  errMsg?: string;
+  /**  */
+  data?: ArticleVO;
+  /**  */
+  addition?: Addition;
+}
+
+export type ArticleVO = {
+  /** 主键id */
+  id?: string;
+  /** 分类id */
+  categoryId?: string;
+  /** 分类名称 */
+  categoryName?: string;
+  /** 标签列表 */
+  tagList?: TagVO[];
+  /** 文章标题 */
+  title?: string;
+  /** 文章简介 */
+  summary?: string;
+  /** 文章内容 */
+  content?: string;
+  /** 文章内容markdown */
+  contentMd?: string;
+  /** 文章的uri地址 */
+  uri?: string;
+  /** 文章状态（DRAFT,PUBLISHED,DELETED） */
+  status?: ('NORMAL' | 'DRAFT' | 'PUBLISHED' | 'DELETED');
+  /** 是否置顶（0: 正常; 1: 置顶） */
+  top?: number;
+  /** 是否热门（0: 正常; 1: 热门） */
+  hot?: number;
+  /** 创建时间 */
+  createTime?: string;
+  /** 更新时间 */
+  updateTime?: string;
+}
+
+export type TagVO = {
+  /** 主键id */
+  id?: string;
+  /** 标签名称 */
+  name?: string;
+  /** 标签颜色 */
+  color?: string;
+  /** 创建时间 */
+  createTime?: string;
+  /** 更新时间 */
+  updateTime?: string;
+}
+
 export type ApiResultUserVO = {
   /** 响应是否成功 */
   success?: boolean;
@@ -255,19 +335,6 @@ export type ApiResultListTagVO = {
   addition?: Addition;
 }
 
-export type TagVO = {
-  /** 主键id */
-  id?: string;
-  /** 标签名称 */
-  name?: string;
-  /** 标签颜色 */
-  color?: string;
-  /** 创建时间 */
-  createTime?: string;
-  /** 更新时间 */
-  updateTime?: string;
-}
-
 export type ApiResultListCategoryVO = {
   /** 响应是否成功 */
   success?: boolean;
@@ -290,5 +357,18 @@ export type CategoryVO = {
   createTime?: string;
   /** 更新时间 */
   updateTime?: string;
+}
+
+export type ApiResultListArticleVO = {
+  /** 响应是否成功 */
+  success?: boolean;
+  /** 失败码 */
+  errCode?: number;
+  /** 失败信息 */
+  errMsg?: string;
+  /** 响应数据 */
+  data?: ArticleVO[];
+  /**  */
+  addition?: Addition;
 }
 

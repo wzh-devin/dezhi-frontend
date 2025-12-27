@@ -8,22 +8,30 @@
  */
 
 .article {
-  &__placeholder {
-    background: #ffffff;
-    border-radius: 12px;
-    padding: 48px;
-    text-align: center;
-    color: #999999;
-
-    h2 {
-      font-size: 24px;
-      color: #1a1a1a;
-      margin-bottom: 16px;
-    }
-
-    p {
-      font-size: 14px;
-    }
-  }
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  height: calc(100vh - 100px);
 }
 
+.recycle-btn {
+  height: 36px;
+  padding: 0 16px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #3b82f6 !important;
+  border-color: #3b82f6 !important;
+  color: #ffffff !important;
+  transition: all 0.2s ease;
+
+  &:hover,
+  &:focus {
+    background: #2563eb !important;
+    border-color: #2563eb !important;
+    color: #ffffff !important;
+  }
+}

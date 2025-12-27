@@ -85,3 +85,15 @@ export async function pageCategory (
     ...(options || {}),
   });
 }
+
+/**
+ * 获取分类下拉列表 GET /api/v1/category/optional
+ */
+export async function optionalCategory (
+  options?: Record<string, any>,
+) {
+  return request<ApiResultListCategoryVO>(`/api/v1/category/optional`, {
+    method: 'GET',
+    ...(options || {}),
+  });
+}

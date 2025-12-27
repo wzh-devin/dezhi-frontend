@@ -44,6 +44,14 @@ export const routes = [
         component: '@/pages/Admin/Content/Article',
       },
       {
+        path: '/admin/content/article/write/:id',
+        component: '@/pages/Admin/Content/Article/Write',
+      },
+      {
+        path: '/admin/content/article/recycle',
+        component: '@/pages/Admin/Content/Article/Recycle',
+      },
+      {
         path: '/admin/content/category',
         component: '@/pages/Admin/Content/Category',
       },

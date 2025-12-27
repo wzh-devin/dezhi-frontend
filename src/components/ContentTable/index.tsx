@@ -8,7 +8,7 @@
  */
 import React, { memo } from 'react'
 import type { ReactNode } from 'react'
-import { Table, Checkbox, Button, Tooltip, Spin, Empty, Pagination, ConfigProvider } from 'antd'
+import { Table, Checkbox, Button, Spin, Empty, Pagination, ConfigProvider } from 'antd'
 import { EditOutlined, DeleteOutlined } from '@ant-design/icons'
 import zhCN from 'antd/locale/zh_CN'
 import type { ColumnsType } from 'antd/es/table'
@@ -35,10 +35,14 @@ interface ContentTableProps<T extends { id?: string }> {
   selectedRowKeys: string[]
   /** 选中变化事件 */
   onSelectChange: (selectedRowKeys: string[]) => void
-  /** 编辑事件 */
-  onEdit: (record: T) => void
-  /** 删除事件 */
-  onDelete: (record: T) => void
+  /** 编辑事件（当没有自定义 actionRender 时必填） */
+  onEdit?: (record: T) => void
+  /** 删除事件（当没有自定义 actionRender 时必填） */
+  onDelete?: (record: T) => void
+  /** 自定义操作列渲染 */
+  actionRender?: (record: T) => ReactNode
+  /** 操作列宽度 */
+  actionWidth?: number
   /** 当前页码 */
   pageNum: number
   /** 每页数量 */
@@ -61,6 +65,8 @@ function ContentTable<T extends { id?: string }>({
   onSelectChange,
   onEdit,
   onDelete,
+  actionRender,
+  actionWidth = 180,
   pageNum,
   pageSize,
   total,
@@ -137,30 +143,42 @@ function ContentTable<T extends { id?: string }>({
     {
       title: '操作',
       key: 'action',
-      width: 180,
+      width: actionWidth,
       align: 'center',
-      render: (_, record) => (
-        <div className={style['action-btns']}>
-          <Tooltip title="编辑">
+      render: (_, record) => {
+        // 如果提供了自定义渲染函数，使用自定义渲染
+        if (actionRender) {
+          return (
+            <div className={style['action-btns']}>
+              {actionRender(record)}
+            </div>
+          )
+        }
+        // 默认的编辑/删除按钮
+        return (
+          <div className={style['action-btns']}>
             <Button
-              type="text"
+              type="link"
               size="small"
               icon={<EditOutlined />}
               className={style['edit-btn']}
-              onClick={() => onEdit(record)}
-            />
-          </Tooltip>
-          <Tooltip title="删除">
+              onClick={() => onEdit?.(record)}
+            >
+              编辑
+            </Button>
             <Button
-              type="text"
+              type="link"
               size="small"
+              danger
               icon={<DeleteOutlined />}
               className={style['delete-btn']}
-              onClick={() => onDelete(record)}
-            />
-          </Tooltip>
-        </div>
-      ),
+              onClick={() => onDelete?.(record)}
+            >
+              删除
+            </Button>
+          </div>
+        )
+      },
     },
   ]
 
