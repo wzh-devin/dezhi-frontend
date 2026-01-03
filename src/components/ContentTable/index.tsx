@@ -22,6 +22,8 @@ export interface ContentTableColumn<T> {
   width?: number | string
   render?: (value: any, record: T, index: number) => ReactNode
   align?: 'left' | 'center' | 'right'
+  /** 是否显示省略号（超出隐藏） */
+  ellipsis?: boolean
 }
 
 interface ContentTableProps<T extends { id?: string }> {
@@ -134,6 +136,7 @@ function ContentTable<T extends { id?: string }>({
       dataIndex: col.dataIndex as string,
       width: col.width,
       align: col.align,
+      ellipsis: col.ellipsis,
       render: col.render
         ? (value: any, record: T, index: number) => col.render!(value, record, index)
         : col.dataIndex?.toString().includes('Time')

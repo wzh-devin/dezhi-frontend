@@ -212,20 +212,22 @@ const Article: FC = () => {
       key: 'title',
       title: '文章标题',
       dataIndex: 'title',
+      width: 150,
+      ellipsis: true,
       render: (value: string) => value || '无标题',
     },
     {
       key: 'categoryName',
       title: '分类',
       dataIndex: 'categoryName',
-      width: 120,
+      width: 100,
       render: (value: string) => value || '-',
     },
     {
       key: 'tagList',
       title: '标签',
+      width: 150,
       dataIndex: 'tagList',
-      width: 200,
       render: (value: TagVO[]) => {
         if (!value || value.length === 0) return '-'
         return (
@@ -274,13 +276,13 @@ const Article: FC = () => {
       key: 'createTime',
       title: '创建时间',
       dataIndex: 'createTime',
-      width: 180,
+      width: 150,
     },
     {
       key: 'updateTime',
       title: '更新时间',
       dataIndex: 'updateTime',
-      width: 180,
+      width: 150,
     },
   ]
 

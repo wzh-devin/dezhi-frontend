@@ -260,6 +260,8 @@ const Recycle: FC = () => {
       key: 'title',
       title: '文章标题',
       dataIndex: 'title',
+      width: 200,
+      ellipsis: true,
       render: (value: string) => value || '无标题',
     },
     {
