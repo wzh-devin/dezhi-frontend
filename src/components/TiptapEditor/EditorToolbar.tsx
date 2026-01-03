@@ -11,6 +11,8 @@ import type { FC } from 'react'
 import type { Editor } from '@tiptap/react'
 import { Modal, Input, Spin, Empty, Pagination, message } from 'antd'
 import {
+  UndoOutlined,
+  RedoOutlined,
   BoldOutlined,
   ItalicOutlined,
   StrikethroughOutlined,
@@ -271,6 +273,28 @@ const EditorToolbar: FC<EditorToolbarProps> = ({ editor }) => {
   return (
     <div className={style['editor-toolbar']}>
       <div className={style['toolbar-buttons']}>
+        {/* 撤销/重做 */}
+        <button
+          className={style['tool-btn']}
+          onClick={() => editor.chain().focus().undo().run()}
+          disabled={!editor.can().undo()}
+          type="button"
+          title="撤销"
+        >
+          <UndoOutlined />
+        </button>
+        <button
+          className={style['tool-btn']}
+          onClick={() => editor.chain().focus().redo().run()}
+          disabled={!editor.can().redo()}
+          type="button"
+          title="重做"
+        >
+          <RedoOutlined />
+        </button>
+
+        <span className={style['toolbar-separator']}>|</span>
+
         {/* 基础格式 */}
         <button
           className={`${style['tool-btn']} ${editor.isActive('bold') ? style['active'] : ''}`}
