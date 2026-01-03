@@ -253,8 +253,7 @@ const EditorToolbar: FC<EditorToolbarProps> = ({ editor }) => {
       // 检查这个段落是否包含 Markdown 语法
       if (hasMarkdownSyntax(content)) {
         hasRendered = true
-        const rendered = marked.parse(content, { async: false }) as string
-        return rendered
+        return marked.parse(content, { async: false }) as string
       }
       return match
     })
