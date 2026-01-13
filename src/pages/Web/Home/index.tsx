@@ -83,7 +83,7 @@ const MainContent: FC = () => {
       isOriginal: true,
       title: '【诚挚邀约】你的每一个建议，都是这款博客系统的成长动力',
       summary: '系统需求和优化征集，欢迎大家来畅所欲言',
-      author: '拾壹',
+      author: 'Devin',
       authorAvatar: 'https://file.devin.wang/dezhi/image/e091869e-6add-407a-a62e-c368c006af17.jpg',
       date: '2025-07-16',
       views: 1234,
@@ -97,7 +97,7 @@ const MainContent: FC = () => {
       isOriginal: true,
       title: 'Docker更换镜像源（阿里可用镜像源列表地址）',
       summary: '由于国内网络环境的原因，直接使用Docker官方镜像源下载镜像速度较慢，本文介绍如何更换为阿里云镜像源...',
-      author: '拾壹',
+      author: 'Devin',
       authorAvatar: 'https://via.placeholder.com/24',
       date: '2025-07-15',
       views: 856,
@@ -111,7 +111,7 @@ const MainContent: FC = () => {
       isOriginal: true,
       title: 'Spring Boot 结合 WxJava 实现文章上传微信公众号草稿箱与群发',
       summary: '在数字化营销与内容传播日益重要的今天，微信公众号已成为企业和个人进行信息发布与推广的重要平台...',
-      author: '拾壹',
+      author: 'Devin',
       authorAvatar: 'https://via.placeholder.com/24',
       date: '8个月前',
       views: 265,
@@ -125,7 +125,7 @@ const MainContent: FC = () => {
       isOriginal: false,
       title: 'mybatisorg.xml.sax.SAXParseException; lineNumber: 2; columnNumber: 6',
       summary: '解决mybatisorg.xml.sax.SAXParseException; lineNumber: 2; columnNumber: 6; 不允许有匹配 "[xX][mM][lL]" 的处理指令目标的问题',
-      author: '拾壹',
+      author: 'Devin',
       authorAvatar: 'https://via.placeholder.com/24',
       date: '8个月前',
       views: 143,
@@ -139,7 +139,7 @@ const MainContent: FC = () => {
       isOriginal: true,
       title: 'v-if动态设置Element表格列时，出现表格列显示错乱、表头闪动等问题',
       summary: '在实际开发中，我们经常会通过v-if控制表格列的显隐，来实现不同条件下展示不同的表格列，这时候就可能会出现表格列显示错乱...',
-      author: '拾壹',
+      author: 'Devin',
       authorAvatar: 'https://via.placeholder.com/24',
       date: '8个月前',
       views: 172,
@@ -153,7 +153,7 @@ const MainContent: FC = () => {
       isOriginal: true,
       title: 'Vue实现不同网站之间的Cookie共享功能',
       summary: '通过两种方法解决不同网站之间的Cookie共享功能，从前端和后端角度各自实现。',
-      author: '拾壹',
+      author: 'Devin',
       authorAvatar: 'https://via.placeholder.com/24',
       date: '8个月前',
       views: 213,
@@ -167,7 +167,7 @@ const MainContent: FC = () => {
       isOriginal: true,
       title: 'Vue3中常用的一些方法使用手册',
       summary: 'Vue3中常用的一些方法使用手册，包括组合式API、响应式数据、生命周期钩子等...',
-      author: '拾壹',
+      author: 'Devin',
       authorAvatar: 'https://via.placeholder.com/24',
       date: '2024-03-20',
       views: 445,
@@ -181,7 +181,7 @@ const MainContent: FC = () => {
       isOriginal: true,
       title: 'MySQL中如何进行字符串替换',
       summary: 'MySQL中字符串替换的几种方法，包括REPLACE函数、REGEXP_REPLACE函数等...',
-      author: '拾壹',
+      author: 'Devin',
       authorAvatar: 'https://via.placeholder.com/24',
       date: '2024-01-26',
       views: 312,
@@ -195,7 +195,7 @@ const MainContent: FC = () => {
       isOriginal: true,
       title: 'springboot实现自定义注解限流',
       summary: '使用Spring Boot实现自定义注解限流，基于Redis实现分布式限流...',
-      author: '拾壹',
+      author: 'Devin',
       authorAvatar: 'https://via.placeholder.com/24',
       date: '2023-07-25',
       views: 567,
@@ -209,7 +209,7 @@ const MainContent: FC = () => {
       isOriginal: true,
       title: 'springboot+vue实现微信公众号扫码登录',
       summary: '使用Spring Boot和Vue实现微信公众号扫码登录功能，包括后端接口和前端页面...',
-      author: '拾壹',
+      author: 'Devin',
       authorAvatar: 'https://via.placeholder.com/24',
       date: '2023-07-04',
       views: 789,
@@ -223,7 +223,7 @@ const MainContent: FC = () => {
       isOriginal: true,
       title: 'Spring Cloud的gateway之动态路由配置',
       summary: 'Spring Cloud Gateway动态路由配置，支持从数据库或配置中心动态加载路由...',
-      author: '拾壹',
+      author: 'Devin',
       authorAvatar: 'https://via.placeholder.com/24',
       date: '2021-09-01',
       views: 1023,
@@ -237,7 +237,7 @@ const MainContent: FC = () => {
       isOriginal: true,
       title: 'Redis实现分布式锁的几种方式',
       summary: 'Redis实现分布式锁的几种方式，包括SETNX、Redisson、RedLock等...',
-      author: '拾壹',
+      author: 'Devin',
       authorAvatar: 'https://via.placeholder.com/24',
       date: '2021-08-15',
       views: 1456,
@@ -440,16 +440,14 @@ const RightSidebar: FC = () => {
             <Avatar
               size={80}
               className={styles['user-avatar']}
-              src="https://via.placeholder.com/80/52c41a/ffffff?text=🍉"
+              src="https://file.devin.wang/dezhi/image/e091869e-6add-407a-a62e-c368c006af17.jpg"
             />
             <span className={styles['online-status']}>在线</span>
           </div>
-          <h3 className={styles['user-name']}>拾壹</h3>
+          <h3 className={styles['user-name']}>Devin</h3>
           <p className={styles['user-signature']}>十八岁以后我的梦想变成了买房买车。</p>
           <div className={styles['social-links']}>
             <GithubOutlined className={styles['social-icon']} />
-            <span className={styles['social-icon-gitee']}>G</span>
-            <span className={styles['social-icon-csdn']}>C</span>
             <QqOutlined className={styles['social-icon']} />
             <MailOutlined className={styles['social-icon']} />
             <WechatOutlined className={styles['social-icon']} />
@@ -466,9 +464,9 @@ const RightSidebar: FC = () => {
         </div>
         <div className={styles['notice-content']}>
           <p>
-            本站基于 <a className={styles['link-green']}>Vue2</a> +{' '}
-            <a className={styles['link-blue']}>ElementUI</a> +{' '}
-            <a className={styles['link-orange']}>Spring Boot</a>
+            本站基于 <a className={styles['link-green']}>React</a> +{' '}
+            <a className={styles['link-blue']}>Ant Design</a> +{' '}
+            <a className={styles['link-orange']}>Spring Boot 3</a>
           </p>
           <p>
             开发，源码已开源。<a className={styles['link-red']}>点我直达</a>

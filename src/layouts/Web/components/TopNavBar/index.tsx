@@ -21,13 +21,27 @@ import {
   InfoCircleOutlined,
   SearchOutlined,
   BellOutlined,
-  DownOutlined,
 } from '@ant-design/icons'
-import { Layout, Avatar, Badge, Dropdown } from 'antd'
+import { Layout, Avatar, Badge, Menu } from 'antd'
 import type { MenuProps } from 'antd'
 import { history } from 'umi'
 
 const { Header } = Layout
+
+/** 路由映射配置 */
+const routeMap: Record<string, string> = {
+  home: '/',
+  archive: '/archive',
+  category: '/category',
+  tag: '/tag',
+  column: '/column',
+  talk: '/talk',
+  hot: '/hot',
+  resource: '/resource',
+  message: '/message',
+  friend: '/friend',
+  about: '/about',
+}
 
 /**
  * 顶部导航栏组件
@@ -36,39 +50,53 @@ const { Header } = Layout
 const TopNavBar: FC = () => {
   const [activeMenu, setActiveMenu] = useState<string>('home')
 
-  // 文章归档下拉菜单
-  const archiveMenuItems: MenuProps['items'] = [
-    { key: 'archive', label: '归档', icon: <FolderOutlined /> },
-    { key: 'category', label: '分类', icon: <FolderOutlined /> },
-    { key: 'tag', label: '标签', icon: <FolderOutlined /> },
-  ]
-
-  // 菜单项数据
-  const menuItems = [
+  /** 菜单项配置 */
+  const menuItems: MenuProps['items'] = [
     { key: 'home', label: '首页', icon: <HomeOutlined /> },
-    { key: 'archive', label: '文章归档', icon: <FolderOutlined />, hasDropdown: true },
+    {
+      key: 'archive-menu',
+      label: '文章归档',
+      icon: <FolderOutlined />,
+      children: [
+        { key: 'archive', label: '归档' },
+        { key: 'category', label: '分类' },
+        { key: 'tag', label: '标签' },
+      ],
+    },
     { key: 'column', label: '专栏', icon: <ReadOutlined /> },
     { key: 'talk', label: '说说', icon: <MessageOutlined /> },
     { key: 'hot', label: '热搜', icon: <FireOutlined /> },
     { key: 'resource', label: '资源', icon: <CloudOutlined /> },
     { key: 'message', label: '留言板', icon: <CommentOutlined /> },
     { key: 'friend', label: '友情链接', icon: <LinkOutlined /> },
-    { key: 'about', label: '关于本站', icon: <InfoCircleOutlined />, hasDropdown: true },
+    { key: 'about', label: '关于本站', icon: <InfoCircleOutlined /> },
   ]
 
   /**
-   * 处理菜单点击
-   * @param key - 菜单key
+   * 处理菜单点击跳转
+   * @param info - 菜单点击信息
    */
-  const handleMenuClick = (key: string): void => {
-    setActiveMenu(key)
+  const handleMenuClick: MenuProps['onClick'] = (info) => {
+    setActiveMenu(info.key)
+    const route = routeMap[info.key]
+    if (route) {
+      history.push(route)
+    }
+  }
+
+  /**
+   * 处理Logo点击跳转首页
+   */
+  const handleLogoClick = (): void => {
+    setActiveMenu('home')
+    history.push('/')
   }
 
   return (
     <Header className={styles['top-nav-bar']}>
       <div className={styles['nav-container']}>
         {/* Logo */}
-        <div className={styles['logo']}>
+        <div className={styles['logo']} onClick={handleLogoClick}>
           <div className={styles['logo-icon']}>
             <svg viewBox="0 0 24 24" width="24" height="24">
               <circle cx="12" cy="12" r="10" fill="#667eea" />
@@ -77,60 +105,17 @@ const TopNavBar: FC = () => {
               </text>
             </svg>
           </div>
-          <span className={styles['logo-text']}>拾壹博客</span>
+          <span className={styles['logo-text']}>得智博客</span>
         </div>
 
         {/* 菜单栏 */}
-        <div className={styles['nav-menu']}>
-          {menuItems.map((item) =>
-            item.hasDropdown && item.key === 'archive' ? (
-              <Dropdown
-                key={item.key}
-                menu={{ items: archiveMenuItems }}
-                placement="bottom"
-              >
-                <div
-                  className={`${styles['menu-item']} ${
-                    activeMenu === item.key ? styles['menu-item-active'] : ''
-                  }`}
-                  onClick={() => handleMenuClick(item.key)}
-                >
-                  {item.icon}
-                  <span>{item.label}</span>
-                  <DownOutlined className={styles['dropdown-icon']} />
-                </div>
-              </Dropdown>
-            ) : item.hasDropdown && item.key === 'about' ? (
-              <Dropdown
-                key={item.key}
-                menu={{ items: [{ key: 'about-site', label: '关于本站' }] }}
-                placement="bottom"
-              >
-                <div
-                  className={`${styles['menu-item']} ${
-                    activeMenu === item.key ? styles['menu-item-active'] : ''
-                  }`}
-                  onClick={() => handleMenuClick(item.key)}
-                >
-                  {item.icon}
-                  <span>{item.label}</span>
-                  <DownOutlined className={styles['dropdown-icon']} />
-                </div>
-              </Dropdown>
-            ) : (
-              <div
-                key={item.key}
-                className={`${styles['menu-item']} ${
-                  activeMenu === item.key ? styles['menu-item-active'] : ''
-                }`}
-                onClick={() => handleMenuClick(item.key)}
-              >
-                {item.icon}
-                <span>{item.label}</span>
-              </div>
-            )
-          )}
-        </div>
+        <Menu
+          className={styles['nav-menu']}
+          mode="horizontal"
+          selectedKeys={[activeMenu]}
+          items={menuItems}
+          onClick={handleMenuClick}
+        />
 
         {/* 右侧功能区 */}
         <div className={styles['nav-right']}>
