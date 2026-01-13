@@ -6,7 +6,7 @@ import {
 } from './typings';
 
 /**
- * 修改文章 PUT /api/v1/article/update
+ * 修改文章 PUT /api/v1/admin/article/update
  */
 export async function updateArticle (
   data?: {
@@ -33,7 +33,7 @@ export async function updateArticle (
   },
   options?: Record<string, any>,
 ) {
-  return request<ApiResultVoid>(`/api/v1/article/update`, {
+  return request<ApiResultVoid>(`/api/v1/admin/article/update`, {
     method: 'PUT',
     data: {
       ...data,
@@ -43,19 +43,19 @@ export async function updateArticle (
 }
 
 /**
- * 初始化新增文章 POST /api/v1/article/save
+ * 初始化新增文章 POST /api/v1/admin/article/save
  */
 export async function saveArticle (
   options?: Record<string, any>,
 ) {
-  return request<ApiResultArticleVO>(`/api/v1/article/save`, {
+  return request<ApiResultArticleVO>(`/api/v1/admin/article/save`, {
     method: 'POST',
     ...(options || {}),
   });
 }
 
 /**
- * 批量删除文章 POST /api/v1/article/delete
+ * 批量删除文章 POST /api/v1/admin/article/delete
  */
 export async function deleteArticle (
   data?: {
@@ -64,7 +64,7 @@ export async function deleteArticle (
   },
   options?: Record<string, any>,
 ) {
-  return request<ApiResultVoid>(`/api/v1/article/delete`, {
+  return request<ApiResultVoid>(`/api/v1/admin/article/delete`, {
     method: 'POST',
     data: {
       ...data,
@@ -74,7 +74,7 @@ export async function deleteArticle (
 }
 
 /**
- * 清空回收站（永久删除） POST /api/v1/article/clearRecycleBin
+ * 清空回收站 POST /api/v1/admin/article/clearRecycleBin
  */
 export async function clearRecycleBin (
   data?: {
@@ -83,7 +83,7 @@ export async function clearRecycleBin (
   },
   options?: Record<string, any>,
 ) {
-  return request<ApiResultVoid>(`/api/v1/article/clearRecycleBin`, {
+  return request<ApiResultVoid>(`/api/v1/admin/article/clearRecycleBin`, {
     method: 'POST',
     data: {
       ...data,
@@ -92,9 +92,8 @@ export async function clearRecycleBin (
   });
 }
 
-
 /**
- * 分页查询文章 GET /api/v1/article/pageArticle
+ * 分页查询文章 GET /api/v1/admin/article/pageArticle
  */
 export async function pageArticle (
   params?: {
@@ -109,7 +108,7 @@ export async function pageArticle (
   },
   options?: Record<string, any>,
 ) {
-  return request<ApiResultListArticleVO>(`/api/v1/article/pageArticle`, {
+  return request<ApiResultListArticleVO>(`/api/v1/admin/article/pageArticle`, {
     method: 'GET',
     params: {
       ...params,
@@ -119,7 +118,7 @@ export async function pageArticle (
 }
 
 /**
- * 获取文章信息 GET /api/v1/article/getArticleInfo/{articleId}
+ * 获取文章信息 GET /api/v1/admin/article/getArticleInfo/{articleId}
  */
 export async function getArticleInfo (
   pathVars: {
@@ -128,7 +127,7 @@ export async function getArticleInfo (
   },
   options?: Record<string, any>,
 ) {
-  return request<ApiResultArticleVO>(`/api/v1/article/getArticleInfo/${pathVars.articleId}`, {
+  return request<ApiResultArticleVO>(`/api/v1/admin/article/getArticleInfo/${pathVars.articleId}`, {
     method: 'GET',
     ...(options || {}),
   });

@@ -5,7 +5,7 @@ import {
 } from './typings';
 
 /**
- * 修改标签 POST /api/v1/tag/update
+ * 修改标签 POST /api/v1/admin/tag/update
  */
 export async function updateTag (
   data?: {
@@ -18,7 +18,7 @@ export async function updateTag (
   },
   options?: Record<string, any>,
 ) {
-  return request<ApiResultVoid>(`/api/v1/tag/update`, {
+  return request<ApiResultVoid>(`/api/v1/admin/tag/update`, {
     method: 'POST',
     data: {
       ...data,
@@ -28,7 +28,7 @@ export async function updateTag (
 }
 
 /**
- * 保存标签 POST /api/v1/tag/save
+ * 保存标签 POST /api/v1/admin/tag/save
  */
 export async function saveTag (
   data?: {
@@ -39,7 +39,7 @@ export async function saveTag (
   },
   options?: Record<string, any>,
 ) {
-  return request<ApiResultVoid>(`/api/v1/tag/save`, {
+  return request<ApiResultVoid>(`/api/v1/admin/tag/save`, {
     method: 'POST',
     data: {
       ...data,
@@ -49,7 +49,7 @@ export async function saveTag (
 }
 
 /**
- * 删除标签 POST /api/v1/tag/delete
+ * 删除标签 POST /api/v1/admin/tag/delete
  */
 export async function deleteTag (
   data?: {
@@ -58,7 +58,7 @@ export async function deleteTag (
   },
   options?: Record<string, any>,
 ) {
-  return request<ApiResultVoid>(`/api/v1/tag/delete`, {
+  return request<ApiResultVoid>(`/api/v1/admin/tag/delete`, {
     method: 'POST',
     data: {
       ...data,
@@ -68,7 +68,7 @@ export async function deleteTag (
 }
 
 /**
- * 查询标签 GET /api/v1/tag/page
+ * 查询标签 GET /api/v1/admin/tag/page
  */
 export async function pageTag (
   params?: {
@@ -81,7 +81,7 @@ export async function pageTag (
   },
   options?: Record<string, any>,
 ) {
-  return request<ApiResultListTagVO>(`/api/v1/tag/page`, {
+  return request<ApiResultListTagVO>(`/api/v1/admin/tag/page`, {
     method: 'GET',
     params: {
       ...params,
@@ -91,12 +91,12 @@ export async function pageTag (
 }
 
 /**
- * 获取标签下拉列表 GET /api/v1/tag/optional
+ * 获取标签下拉列表 GET /api/v1/admin/tag/optional
  */
 export async function optionalTag (
   options?: Record<string, any>,
 ) {
-  return request<ApiResultListTagVO>(`/api/v1/tag/optional`, {
+  return request<ApiResultListTagVO>(`/api/v1/admin/tag/optional`, {
     method: 'GET',
     ...(options || {}),
   });

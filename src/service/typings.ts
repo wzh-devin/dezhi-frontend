@@ -108,6 +108,21 @@ export type CommonDeleteVO = {
   idList?: string[];
 }
 
+export type ModelManagerUpdateVO = {
+  /** 主键id */
+  id?: string;
+  /** 模型提供商 */
+  provider?: ('OPENAI');
+  /** 模型名称 */
+  name?: string;
+  /** 模型的base_url */
+  baseUrl?: string;
+  /** 模型的api_key */
+  apiKey?: string;
+  /** 模型类型（CHAT, EMBEDDING） */
+  type?: ('CHAT' | 'EMBEDDING');
+}
+
 export type ApiResultUploadSession = {
   /** 响应是否成功 */
   success?: boolean;
@@ -298,28 +313,15 @@ export type TagVO = {
   updateTime?: string;
 }
 
-export type ApiResultUserVO = {
-  /** 响应是否成功 */
-  success?: boolean;
-  /** 失败码 */
-  errCode?: number;
-  /** 失败信息 */
-  errMsg?: string;
-  /**  */
-  data?: UserVO;
-  /**  */
-  addition?: Addition;
-}
-
-export type UserVO = {
-  /** 用户名 */
-  username?: string;
-  /** 邮箱 */
-  email?: string;
-  /** 创建时间 */
-  createTime?: string;
-  /** 更新时间 */
-  updateTime?: string;
+export type ChatRequest = {
+  /** 会话id */
+  sessionId?: string;
+  /** 消息 */
+  message?: string;
+  /** 搜索数量 */
+  topK?: number;
+  /** 流式返回 */
+  stream?: boolean;
 }
 
 export type ApiResultListTagVO = {
@@ -370,5 +372,74 @@ export type ApiResultListArticleVO = {
   data?: ArticleVO[];
   /**  */
   addition?: Addition;
+}
+
+export type ApiResultUserVO = {
+  /** 响应是否成功 */
+  success?: boolean;
+  /** 失败码 */
+  errCode?: number;
+  /** 失败信息 */
+  errMsg?: string;
+  /**  */
+  data?: UserVO;
+  /**  */
+  addition?: Addition;
+}
+
+export type UserVO = {
+  /** 用户名 */
+  username?: string;
+  /** 邮箱 */
+  email?: string;
+  /** 创建时间 */
+  createTime?: string;
+  /** 更新时间 */
+  updateTime?: string;
+}
+
+export type ApiResultModelProviderEnum[] = {
+  /** 响应是否成功 */
+  success?: boolean;
+  /** 失败码 */
+  errCode?: number;
+  /** 失败信息 */
+  errMsg?: string;
+  /** 响应数据 */
+  data?: ('OPENAI')[];
+  /**  */
+  addition?: Addition;
+}
+
+export type ApiResultListModelManagerVO = {
+  /** 响应是否成功 */
+  success?: boolean;
+  /** 失败码 */
+  errCode?: number;
+  /** 失败信息 */
+  errMsg?: string;
+  /** 响应数据 */
+  data?: ModelManagerVO[];
+  /**  */
+  addition?: Addition;
+}
+
+export type ModelManagerVO = {
+  /** 主键id */
+  id?: string;
+  /** 模型提供商 */
+  provider?: ('OPENAI');
+  /** 模型名称 */
+  name?: string;
+  /** 模型的base_url */
+  baseUrl?: string;
+  /** 模型的api_key */
+  apiKey?: string;
+  /** 创建时间 */
+  createTime?: string;
+  /** 更新时间 */
+  updateTime?: string;
+  /** 模型类型（CHAT, EMBEDDING） */
+  type?: ('CHAT' | 'EMBEDDING');
 }
 

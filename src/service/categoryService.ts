@@ -5,7 +5,7 @@ import {
 } from './typings';
 
 /**
- * 修改分类 POST /api/v1/category/update
+ * 修改分类 POST /api/v1/admin/category/update
  */
 export async function updateCategory (
   data?: {
@@ -16,7 +16,7 @@ export async function updateCategory (
   },
   options?: Record<string, any>,
 ) {
-  return request<ApiResultVoid>(`/api/v1/category/update`, {
+  return request<ApiResultVoid>(`/api/v1/admin/category/update`, {
     method: 'POST',
     data: {
       ...data,
@@ -26,7 +26,7 @@ export async function updateCategory (
 }
 
 /**
- * 保存分类 POST /api/v1/category/save
+ * 保存分类 POST /api/v1/admin/category/save
  */
 export async function saveCategory (
   data?: {
@@ -35,7 +35,7 @@ export async function saveCategory (
   },
   options?: Record<string, any>,
 ) {
-  return request<ApiResultVoid>(`/api/v1/category/save`, {
+  return request<ApiResultVoid>(`/api/v1/admin/category/save`, {
     method: 'POST',
     data: {
       ...data,
@@ -45,7 +45,7 @@ export async function saveCategory (
 }
 
 /**
- * 删除分类 POST /api/v1/category/delete
+ * 删除分类 POST /api/v1/admin/category/delete
  */
 export async function deleteCategory (
   data?: {
@@ -54,7 +54,7 @@ export async function deleteCategory (
   },
   options?: Record<string, any>,
 ) {
-  return request<ApiResultVoid>(`/api/v1/category/delete`, {
+  return request<ApiResultVoid>(`/api/v1/admin/category/delete`, {
     method: 'POST',
     data: {
       ...data,
@@ -64,7 +64,7 @@ export async function deleteCategory (
 }
 
 /**
- * 查询分类 GET /api/v1/category/page
+ * 查询分类 GET /api/v1/admin/category/page
  */
 export async function pageCategory (
   params?: {
@@ -77,7 +77,7 @@ export async function pageCategory (
   },
   options?: Record<string, any>,
 ) {
-  return request<ApiResultListCategoryVO>(`/api/v1/category/page`, {
+  return request<ApiResultListCategoryVO>(`/api/v1/admin/category/page`, {
     method: 'GET',
     params: {
       ...params,
@@ -87,12 +87,12 @@ export async function pageCategory (
 }
 
 /**
- * 获取分类下拉列表 GET /api/v1/category/optional
+ * 获取分类下拉列表 GET /api/v1/admin/category/optional
  */
 export async function optionalCategory (
   options?: Record<string, any>,
 ) {
-  return request<ApiResultListCategoryVO>(`/api/v1/category/optional`, {
+  return request<ApiResultListCategoryVO>(`/api/v1/admin/category/optional`, {
     method: 'GET',
     ...(options || {}),
   });

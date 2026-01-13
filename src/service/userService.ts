@@ -6,19 +6,19 @@ import {
 } from './typings';
 
 /**
- * 登出 POST /api/v1/user/logout
+ * 登出 POST /api/v1/admin/user/logout
  */
 export async function logout (
   options?: Record<string, any>,
 ) {
-  return request<ApiResultVoid>(`/api/v1/user/logout`, {
+  return request<ApiResultVoid>(`/api/v1/admin/user/logout`, {
     method: 'POST',
     ...(options || {}),
   });
 }
 
 /**
- * 登录 POST /api/v1/user/login
+ * 登录 POST /api/v1/admin/user/login
  */
 export async function login (
   data?: {
@@ -29,7 +29,7 @@ export async function login (
   },
   options?: Record<string, any>,
 ) {
-  return request<ApiResultString>(`/api/v1/user/login`, {
+  return request<ApiResultString>(`/api/v1/admin/user/login`, {
     method: 'POST',
     data: {
       ...data,
@@ -39,7 +39,7 @@ export async function login (
 }
 
 /**
- * 修改用户信息 POST /api/v1/user/edit
+ * 修改用户信息 POST /api/v1/admin/user/edit
  */
 export async function editUserInfo (
   data?: {
@@ -54,7 +54,7 @@ export async function editUserInfo (
   },
   options?: Record<string, any>,
 ) {
-  return request<ApiResultVoid>(`/api/v1/user/edit`, {
+  return request<ApiResultVoid>(`/api/v1/admin/user/edit`, {
     method: 'POST',
     data: {
       ...data,
@@ -64,12 +64,12 @@ export async function editUserInfo (
 }
 
 /**
- * 获取当前用户信息 GET /api/v1/user/getUserInfo
+ * 获取当前用户信息 GET /api/v1/admin/user/getUserInfo
  */
 export async function getUserInfo (
   options?: Record<string, any>,
 ) {
-  return request<ApiResultUserVO>(`/api/v1/user/getUserInfo`, {
+  return request<ApiResultUserVO>(`/api/v1/admin/user/getUserInfo`, {
     method: 'GET',
     ...(options || {}),
   });

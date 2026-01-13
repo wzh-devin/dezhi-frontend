@@ -7,7 +7,7 @@ import {
 } from './typings';
 
 /**
- * 获取上传状态 POST /api/v1/file/upload/status
+ * 获取上传状态 POST /api/v1/admin/file/upload/status
  */
 export async function getUploadStatus (
   params?: {
@@ -16,7 +16,7 @@ export async function getUploadStatus (
   },
   options?: Record<string, any>,
 ) {
-  return request<ApiResultUploadSession>(`/api/v1/file/upload/status`, {
+  return request<ApiResultUploadSession>(`/api/v1/admin/file/upload/status`, {
     method: 'POST',
     params: {
       ...params,
@@ -26,7 +26,7 @@ export async function getUploadStatus (
 }
 
 /**
- * 初始化上传 POST /api/v1/file/upload/initiate
+ * 初始化上传 POST /api/v1/admin/file/upload/initiate
  */
 export async function initiateUpload (
   data?: {
@@ -41,7 +41,7 @@ export async function initiateUpload (
   },
   options?: Record<string, any>,
 ) {
-  return request<ApiResultUploadSession>(`/api/v1/file/upload/initiate`, {
+  return request<ApiResultUploadSession>(`/api/v1/admin/file/upload/initiate`, {
     method: 'POST',
     data: {
       ...data,
@@ -51,7 +51,7 @@ export async function initiateUpload (
 }
 
 /**
- * 完成上传 POST /api/v1/file/upload/complete
+ * 完成上传 POST /api/v1/admin/file/upload/complete
  */
 export async function completeUpload (
   params?: {
@@ -60,7 +60,7 @@ export async function completeUpload (
   },
   options?: Record<string, any>,
 ) {
-  return request<ApiResultFileVO>(`/api/v1/file/upload/complete`, {
+  return request<ApiResultFileVO>(`/api/v1/admin/file/upload/complete`, {
     method: 'POST',
     params: {
       ...params,
@@ -70,7 +70,7 @@ export async function completeUpload (
 }
 
 /**
- * 上传文件分片 POST /api/v1/file/upload/chunk
+ * 上传文件分片 POST /api/v1/admin/file/upload/chunk
  */
 export async function uploadChunk (
   data?: {
@@ -93,7 +93,7 @@ export async function uploadChunk (
   if (data?.file) {
     formData.append('file', data.file);
   }
-  return request<ApiResultVoid>(`/api/v1/file/upload/chunk`, {
+  return request<ApiResultVoid>(`/api/v1/admin/file/upload/chunk`, {
     method: 'POST',
     data: formData,
     requestType: 'form',
@@ -102,7 +102,7 @@ export async function uploadChunk (
 }
 
 /**
- * 取消上传 POST /api/v1/file/upload/cancel
+ * 取消上传 POST /api/v1/admin/file/upload/cancel
  */
 export async function cancelUpload (
   params?: {
@@ -111,7 +111,7 @@ export async function cancelUpload (
   },
   options?: Record<string, any>,
 ) {
-  return request<ApiResultVoid>(`/api/v1/file/upload/cancel`, {
+  return request<ApiResultVoid>(`/api/v1/admin/file/upload/cancel`, {
     method: 'POST',
     params: {
       ...params,
@@ -121,7 +121,7 @@ export async function cancelUpload (
 }
 
 /**
- * 分页查询文件 POST /api/v1/file/page
+ * 分页查询文件 POST /api/v1/admin/file/page
  */
 export async function pageFile (
   data?: {
@@ -140,7 +140,7 @@ export async function pageFile (
   },
   options?: Record<string, any>,
 ) {
-  return request<ApiResultListFileVO>(`/api/v1/file/page`, {
+  return request<ApiResultListFileVO>(`/api/v1/admin/file/page`, {
     method: 'POST',
     data: {
       ...data,
@@ -150,7 +150,7 @@ export async function pageFile (
 }
 
 /**
- * 删除文件 POST /api/v1/file/delete
+ * 删除文件 POST /api/v1/admin/file/delete
  */
 export async function deleteFile (
   data?: {
@@ -159,7 +159,7 @@ export async function deleteFile (
   },
   options?: Record<string, any>,
 ) {
-  return request<ApiResultVoid>(`/api/v1/file/delete`, {
+  return request<ApiResultVoid>(`/api/v1/admin/file/delete`, {
     method: 'POST',
     data: {
       ...data,
