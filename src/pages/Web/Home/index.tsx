@@ -30,6 +30,7 @@ import {
   QqOutlined,
   TagsOutlined,
 } from '@ant-design/icons'
+import { history } from 'umi'
 import ArticleCard from '@/components/ArticleCard'
 import type { ArticleData } from '@/components/ArticleCard'
 import styles from './index.less'
@@ -281,6 +282,14 @@ const MainContent: FC = () => {
     setCurrentPage(page)
   }
 
+  /**
+   * 处理文章点击跳转
+   * @param id - 文章ID
+   */
+  const handleArticleClick = (id: number): void => {
+    history.push(`/article/${id}`)
+  }
+
   // 分页配置
   const pageSize = 10
   const startIndex = (currentPage - 1) * pageSize
@@ -355,7 +364,7 @@ const MainContent: FC = () => {
       {/* 文章列表 */}
       <div className={styles['article-list']}>
         {currentArticles.map((article) => (
-          <ArticleCard key={article.id} article={article} />
+          <ArticleCard key={article.id} article={article} onClick={handleArticleClick} />
         ))}
       </div>
 

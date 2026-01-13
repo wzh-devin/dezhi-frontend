@@ -17,6 +17,10 @@ export const routes = [
         path: '/',
         component: '@/pages/Web/Home',
       },
+      {
+        path: '/article/:id',
+        component: '@/pages/Web/Article',
+      },
     ],
   },
   // 后台登录页（独立页面，不使用后台布局）
