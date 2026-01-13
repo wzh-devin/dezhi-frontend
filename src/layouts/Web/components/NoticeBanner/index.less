@@ -1,0 +1,35 @@
+// 公告横幅样式
+.notice-banner {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: 8px 0;
+
+  .notice-content {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+
+    .notice-text {
+      font-size: 14px;
+      color: #ffffff;
+      font-weight: 400;
+    }
+
+    .close-icon {
+      font-size: 14px;
+      color: #ffffff;
+      cursor: pointer;
+      opacity: 0.8;
+      transition: opacity 0.3s ease;
+      position: absolute;
+      right: 24px;
+
+      &:hover {
+        opacity: 1;
+      }
+    }
+  }
+}
