@@ -6,29 +6,61 @@
  * @version 1.0.0
  * @since 1.0.0
  */
-import React, { memo, useState } from 'react'
+import { memo, useState } from 'react'
 import type { FC } from 'react'
 import styles from './index.less'
-import { SearchOutlined, SettingOutlined } from '@ant-design/icons'
-import { Layout } from 'antd'
+import {
+  HomeOutlined,
+  FolderOutlined,
+  ReadOutlined,
+  MessageOutlined,
+  FireOutlined,
+  CloudOutlined,
+  CommentOutlined,
+  LinkOutlined,
+  InfoCircleOutlined,
+  SearchOutlined,
+  BellOutlined,
+  DownOutlined,
+} from '@ant-design/icons'
+import { Layout, Avatar, Badge, Dropdown } from 'antd'
+import type { MenuProps } from 'antd'
 import { history } from 'umi'
 
 const { Header } = Layout
 
+/**
+ * 顶部导航栏组件
+ * @description 包含Logo、菜单、搜索框、通知和用户头像
+ */
 const TopNavBar: FC = () => {
   const [activeMenu, setActiveMenu] = useState<string>('home')
 
-  const menuItems = [
-    { key: 'home', label: '首页' },
-    { key: 'ai', label: 'A I' },
-    { key: 'develop', label: '开发' },
-    { key: 'software', label: '软件' },
-    { key: 'hardware', label: '硬件' },
-    { key: 'network', label: '网络' },
-    { key: 'about', label: '关于' },
+  // 文章归档下拉菜单
+  const archiveMenuItems: MenuProps['items'] = [
+    { key: 'archive', label: '归档', icon: <FolderOutlined /> },
+    { key: 'category', label: '分类', icon: <FolderOutlined /> },
+    { key: 'tag', label: '标签', icon: <FolderOutlined /> },
   ]
 
-  const handlerMenuClick = (key: string) => {
+  // 菜单项数据
+  const menuItems = [
+    { key: 'home', label: '首页', icon: <HomeOutlined /> },
+    { key: 'archive', label: '文章归档', icon: <FolderOutlined />, hasDropdown: true },
+    { key: 'column', label: '专栏', icon: <ReadOutlined /> },
+    { key: 'talk', label: '说说', icon: <MessageOutlined /> },
+    { key: 'hot', label: '热搜', icon: <FireOutlined /> },
+    { key: 'resource', label: '资源', icon: <CloudOutlined /> },
+    { key: 'message', label: '留言板', icon: <CommentOutlined /> },
+    { key: 'friend', label: '友情链接', icon: <LinkOutlined /> },
+    { key: 'about', label: '关于本站', icon: <InfoCircleOutlined />, hasDropdown: true },
+  ]
+
+  /**
+   * 处理菜单点击
+   * @param key - 菜单key
+   */
+  const handleMenuClick = (key: string): void => {
     setActiveMenu(key)
   }
 
@@ -38,37 +70,86 @@ const TopNavBar: FC = () => {
         {/* Logo */}
         <div className={styles['logo']}>
           <div className={styles['logo-icon']}>
-            <svg viewBox="0 0 100 50" className={styles['logo-svg']}>
-              <text x="5" y="35" className={styles['logo-text']}>
-                PΔ∨∠ERO
+            <svg viewBox="0 0 24 24" width="24" height="24">
+              <circle cx="12" cy="12" r="10" fill="#667eea" />
+              <text x="12" y="16" textAnchor="middle" fill="#fff" fontSize="10" fontWeight="bold">
+                N
               </text>
             </svg>
           </div>
+          <span className={styles['logo-text']}>拾壹博客</span>
         </div>
 
         {/* 菜单栏 */}
         <div className={styles['nav-menu']}>
-          {menuItems.map((item) => (
-            <div
-              key={item.key}
-              className={`${styles['menu-item']} ${
-                activeMenu === item.key ? styles['menu-item-active'] : ''
-              }`}
-              onClick={() => handlerMenuClick(item.key)}
-            >
-              {item.label}
-            </div>
-          ))}
+          {menuItems.map((item) =>
+            item.hasDropdown && item.key === 'archive' ? (
+              <Dropdown
+                key={item.key}
+                menu={{ items: archiveMenuItems }}
+                placement="bottom"
+              >
+                <div
+                  className={`${styles['menu-item']} ${
+                    activeMenu === item.key ? styles['menu-item-active'] : ''
+                  }`}
+                  onClick={() => handleMenuClick(item.key)}
+                >
+                  {item.icon}
+                  <span>{item.label}</span>
+                  <DownOutlined className={styles['dropdown-icon']} />
+                </div>
+              </Dropdown>
+            ) : item.hasDropdown && item.key === 'about' ? (
+              <Dropdown
+                key={item.key}
+                menu={{ items: [{ key: 'about-site', label: '关于本站' }] }}
+                placement="bottom"
+              >
+                <div
+                  className={`${styles['menu-item']} ${
+                    activeMenu === item.key ? styles['menu-item-active'] : ''
+                  }`}
+                  onClick={() => handleMenuClick(item.key)}
+                >
+                  {item.icon}
+                  <span>{item.label}</span>
+                  <DownOutlined className={styles['dropdown-icon']} />
+                </div>
+              </Dropdown>
+            ) : (
+              <div
+                key={item.key}
+                className={`${styles['menu-item']} ${
+                  activeMenu === item.key ? styles['menu-item-active'] : ''
+                }`}
+                onClick={() => handleMenuClick(item.key)}
+              >
+                {item.icon}
+                <span>{item.label}</span>
+              </div>
+            )
+          )}
         </div>
 
-        {/* 右侧搜索和设置 */}
+        {/* 右侧功能区 */}
         <div className={styles['nav-right']}>
-          <SearchOutlined className={styles['nav-icon']} />
-          <SettingOutlined
-            className={styles['nav-icon']}
-            onClick={() => {
-              history.push('/admin/login')
-            }}
+          {/* 搜索按钮 */}
+          <div className={styles['search-btn']}>
+            <SearchOutlined />
+            <span>搜索</span>
+          </div>
+
+          {/* 通知图标 */}
+          <Badge count={0} size="small">
+            <BellOutlined className={styles['nav-icon']} />
+          </Badge>
+
+          {/* 用户头像 */}
+          <Avatar
+            className={styles['user-avatar']}
+            src="https://file.devin.wang/dezhi/image/e091869e-6add-407a-a62e-c368c006af17.jpg"
+            onClick={() => history.push('/admin/login')}
           />
         </div>
       </div>

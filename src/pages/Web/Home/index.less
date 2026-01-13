@@ -2,213 +2,159 @@
 .home-page {
   padding: 0;
 
-  // 左侧信息栏样式
-  .left-sidebar {
-    // 作者信息卡片
-    .author-info-card {
-      border-radius: 16px;
-      margin-bottom: 24px;
-      border: 1px solid #e8e8e8;
+  // 主行容器
+  .home-row {
+    align-items: stretch;
+  }
+
+  // 右侧边栏列
+  .sidebar-col {
+    display: flex;
+    flex-direction: column;
+  }
+
+  // 右侧边栏容器
+  .sidebar-wrapper {
+    position: sticky;
+    top: 80px;
+    align-self: flex-end;
+    width: 100%;
+  }
+
+  // 主内容区样式
+  .main-content {
+    // 轮播图/Banner
+    .banner-wrapper {
+      margin-bottom: 16px;
+      border-radius: 12px;
       overflow: hidden;
 
-      :global {
-        .ant-card-body {
-          padding: 0;
-        }
-      }
-
-      .author-header {
+      .banner-item {
+        height: 300px;
+        background-size: cover;
+        background-position: center;
+        position: relative;
         display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 16px 20px;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        color: #ffffff;
-        border-radius: 16px 16px 0 0;
+        align-items: flex-end;
 
-        .author-label {
-          font-size: 14px;
-          font-weight: 500;
+        &::before {
+          content: '';
+          position: absolute;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          background: linear-gradient(to top, rgba(0, 0, 0, 0.7) 0%, transparent 50%);
         }
 
-        .author-settings {
-          font-size: 14px;
-          cursor: pointer;
-        }
-      }
+        .banner-content {
+          position: relative;
+          z-index: 1;
+          padding: 32px;
+          width: 100%;
 
-      .author-profile {
-        padding: 24px 20px;
-        text-align: center;
-
-        .author-avatar {
-          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-          font-size: 32px;
-          font-weight: bold;
-          margin-bottom: 16px;
-        }
-
-        .author-name {
-          font-size: 18px;
-          font-weight: 600;
-          color: #333;
-          margin-bottom: 12px;
-        }
-
-        .author-intro {
-          font-size: 13px;
-          color: #666;
-          line-height: 1.6;
-          margin-bottom: 16px;
-        }
-
-        .author-status {
-          margin-bottom: 16px;
-
-          .status-badge {
-            display: inline-block;
-            padding: 4px 12px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+          .banner-title {
+            font-size: 28px;
+            font-weight: 600;
             color: #ffffff;
-            border-radius: 12px;
-            font-size: 12px;
-            font-weight: 500;
+            margin-bottom: 16px;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
           }
-        }
 
-        .author-social {
-          display: flex;
-          justify-content: center;
-          gap: 16px;
-          margin-bottom: 16px;
-
-          .social-icon {
-            font-size: 20px;
-            color: #666;
-            cursor: pointer;
-            transition: all 0.3s ease;
+          .banner-btn {
+            background: #667eea;
+            border-color: #667eea;
+            border-radius: 8px;
+            height: 40px;
+            padding: 0 24px;
+            font-size: 14px;
 
             &:hover {
-              color: #667eea;
-              transform: scale(1.1);
+              background: #764ba2;
+              border-color: #764ba2;
             }
-          }
-        }
-
-        .author-more {
-          font-size: 14px;
-          color: #1890ff;
-          cursor: pointer;
-          transition: all 0.3s ease;
-
-          &:hover {
-            color: #40a9ff;
           }
         }
       }
     }
 
-    // 热门文章卡片
-    .recommend-card {
+    // 最新说说
+    .talk-card {
       border-radius: 12px;
+      margin-bottom: 16px;
       border: 1px solid #e8e8e8;
 
       :global {
-        .ant-card-head {
-          border-bottom: 1px solid #f0f0f0;
-          padding: 16px 20px;
-
-          .ant-card-head-title {
-            font-size: 16px;
-            font-weight: 600;
-            padding: 0;
-          }
-        }
-
         .ant-card-body {
-          padding: 16px 20px;
+          padding: 12px 20px;
         }
       }
 
-      .card-title {
+      .talk-content {
         display: flex;
         align-items: center;
-        gap: 8px;
-        font-size: 16px;
-        font-weight: 600;
-      }
+        gap: 12px;
 
-        .recommend-item {
+        .talk-label {
           display: flex;
-          gap: 12px;
-          margin-bottom: 16px;
-          padding: 8px;
-          border-radius: 8px;
-          cursor: pointer;
-          transition: all 0.3s ease;
-
-          &:last-child {
-            margin-bottom: 0;
-          }
-
-          &:hover {
-            background: #f5f5f5;
-            .recommend-title {
-              color: #1890ff;
-            }
-          }
-
-        .recommend-img {
-          width: 60px;
-          height: 60px;
-          border-radius: 8px;
-          object-fit: cover;
+          align-items: center;
+          gap: 6px;
+          color: #667eea;
+          font-weight: 500;
           flex-shrink: 0;
         }
 
-        .recommend-info {
+        .talk-text {
           flex: 1;
-          display: flex;
-          flex-direction: column;
-          justify-content: space-between;
+          overflow: hidden;
+          white-space: nowrap;
 
-          .recommend-title {
+          .talk-item {
             font-size: 14px;
-            color: #333;
-            line-height: 1.5;
-            margin-bottom: 8px;
-            transition: color 0.3s ease;
-            display: -webkit-box;
-            -webkit-line-clamp: 2;
-            -webkit-box-orient: vertical;
-            overflow: hidden;
-          }
-
-          .recommend-date {
-            font-size: 12px;
-            color: #999;
+            color: #666;
+            margin-right: 24px;
           }
         }
       }
     }
-  }
 
-  // 右侧内容区域样式
-  .right-content {
-    // 内容导航栏
+    // 分类导航栏
     .content-nav {
       background: #ffffff;
       border-radius: 12px;
       border: 1px solid #e8e8e8;
-      margin-bottom: 24px;
-      padding: 16px 24px;
+      margin-bottom: 16px;
+      padding: 12px 16px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+
+      .nav-arrow {
+        width: 32px;
+        height: 32px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #f5f5f5;
+        border-radius: 8px;
+        cursor: pointer;
+        color: #666;
+        flex-shrink: 0;
+        transition: all 0.3s ease;
+
+        &:hover {
+          background: #667eea;
+          color: #fff;
+        }
+      }
 
       .nav-tabs-wrapper {
-        position: relative;
+        flex: 1;
+        overflow: hidden;
 
         .nav-scroll-container {
           display: flex;
-          gap: 16px;
+          gap: 8px;
           overflow-x: auto;
           scrollbar-width: none;
 
@@ -222,17 +168,21 @@
             color: #666;
             cursor: pointer;
             white-space: nowrap;
-            border-radius: 6px;
+            border-radius: 8px;
             transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            background: #f5f5f5;
 
             &:hover {
-              color: #1890ff;
-              background: #f0f5ff;
+              color: #667eea;
+              background: rgba(102, 126, 234, 0.1);
             }
 
             &.nav-tab-active {
               color: #ffffff;
-              background: #ff6b35;
+              background: #667eea;
               font-weight: 500;
             }
           }
@@ -242,95 +192,381 @@
 
     // 文章列表
     .article-list {
-      .article-card {
-        height: 320px;
-        border-radius: 12px;
-        border: 1px solid #e8e8e8;
-        overflow: hidden;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        display: flex;
-        flex-direction: column;
+      // 样式已移至 ArticleCard 组件
+    }
 
-        &:hover {
-          border-color: #d9d9d9;
-          transform: translateY(-2px);
-          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-        }
+    // 分页
+    .pagination-wrapper {
+      display: flex;
+      justify-content: center;
+      padding: 24px 0;
 
-        :global {
-          .ant-card-body {
-            padding: 0;
-            height: 100%;
-            display: flex;
-            flex-direction: column;
+      :global {
+        .ant-pagination-item {
+          border-radius: 4px;
+          border-color: #e8e8e8;
+
+          &:hover {
+            border-color: #667eea;
+
+            a {
+              color: #667eea;
+            }
           }
-        }
 
-        .article-image-wrapper {
-          height: 200px;
-          flex-shrink: 0;
-          background-size: cover;
-          background-position: center;
-          position: relative;
+          &-active {
+            background: #667eea;
+            border-color: #667eea;
 
-          .article-overlay {
-            position: absolute;
-            top: 16px;
-            left: 16px;
+            a {
+              color: #fff;
+            }
 
-            .article-category {
-              background: rgba(0, 0, 0, 0.6);
-              border: none;
-              color: #ffffff;
-              padding: 4px 12px;
-              border-radius: 4px;
-              font-size: 12px;
+            &:hover a {
+              color: #fff;
             }
           }
         }
 
-        .article-info {
-          padding: 16px 20px 20px;
-          flex: 1;
-          display: flex;
-          flex-direction: column;
-
-          .article-meta {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 12px;
-
-            .article-tag {
-              margin: 0;
-              border-radius: 4px;
-            }
-
-            .article-date {
-              font-size: 12px;
-              color: #999;
-            }
-          }
-
-          .article-title {
-            font-size: 16px;
-            font-weight: 600;
-            color: #333;
-            line-height: 1.5;
-            margin: 0;
-            height: 48px;
-            display: -webkit-box;
-            -webkit-line-clamp: 2;
-            -webkit-box-orient: vertical;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            transition: color 0.3s ease;
+        .ant-pagination-prev,
+        .ant-pagination-next {
+          .ant-pagination-item-link {
+            border-radius: 4px;
+            border-color: #e8e8e8;
 
             &:hover {
-              color: #1890ff;
+              border-color: #667eea;
+              color: #667eea;
             }
           }
+        }
+      }
+    }
+  }
+
+  // 右侧边栏样式
+  .right-sidebar {
+    // 用户信息卡片
+    .user-card {
+      border-radius: 12px;
+      margin-bottom: 16px;
+      border: 1px solid #e8e8e8;
+      overflow: hidden;
+
+      :global {
+        .ant-card-body {
+          padding: 0;
+        }
+      }
+
+      .user-bg {
+        height: 100px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        background-image: url('https://via.placeholder.com/400x100/667eea/764ba2?text=');
+        background-size: cover;
+        background-position: center;
+      }
+
+      .user-profile {
+        text-align: center;
+        padding: 0 20px 24px;
+        margin-top: -40px;
+
+        .avatar-wrapper {
+          position: relative;
+          display: inline-block;
+          margin-bottom: 12px;
+
+          .user-avatar {
+            border: 4px solid #fff;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+          }
+
+          .online-status {
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #52c41a;
+            color: #fff;
+            font-size: 12px;
+            padding: 2px 8px;
+            border-radius: 10px;
+          }
+        }
+
+        .user-name {
+          font-size: 18px;
+          font-weight: 600;
+          color: #667eea;
+          margin-bottom: 8px;
+        }
+
+        .user-signature {
+          font-size: 13px;
+          color: #999;
+          margin-bottom: 16px;
+        }
+
+        .social-links {
+          display: flex;
+          justify-content: center;
+          gap: 12px;
+          flex-wrap: wrap;
+
+          .social-icon {
+            font-size: 18px;
+            color: #666;
+            cursor: pointer;
+            transition: all 0.3s ease;
+
+            &:hover {
+              color: #667eea;
+              transform: scale(1.1);
+            }
+          }
+
+          .social-icon-gitee,
+          .social-icon-csdn {
+            width: 18px;
+            height: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            font-weight: bold;
+            color: #fff;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+
+            &:hover {
+              transform: scale(1.1);
+            }
+          }
+
+          .social-icon-gitee {
+            background: #c71d23;
+          }
+
+          .social-icon-csdn {
+            background: #fc5531;
+          }
+        }
+      }
+    }
+
+    // 公告卡片和推荐文章卡片
+    .notice-card,
+    .recommend-card {
+      border-radius: 12px;
+      margin-bottom: 16px;
+      border: 1px solid #e8e8e8;
+
+      :global {
+        .ant-card-body {
+          padding: 16px 20px;
+        }
+      }
+
+      .card-header {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 16px;
+
+        .header-line {
+          width: 4px;
+          height: 16px;
+          background: #667eea;
+          border-radius: 2px;
+        }
+
+        .header-icon {
+          font-size: 16px;
+          color: #667eea;
+        }
+
+        .header-title {
+          font-size: 16px;
+          font-weight: 600;
+          color: #333;
+        }
+      }
+
+      .notice-content {
+        p {
+          font-size: 13px;
+          color: #666;
+          margin-bottom: 8px;
+          line-height: 1.6;
+        }
+
+        .link-green {
+          color: #52c41a;
+          cursor: pointer;
+        }
+
+        .link-blue {
+          color: #1890ff;
+          cursor: pointer;
+        }
+
+        .link-orange {
+          color: #fa8c16;
+          cursor: pointer;
+        }
+
+        .link-red {
+          color: #ff4d4f;
+          cursor: pointer;
+        }
+
+        .notice-text {
+          color: #999;
+        }
+
+        .notice-ad {
+          color: #666;
+          font-size: 12px;
+        }
+      }
+
+      .recommend-item {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 16px;
+        padding: 8px;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+
+        &:last-child {
+          margin-bottom: 0;
+        }
+
+        &:hover {
+          background: #f5f5f5;
+
+          .recommend-title {
+            color: #667eea;
+          }
+        }
+
+        .recommend-index {
+          width: 24px;
+          height: 24px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          background: #667eea;
+          color: #fff;
+          font-size: 12px;
+          font-weight: 600;
+          border-radius: 4px;
+          flex-shrink: 0;
+        }
+
+        .recommend-img {
+          width: 50px;
+          height: 50px;
+          border-radius: 6px;
+          object-fit: cover;
+          flex-shrink: 0;
+        }
+
+        .recommend-info {
+          flex: 1;
+          min-width: 0;
+        }
+
+        .recommend-title {
+          font-size: 13px;
+          color: #333;
+          line-height: 1.5;
+          transition: color 0.3s ease;
+          display: -webkit-box;
+          -webkit-line-clamp: 2;
+          -webkit-box-orient: vertical;
+          overflow: hidden;
+        }
+
+        .recommend-date {
+          font-size: 12px;
+          color: #999;
+          margin-top: 4px;
+          display: flex;
+          align-items: center;
+          gap: 4px;
+        }
+      }
+    }
+
+    // 标签云卡片
+    .tag-cloud-card {
+      border-radius: 12px;
+      margin-bottom: 16px;
+      border: 1px solid #e8e8e8;
+
+      :global {
+        .ant-card-body {
+          padding: 16px 20px;
+        }
+      }
+
+      .card-header {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 16px;
+
+        .header-line {
+          width: 4px;
+          height: 16px;
+          background: #667eea;
+          border-radius: 2px;
+        }
+
+        .header-icon {
+          font-size: 16px;
+          color: #667eea;
+        }
+
+        .header-title {
+          font-size: 16px;
+          font-weight: 600;
+          color: #333;
+        }
+      }
+
+      .tag-cloud-content {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        line-height: 2;
+
+        .tag-item {
+          cursor: pointer;
+          transition: all 0.3s ease;
+          color: #666;
+
+          &:hover {
+            color: #667eea;
+          }
+        }
+
+        .tag-small {
+          font-size: 12px;
+        }
+
+        .tag-medium {
+          font-size: 14px;
+        }
+
+        .tag-large {
+          font-size: 18px;
+          font-weight: 500;
         }
       }
     }

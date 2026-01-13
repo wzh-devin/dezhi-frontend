@@ -12,12 +12,13 @@ import { Layout } from 'antd'
 import { Outlet } from 'umi'
 import styles from './index.less'
 import TopNavBar from '@/layouts/Web/components/TopNavBar'
-import HotModule from '@/layouts/Web/components/HotModule'
+import NoticeBanner from '@/layouts/Web/components/NoticeBanner'
 
 const { Content } = Layout
 
 /**
  * 主布局组件
+ * @description 博客网站主布局，包含导航栏、公告和内容区
  */
 const WebLayout: FC = () => {
   return (
@@ -25,12 +26,11 @@ const WebLayout: FC = () => {
       {/* 顶部导航栏 */}
       <TopNavBar />
 
+      {/* 公告横幅 */}
+      <NoticeBanner />
+
       {/* 主内容区域 */}
       <Content className={styles['main-content']}>
-        {/* Hot模块 */}
-        <HotModule />
-
-        {/* 页面内容 */}
         <div className={styles['page-content']}>
           <Outlet />
         </div>
